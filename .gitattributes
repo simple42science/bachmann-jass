@@ -1,0 +1,13 @@
+# Einheitliche Zeilenenden, damit Golden-Tests und Fixtures unter Windows und in der CI identisch sind.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.png binary
+*.webp binary
+*.jpg binary
+*.ttf binary
+*.otf binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
