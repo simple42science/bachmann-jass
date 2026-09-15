@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Analyse, Tests und Web-Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Abhaengigkeiten installieren
+        run: |
+          flutter pub get
+          cd packages/jass_engine && dart pub get
+
+      - name: Formatierung pruefen
+        run: dart format --output=none --set-exit-if-changed lib test packages/jass_engine
+
+      - name: Code analysieren
+        run: |
+          flutter analyze
+          cd packages/jass_engine && dart analyze --fatal-infos
+
+      - name: Engine testen (Dart-VM)
+        working-directory: packages/jass_engine
+        run: dart test
+
+      - name: Engine testen (JavaScript-Zahlen ueber Node)
+        working-directory: packages/jass_engine
+        run: dart test -p node
+
+      - name: App testen
+        run: flutter test
+
+      - name: Web-Version bauen
+        run: flutter build web --release

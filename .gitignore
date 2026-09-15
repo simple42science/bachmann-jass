@@ -43,3 +43,6 @@ app.*.map.json
 *.keystore
 key.properties
 .env
+
+# Lockfile nur fuer die App, nicht fuer das Engine-Paket
+packages/jass_engine/pubspec.lock
