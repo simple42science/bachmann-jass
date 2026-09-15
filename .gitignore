@@ -49,3 +49,6 @@ packages/jass_engine/pubspec.lock
 
 # Von gen-l10n erzeugt (flutter pub get)
 lib/l10n/generated/
+
+# Kotlin-Build-Cache
+/android/.kotlin/

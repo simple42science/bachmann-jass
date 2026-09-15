@@ -1,6 +1,6 @@
 # Bachmann Jass – Umsetzungsplan Flutter
 
-Stand: 15.09.2026, Phase 1 abgeschlossen · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
+Stand: 15.09.2026, Meilensteine M1 und M2 erreicht · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
 
 Die bestehende Jass-Web-App wird als Flutter-App neu aufgebaut. Sie soll **dynamischer** werden (Animationen, Sound, Haptik), **besser steuerbar** (Einstellungen, Hausregeln, Debug-Werkzeuge) und ein **eigenes, hochwertiges Design** bekommen. Regeln und Computergegner werden nicht neu erfunden: Sie werden 1:1 übernommen und per Test gegen das Original abgesichert.
 
@@ -56,8 +56,8 @@ Umfang: **S** = wenige Stunden · **M** = etwa 1–2 Arbeitstage · **L** = mehr
 | 3 | Die Namen der Computergegner sind fest verdrahtet (Yannick, Papsli, Gusti) | `game-engine.js:387` | ✅ konfigurierbar |
 | 4 | Die Handsortierung ignoriert die Spielart; das Umsortieren nach der Trumpfwahl bewirkt nichts | `game-engine.js:352`, `:1072` | ✅ `sortHandForDisplay` für die Anzeige: Trumpf zuerst, bei Une-Ufe umgekehrt. Die Engine sortiert wie bisher, weil die KI davon abhängt |
 | 5 | Das KI-Gebot im Bieterjass „wie im Schieber" rechnet nur mit Trumpffarben, obwohl die KI danach Obe-Abe, Une-Ufe oder Slalom wählen darf | `ai.js:169` | ❌ gemessen und verworfen: Mit allen Spielarten bietet die KI zu hoch (Siegquote 27 statt 33 %) |
-| 6 | Die Stöck-Punkte stehen in zwei UI-Texten fest als 20, statt aus dem Regelwerk zu kommen | `app.js:965`, `:1152` | aus dem `RuleSet` |
-| 7 | „Home" bricht die Partie ab und löscht den Speicherstand; eine Pause gibt es nicht | `app.js:1614` | Pause-Menü; Abbrechen als eigene Aktion |
+| 6 | Die Stöck-Punkte stehen in zwei UI-Texten fest als 20, statt aus dem Regelwerk zu kommen | `app.js:965`, `:1152` | ✅ aus dem `RuleSet` |
+| 7 | „Home" bricht die Partie ab und löscht den Speicherstand; eine Pause gibt es nicht | `app.js:1614` | ✅ Home behält die Partie (Fortsetzen auf dem Homescreen), Pause-Knopf; eine neue Partie fragt nach, bevor sie die gespeicherte verwirft |
 | 8 | Nur der erste Stich lässt sich nochmals ansehen; gegnerische Weise erscheinen nur als Logtext | `app.js:529`, `game-engine.js:966` | einstellbarer Stich-Rückblick, Weis-Karten kurz aufdecken |
 | 9 | Der Schieber endet erst am Rundenende, auch wenn das Ziel mitten in der Runde erreicht ist | `game-engine.js:1474` | optionale Regel „Bedanken" |
 | 10 | Die Schriften kommen übers Netz von Google Fonts; offline fällt die App auf die Systemschrift zurück | `index.html:16` | Schriften in die App einbetten |
@@ -144,26 +144,26 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | 1.3 | Reproduzierbarer Zufall | 🟢 | S | 1.1 | ✅ erledigt |
 | 1.4 | Tests und Paritätsprüfung gegen die Web-App | 🟢 | M | 1.2, 1.3 | ✅ erledigt |
 | 1.5 | Computergegner portieren | 🟢 | M | 1.2 | ✅ erledigt |
-| 2.1 | GameController und Spielablauf | 🟢 | M | 1.2 | offen |
-| 2.2 | Speicherstand und Einstellungen | 🟢 | S | 2.1 | offen |
-| 2.3 | Navigation und Screen-Gerüst | 🟢 | S | 0.1 | offen |
-| 2.4 | Texte und Lokalisierung | 🟡 | S | 1.2 | offen |
+| 2.1 | GameController und Spielablauf | 🟢 | M | 1.2 | ✅ erledigt |
+| 2.2 | Speicherstand und Einstellungen | 🟢 | S | 2.1 | ✅ erledigt |
+| 2.3 | Navigation und Screen-Gerüst | 🟢 | S | 0.1 | ✅ erledigt |
+| 2.4 | Texte und Lokalisierung | 🟡 | S | 1.2 | ✅ erledigt (Deutsch); Mundart offen |
 | 3.1 | Designrichtung | 🟡 | M | 0.3 | offen |
 | 3.2 | Design-System und Theme | 🟢 | M | 3.1 | offen |
-| 3.3 | Karten-Assets | 🟢 | S | – | offen, Bilder freigegeben (D6) |
-| 3.4 | App-Icon und Splash | 🟡 | S | 3.1 | offen |
+| 3.3 | Karten-Assets | 🟢 | S | – | ✅ erledigt; Quelle/Lizenz nachtragen |
+| 3.4 | App-Icon und Splash | 🟡 | S | 3.1 | teilweise: bisheriges Icon übernommen |
 | 3.5 | Sound und Haptik | 🟡 | S | 4.3 | offen |
-| 4.1 | Adaptives Tisch-Layout | 🟢 | L | 2.1 | offen |
-| 4.2 | Karten und Hand | 🟢 | M | 3.3, 4.1 | offen |
+| 4.1 | Adaptives Tisch-Layout | 🟢 | L | 2.1 | ✅ erledigt |
+| 4.2 | Karten und Hand | 🟢 | M | 3.3, 4.1 | ✅ erledigt (Tippen); Ziehen später |
 | 4.3 | Animationen | 🟢 | L | 4.1, 4.2 | offen |
-| 4.4 | Bedien-Panels | 🟢 | M | 4.1 | offen |
+| 4.4 | Bedien-Panels | 🟢 | M | 4.1 | ✅ erledigt |
 | 4.5 | Jasstafel und Verlauf | 🟢 | M | 2.1 | offen |
 | 4.6 | Regeln und Tutorial | 🟡 | M | 4.4 | offen |
 | 5.1 | Spieler-Einstellungen | 🟢 | M | 2.2 | offen |
 | 5.2 | Hausregel-Editor | 🟡 | M | 1.2, 2.2 | offen |
 | 5.3 | Gegner und Profile | 🟡 | S | 2.2 | offen |
 | 5.4 | Statistik | 🟢 | S | 2.2 | offen |
-| 5.5 | Debug-Menü | 🟢 | S | 2.1 | offen |
+| 5.5 | Debug-Menü | 🟢 | S | 2.1 | teilweise: Demo-Start per URL |
 | 6.1 | Automatisierte Tests | 🟢 | M | Phase 4 | offen |
 | 6.2 | Performance und Barrierefreiheit | 🟡 | M | Phase 4 | offen |
 | 6.3 | Spieltests | 🔴 | M | M3 | offen |
@@ -258,23 +258,27 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Er nimmt Eingaben entgegen, lässt KI-Spieler mit Tempo-Verzögerung ziehen und reicht Events an die Animations-Warteschlange weiter.
 - Pause, Fortsetzen und „Tippen überspringt die Wartezeit" liegen zentral an einer Stelle.
 - **Fertig, wenn** eine Partie in einem Test mit simulierter Uhr komplett durchläuft.
+- **Stand:** ✅ erledigt. `GameController` (Riverpod) mit Wartezeiten wie in der Web-App, Tempo aus den Einstellungen, Tipp überspringt die Wartezeit, Pause auch automatisch, wenn die App in den Hintergrund geht. Getestet mit `fake_async`.
 
 #### AP 2.2 Speicherstand und Einstellungen · 🟢 Claude · S
 
 - Automatisch speichern nach jeder Aktion und beim Wegschalten der App (`AppLifecycleState.paused`).
 - Speicherstand mit Schema-Version; Einstellungen über `shared_preferences`.
 - „Home" pausiert und behält die Partie. Abbrechen wird eine eigene, bestätigte Aktion (Befund 7).
+- **Stand:** ✅ erledigt. Speicherstand und Einstellungen über `shared_preferences`, gesichert nach jeder Aktion; unlesbare Stände werden verworfen statt die App zu blockieren.
 
 #### AP 2.3 Navigation und Screen-Gerüst · 🟢 Claude · S
 
 - `go_router` mit Home, Neue Partie, Tisch, Jasstafel, Regeln, Einstellungen und Statistik.
 - Im Web mit sprechenden URLs und funktionierendem Browser-Zurück.
+- **Stand:** ✅ erledigt für Home, Neue Partie und Tisch (`go_router`). Nach einem Neuladen im Browser führt der Tisch zum Homescreen mit „Partie fortsetzen“.
 
 #### AP 2.4 Texte und Lokalisierung · 🟡 Claude + Input · S
 
 - Alle Texte in ARB-Dateien (`gen-l10n`), Basis ist Hochdeutsch in Schweizer Schreibweise (ohne ß).
 - Events werden erst in der UI zu Sätzen, etwa „Papsli sagt Stöck an".
 - 🟡 Optional ein Mundart-Modus. Die Ausdrücke dafür lieferst du.
+- **Stand:** ✅ Alle Texte liegen in `lib/l10n/app_de.arb` (gen-l10n). Events werden erst in der App zu Sätzen (`GameTexts`).
 
 ### Phase 3 – Design
 
@@ -299,12 +303,14 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - 36 PNG mit zusammen 52 MB nach WebP konvertieren. Gemessen: 1,8 MB bei 480 px Breite, 2,9 MB bei 720 px. Beide Grössen als 1×/2×-Varianten ablegen.
 - Das Konvertierungsskript liegt unter `tool/`, damit der Schritt reproduzierbar bleibt.
 - Neuer Kartenrücken als Vektorgrafik, zum Beispiel mit „B"-Monogramm. Heute ist der Rücken nur ein CSS-Streifenmuster.
-- 🔴 **Rechte klären:** Woher stammt das Kartenset `jasskarten_deck_png_sharper`, und darf es in einer Store-App verwendet werden? Falls nicht: ein lizenziertes Set kaufen oder ein eigenes Deck gestalten lassen.
+- ✅ Rechte: laut D6 Open Source. Quelle und Lizenztext sind in `assets/cards/README.md` noch nachzutragen.
+- **Stand:** ✅ 36 Karten als WebP, 720 px breit, zusammen 2,9 MB (`tool/convert_cards.py`). Die App dekodiert nur in der gebrauchten Grösse. Der Kartenrücken ist vorerst gemalt (Streifen wie in der Web-App); das Monogramm folgt mit AP 3.2.
 
 #### AP 3.4 App-Icon und Splash · 🟡 Claude + Input · S
 
 - Aus dem bestehenden `app-icon.svg` oder dem neuen Design mit `flutter_launcher_icons` und `flutter_native_splash` erzeugen, inklusive Android-Adaptive-Icon.
 - 🟡 Abnahme durch dich.
+- **Stand:** teilweise. Das bisherige App-Icon ersetzt vorerst das Flutter-Logo für Web und Android (`tool/make_icons.py`). Splash und neues Icon folgen nach der Designrichtung.
 
 #### AP 3.5 Sound und Haptik · 🟡 Claude + Input · S
 
@@ -318,6 +324,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Ein Geometrie-Modell berechnet Sitzplätze, Kartengrössen, Stichmitte und Stapel aus der verfügbaren Fläche. Es deckt 3er- und 4er-Tisch, Hoch- und Querformat sowie Handy bis Desktop ab und ersetzt die vier CSS-Breakpoints samt Einzelkorrekturen.
 - Safe Areas (Notch, Home-Indicator) sind von Anfang an berücksichtigt.
 - **Fertig, wenn** Golden-Screenshots in mindestens sechs Grössen, von iPhone SE bis 1440 px Desktop und jeweils für 3er- und 4er-Tisch, keine Überlappungen zeigen.
+- **Stand:** ✅ `TableGeometry` rechnet Hand, Sitzplätze, Stichmitte und Panelbereich aus der Fläche. Geprüft per Test in sechs Grössen für beide Tische (keine Überlappung, kein Überlauf) und per Screenshot der Web-Version in vier Grössen (`docs/screenshots/`). Golden-Tests folgen mit AP 6.1. Landscape auf dem Handy ist eng, aber vollständig.
 
 #### AP 4.2 Karten und Hand · 🟢 Claude · M
 
@@ -325,6 +332,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Der Fächer passt sich an 9 oder 12 Karten an.
 - Ausspielen per Tippen, Doppeltippen oder Ziehen auf den Tisch, wählbar in den Einstellungen.
 - Die Busdriver-Widgets `reveal_flip_card.dart` und `visual_card_stack.dart` als möglichen Ausgangspunkt prüfen.
+- **Stand:** ✅ Fächer mit Neigung wie in der Web-App, spielbare Karten angehoben, gesperrte gedimmt; ein Tipp auf eine gesperrte Karte nennt den Grund. Ausspielen per Tippen; Ziehen und Bestätigen kommen mit AP 5.1.
 
 #### AP 4.3 Animationen · 🟢 Claude · L
 
@@ -338,6 +346,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Bieten mit Wert-Chips statt Dropdown; das aktuelle Höchstgebot ist gut sichtbar.
 - Spielartwahl als grosse Kacheln mit Farbsymbol und Multiplikator; Schieben ist eine eigene Kachel.
 - Weis-Auswahl mit Kartenvorschau. Rundenabrechnung und Spielende erscheinen als Bottom-Sheets.
+- **Stand:** ✅ Gebot-Chips, Spielart-Kacheln mit Puur als Symbol und Multiplikator, Schieben, Weis-Liste mit Stöck-Hinweis, Rundenabrechnung und Rangliste als Panel über dem Tisch.
 
 #### AP 4.5 Jasstafel und Verlauf · 🟢 Claude · M
 
@@ -379,6 +388,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 #### AP 5.5 Debug-Menü · 🟢 Claude · S
 
 - Nur in Debug-Builds: Seed setzen, Gegnerkarten aufdecken, Handverteilung vorgeben (zum Beispiel für ein Stöck-Szenario), KI gegen KI zuschauen, Partie aus Seed und Aktionen nachspielen.
+- **Stand:** teilweise. Builds mit `--dart-define=JASS_DEMO=true` starten über die URL eine reproduzierbare Situation (`?demo=schieber&seed=5&moves=4`), genutzt vom Screenshot-Werkzeug.
 
 ### Phase 6 – Qualität
 
@@ -449,13 +459,13 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | Meilenstein | Enthält | Ergebnis |
 | --- | --- | --- |
 | **M1 Engine-Parität** | Phase 1 | Dart-Engine und KI spielen nachweislich wie die Web-App – ✅ erreicht am 15.09.2026 |
-| **M2 Spielbarer Prototyp** | 2.1–2.3, 4.1, 4.2, 4.4 (schlichtes Design) | Schieber und Bieterjass komplett spielbar auf Android und Web |
+| **M2 Spielbarer Prototyp** | 2.1–2.3, 4.1, 4.2, 4.4 (schlichtes Design) | Schieber und Bieterjass komplett spielbar auf Android und Web – ✅ erreicht am 15.09.2026 (Web per Screenshot geprüft, Android nur gebaut) |
 | **M3 Look & Feel** | Phase 3, 4.3, 4.5, 4.6 | neues Design, Animationen, Jasstafel |
 | **M4 Feature-komplett** | Phase 5, 6.1, 6.2 | Einstellungen, Hausregeln, Statistik, Tests |
 | **M5 Version 1.0** | 6.3, Phase 7 | im Web und in den Stores |
 
-**Nächster Schritt (M2):** AP 2.1 → 2.3 → 4.1 → 4.4 → 4.2 im schlichten Design, dazu AP 3.3 (Karten konvertieren) und parallel AP 3.1 (Design-Mockups).
-**Bei dir:** Android-Handy anschliessen (AP 0.2), Quelle und Lizenz der Kartenbilder nennen, D3 entscheiden.
+**Nächster Schritt (M3):** AP 3.1 Designrichtung (drei Mockups zur Wahl), danach 3.2 Design-System, 4.3 Animationen, 4.5 Jasstafel und 4.6 Regeln.
+**Bei dir:** Prototyp auf dem Handy und im Browser spielen und Rückmeldung geben, Android-Handy anschliessen (AP 0.2), Quelle und Lizenz der Kartenbilder nennen, D3 entscheiden.
 
 ---
 
