@@ -174,7 +174,7 @@ GameState _resolveBieterRound(GameState state) {
 GameState _resolveSchieberRound(GameState state) {
   final multiplier = state.roundMultiplier;
 
-  final results = [for (final team in state.teams) _teamResult(state, team.id, multiplier)];
+  final results = [for (final team in state.teams) schieberTeamResult(state, team.id)];
   final resultByTeam = {for (final result in results) result.teamId: result};
   final teams = [
     for (final team in state.teams)
@@ -212,28 +212,6 @@ GameState _resolveSchieberRound(GameState state) {
     phase: rankedTeams.first.totalScore >= state.targetScore
         ? GamePhase.gameOver
         : GamePhase.roundEnd,
-  );
-}
-
-TeamRoundResult _teamResult(GameState state, int teamId, int multiplier) {
-  final members = state.players.where((player) => player.teamId == teamId);
-  final trickPointsWon = members.fold(0, (sum, player) => sum + player.pointsWon);
-  final tricksWon = members.fold(0, (sum, player) => sum + player.tricksWon);
-  final weisPoints = state.teamWeisScores[teamId];
-  final stoeckPoints = state.teamStoeckPoints[teamId];
-  // Match: ein Team holt alle Stiche der Runde.
-  final matchPoints = tricksWon == state.variant.handSize ? state.rules.matchBonus : 0;
-  final basePoints = trickPointsWon + weisPoints + stoeckPoints + matchPoints;
-
-  return TeamRoundResult(
-    teamId: teamId,
-    trickPoints: trickPointsWon,
-    weisPoints: weisPoints,
-    stoeckPoints: stoeckPoints,
-    matchPoints: matchPoints,
-    basePoints: basePoints,
-    roundPoints: basePoints * multiplier,
-    tricksWon: tricksWon,
   );
 }
 

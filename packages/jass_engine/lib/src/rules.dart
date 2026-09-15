@@ -1,6 +1,7 @@
 import 'cards.dart';
 import 'game_state.dart';
 import 'model.dart';
+import 'round.dart';
 
 /// Bedienpflicht nach den offiziellen Schweizer Jassregeln, fuer alle Jassarten gleich:
 ///
@@ -180,6 +181,30 @@ bool sameSide(GameState state, int first, int second) {
     return (first == state.soloPlayer) == (second == state.soloPlayer);
   }
   return state.players[first].teamId == state.players[second].teamId;
+}
+
+/// Punkte eines Schieber-Teams in der laufenden Runde, auch vor dem Rundenende
+/// (zum Beispiel fuer die Live-Anzeige).
+TeamRoundResult schieberTeamResult(GameState state, int teamId) {
+  final members = state.players.where((player) => player.teamId == teamId);
+  final trickPointsWon = members.fold(0, (sum, player) => sum + player.pointsWon);
+  final tricksWon = members.fold(0, (sum, player) => sum + player.tricksWon);
+  final weisPoints = state.teamWeisScores[teamId];
+  final stoeckPoints = state.teamStoeckPoints[teamId];
+  // Match: ein Team holt alle Stiche der Runde.
+  final matchPoints = tricksWon == state.variant.handSize ? state.rules.matchBonus : 0;
+  final basePoints = trickPointsWon + weisPoints + stoeckPoints + matchPoints;
+
+  return TeamRoundResult(
+    teamId: teamId,
+    trickPoints: trickPointsWon,
+    weisPoints: weisPoints,
+    stoeckPoints: stoeckPoints,
+    matchPoints: matchPoints,
+    basePoints: basePoints,
+    roundPoints: basePoints * state.roundMultiplier,
+    tricksWon: tricksWon,
+  );
 }
 
 JassCard? _highestTrump(List<TrickEntry> trick, RoundMode trickMode) {
