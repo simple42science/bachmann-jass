@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #d52b1e; } a:hover { color: #a81f14; }
+    .row { display: grid; grid-template-columns: 30px 1fr 58px 58px; gap: 8px; align-items: center; padding: 10px 14px; border-radius: 14px; background: #fff; border: 2px solid #14301f; box-shadow: 3px 3px 0 #14301f; font-variant-numeric: tabular-nums; }
+    .num { text-align: right; font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-weight: 800; font-size: 18px; }
+    .tag { display: inline-flex; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; background: #d52b1e; }
+    .nr { width: 26px; height: 26px; border-radius: 50%; background: #f2c230; border: 2px solid #14301f; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; }
+  </style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #f6efe1; color: #14301f;">
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 66px; display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box; background: #d52b1e; border-bottom: 3px solid #14301f;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+    <div style="font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-weight: 800; font-size: 26px; color: #fff; text-shadow: 2px 2px 0 #14301f;">Jasstafel</div>
+    <div style="flex-grow: 1;"></div>
+    <div style="padding: 4px 10px; border-radius: 999px; background: #fff; border: 2px solid #14301f; font-size: 12px; font-weight: 800;">Ziel 1000</div>
+  </div>
+
+  <div style="position: absolute; left: 16px; top: 84px; width: 358px; display: flex; gap: 12px;">
+    <div style="flex-grow: 1; padding: 14px 16px; border-radius: 18px; background: #f2c230; border: 3px solid #14301f; box-shadow: 5px 6px 0 #14301f;">
+      <div style="font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;">Papsli &amp; Du</div>
+      <div style="font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-size: 44px; font-weight: 800; line-height: 1.05;">676</div>
+    </div>
+    <div style="flex-grow: 1; padding: 14px 16px; border-radius: 18px; background: #7cc6e6; border: 3px solid #14301f; box-shadow: 5px 6px 0 #14301f;">
+      <div style="font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;">Yannick &amp; Gusti</div>
+      <div style="font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-size: 44px; font-weight: 800; line-height: 1.05;">737</div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 16px; top: 206px; width: 358px; height: 14px; border-radius: 7px; background: #fff; border: 2px solid #14301f; overflow: hidden;">
+    <div style="width: 68%; height: 14px; background: repeating-linear-gradient(-45deg, #f2c230 0 8px, #e5b21c 8px 16px);"></div>
+  </div>
+  <div style="position: absolute; left: 16px; top: 228px; font-size: 12px; font-weight: 800; color: #1f7a4d;">Noch 324 Punkte bis zum Gipfel!</div>
+
+  <div style="position: absolute; left: 16px; top: 262px; width: 358px; display: flex; flex-direction: column; gap: 10px;">
+    <div class="row"><div class="nr">1</div><div style="display: flex; align-items: center; gap: 8px; font-weight: 800;">Rosen <span class="tag">Weis</span></div><div class="num" style="color: #d52b1e;">58</div><div class="num">99</div></div>
+    <div class="row"><div class="nr">2</div><div style="font-weight: 800;">Schilten <span style="color: #d52b1e;">×2</span></div><div class="num" style="color: #d52b1e;">214</div><div class="num">100</div></div>
+    <div class="row"><div class="nr">3</div><div style="font-weight: 800;">Obe-Abe <span style="color: #d52b1e;">×3</span></div><div class="num" style="color: #d52b1e;">150</div><div class="num">321</div></div>
+    <div class="row"><div class="nr">4</div><div style="display: flex; align-items: center; gap: 8px; font-weight: 800;">Eicheln <span class="tag">Stöck</span></div><div class="num" style="color: #d52b1e;">74</div><div class="num">83</div></div>
+    <div class="row" style="background: #f2c230;"><div class="nr" style="background: #fff;">5</div><div style="display: flex; align-items: center; gap: 8px; font-weight: 800;">Schellen <span style="color: #d52b1e;">×2</span><span class="tag" style="background: #1f7a4d;">Match</span></div><div class="num" style="color: #d52b1e;">180</div><div class="num">134</div></div>
+  </div>
+
+  <div style="position: absolute; left: 16px; top: 612px; width: 358px; padding: 12px 16px; box-sizing: border-box; border-radius: 14px; background: #fff; border: 2px dashed #14301f; font-size: 13px; font-weight: 600; line-height: 1.5;">
+    <span style="font-weight: 800; color: #d52b1e;">Runde 6</span> läuft: Papsli hat geschoben, du hast Rosen gewählt. Gusti spielt aus.
+  </div>
+
+  <div style="position: absolute; left: 0; bottom: 0; width: 390px; height: 100px; display: flex; align-items: center; justify-content: center;">
+    <div style="padding: 14px 32px; border-radius: 999px; background: #1f7a4d; color: #fff; font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-weight: 800; font-size: 16px; border: 3px solid #14301f; box-shadow: 4px 5px 0 #14301f;">Zurück zum Tisch</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

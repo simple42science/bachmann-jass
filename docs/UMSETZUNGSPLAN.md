@@ -138,7 +138,7 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | --- | --- | --- | --- | --- | --- |
 | 0.1 | Repo und Projektgerüst | 🟢 | S | – | ✅ erledigt |
 | 0.2 | Entwicklungsumgebung | 🟡 | S | – | teilweise: Handy fehlt |
-| 0.3 | Grundsatzentscheide | 🔴 | S | – | teilweise: D3 offen |
+| 0.3 | Grundsatzentscheide | 🔴 | S | – | ✅ erledigt (D1, D2, D3, D6) |
 | 1.1 | Datenmodell | 🟢 | M | 0.1 | ✅ erledigt |
 | 1.2 | Regel-Engine portieren | 🟢 | L | 1.1 | ✅ erledigt |
 | 1.3 | Reproduzierbarer Zufall | 🟢 | S | 1.1 | ✅ erledigt |
@@ -196,7 +196,7 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 
 #### AP 0.3 Grundsatzentscheide · 🔴 Deine Hilfe · S
 
-- ✅ D1, D2 und D6 entschieden. Offen ist noch D3 (Monetarisierung).
+- ✅ D1, D2, D3 und D6 entschieden.
 - **Fertig, wenn** die Entscheide in Kapitel 4 eingetragen sind.
 
 ### Phase 1 – Spielkern in Dart
@@ -445,7 +445,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | --- | --- | --- | --- | --- |
 | D1 | Zielplattformen und Reihenfolge | Android und Web zuerst, iOS danach | AP 0.1 | ✅ Android und Web |
 | D2 | App-ID | `com.simple42science.bachmannjass`, passend zu Busdriver. Nach der ersten Store-Veröffentlichung nicht mehr änderbar | AP 0.1, spätestens 7.2 | ✅ `simple42science.bachmannjass` |
-| D3 | Monetarisierung | keine – wie bisher offline und ohne Datenerhebung | AP 3.1 | offen |
+| D3 | Monetarisierung | keine – wie bisher offline und ohne Datenerhebung | AP 3.1 | ✅ keine |
 | D4 | Designrichtung | nach den Mockups aus AP 3.1 | AP 3.2 | offen |
 | D5 | Standard-Hausregeln | heutige Werte der Web-App als Preset „Bachmann" | AP 5.2 | offen |
 | D6 | Rechte an den Kartenbildern | klären, bevor Store-Screenshots entstehen | AP 7.2 | ✅ nutzbar (Open Source); Quelle und Lizenz im Repo vermerken |
@@ -465,7 +465,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | **M5 Version 1.0** | 6.3, Phase 7 | im Web und in den Stores |
 
 **Nächster Schritt (M3):** AP 3.1 Designrichtung (drei Mockups zur Wahl), danach 3.2 Design-System, 4.3 Animationen, 4.5 Jasstafel und 4.6 Regeln.
-**Bei dir:** Prototyp auf dem Handy und im Browser spielen und Rückmeldung geben, Android-Handy anschliessen (AP 0.2), Quelle und Lizenz der Kartenbilder nennen, D3 entscheiden.
+**Bei dir:** Prototyp auf dem Handy und im Browser spielen und Rückmeldung geben, Android-Handy anschliessen (AP 0.2), Quelle und Lizenz der Kartenbilder nennen.
 
 ---
 

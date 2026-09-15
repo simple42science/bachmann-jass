@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #d52b1e; } a:hover { color: #a81f14; }
+    .card { position: absolute; width: 72px; height: 112px; border-radius: 8px; overflow: hidden; box-shadow: 3px 4px 0 #14301f; transform-origin: 50% 100%; }
+    .card img { width: 100%; height: 100%; display: block; }
+    .dim::after { content: ""; position: absolute; inset: 0; background: rgba(246,239,225,0.55); }
+    .back { position: absolute; width: 28px; height: 44px; border-radius: 5px; background:
+      radial-gradient(circle at 50% 50%, #fff 0 1.6px, transparent 1.7px) 0 0 / 7px 7px, #d52b1e;
+      box-shadow: inset 0 0 0 2px #fff, 2px 2px 0 #14301f; }
+    .trick { position: absolute; width: 64px; height: 100px; border-radius: 7px; overflow: hidden; box-shadow: 3px 4px 0 #14301f; }
+    .trick img { width: 100%; height: 100%; display: block; }
+    .chip { display: flex; align-items: center; gap: 6px; white-space: nowrap; padding: 5px 12px; border-radius: 999px; background: #fff; color: #14301f; font-weight: 800; font-size: 13px; box-shadow: 2px 3px 0 #14301f; border: 2px solid #14301f; }
+  </style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #f6efe1; color: #14301f;">
+
+  <!-- Kopfzeile -->
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 66px; display: flex; align-items: center; gap: 8px; padding: 0 12px; box-sizing: border-box; background: #d52b1e; border-bottom: 3px solid #14301f;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path></svg>
+    <div class="chip" style="background: #f2c230;"><span style="font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-size: 20px; font-weight: 800;">280</span><span style="font-size: 12px;">Papsli &amp; Du</span></div>
+    <div class="chip"><span style="font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-size: 20px; font-weight: 800;">114</span><span style="font-size: 12px;">Yannick &amp; Gusti</span></div>
+    <div style="flex-grow: 1;"></div>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M9 5v14M15 5v14"></path></svg>
+  </div>
+
+  <!-- Tisch: flache Form mit dickem Rand -->
+  <div style="position: absolute; left: 14px; top: 84px; width: 362px; height: 560px; border-radius: 180px 180px 36px 36px; background: #1f7a4d; border: 4px solid #14301f; box-shadow: 6px 8px 0 #14301f;"></div>
+  <!-- Berge als Silhouette -->
+  <svg style="position: absolute; left: 30px; top: 96px;" width="330" height="90" viewBox="0 0 330 90" fill="none"><path d="M0 90 60 34 96 62 150 12 200 58 236 30 300 90Z" fill="#2c9c63"></path><path d="M150 12l-14 20 10-3 6 8 8-8 8 3z" fill="#f6efe1"></path><path d="M60 34l-8 12 6-2 4 5 5-5 5 2z" fill="#f6efe1"></path></svg>
+
+  <!-- Oberer Sitz -->
+  <div style="position: absolute; left: 0; top: 160px; width: 390px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div class="chip">Papsli <span style="font-weight: 600; color: #d52b1e; font-size: 11px;">Partner · Geber</span></div>
+    <div style="position: relative; width: 110px; height: 52px;">
+      <div class="back" style="left: 0; top: 4px; transform: rotate(196deg);"></div>
+      <div class="back" style="left: 16px; top: 1px; transform: rotate(188deg);"></div>
+      <div class="back" style="left: 32px; top: 0; transform: rotate(182deg);"></div>
+      <div class="back" style="left: 48px; top: 0; transform: rotate(178deg);"></div>
+      <div class="back" style="left: 64px; top: 1px; transform: rotate(172deg);"></div>
+      <div class="back" style="left: 80px; top: 4px; transform: rotate(164deg);"></div>
+    </div>
+  </div>
+
+  <!-- Seiten -->
+  <div style="position: absolute; left: 26px; top: 370px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div class="chip" style="font-size: 12px;">Yannick</div>
+    <div style="position: relative; width: 48px; height: 118px;">
+      <div class="back" style="left: 2px; top: 0; transform: rotate(84deg);"></div>
+      <div class="back" style="left: 2px; top: 14px; transform: rotate(88deg);"></div>
+      <div class="back" style="left: 2px; top: 28px; transform: rotate(92deg);"></div>
+      <div class="back" style="left: 2px; top: 42px; transform: rotate(96deg);"></div>
+      <div class="back" style="left: 2px; top: 56px; transform: rotate(100deg);"></div>
+      <div class="back" style="left: 2px; top: 70px; transform: rotate(104deg);"></div>
+    </div>
+  </div>
+  <div style="position: absolute; right: 26px; top: 370px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div class="chip" style="font-size: 12px; background: #f2c230;">Gusti</div>
+    <div style="position: relative; width: 48px; height: 118px;">
+      <div class="back" style="left: 2px; top: 0; transform: rotate(-84deg);"></div>
+      <div class="back" style="left: 2px; top: 14px; transform: rotate(-88deg);"></div>
+      <div class="back" style="left: 2px; top: 28px; transform: rotate(-92deg);"></div>
+      <div class="back" style="left: 2px; top: 42px; transform: rotate(-96deg);"></div>
+      <div class="back" style="left: 2px; top: 56px; transform: rotate(-100deg);"></div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div style="position: absolute; left: 0; top: 246px; width: 390px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+    <div class="chip" style="background: #d52b1e; color: #fff; font-size: 12px;">Rosen Trumpf</div>
+    <div style="font-family: 'Bricolage Grotesque', 'Arial Black', sans-serif; font-weight: 800; font-size: 18px; color: #fff; text-shadow: 2px 2px 0 #14301f;">Wähle eine Karte!</div>
+  </div>
+
+  <!-- Stich -->
+  <div class="trick" style="left: 163px; top: 360px; transform: rotate(-4deg);"><img src="schellen_ass.webp" alt=""></div>
+  <div class="trick" style="left: 104px; top: 438px; transform: rotate(-9deg);"><img src="schellen_6.webp" alt=""></div>
+  <div class="trick" style="left: 222px; top: 436px; transform: rotate(7deg);"><img src="schellen_under.webp" alt=""></div>
+
+  <!-- Eigener Sitz -->
+  <div style="position: absolute; left: 0; top: 662px; width: 390px; display: flex; justify-content: center;">
+    <div class="chip" style="background: #f2c230;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #d52b1e;"></span>Du</div>
+  </div>
+  <div style="position: absolute; left: 0; top: 700px; width: 390px; height: 144px;">
+    <div class="card" style="left: 31px; top: 11px; transform: translateY(11px) rotate(-16.8deg);"><img src="rosen_6.webp" alt=""></div>
+    <div class="card" style="left: 63px; top: 8px; transform: translateY(8px) rotate(-12.6deg);"><img src="rosen_9.webp" alt=""></div>
+    <div class="card" style="left: 95px; top: 6px; transform: translateY(6px) rotate(-8.4deg);"><img src="rosen_under.webp" alt=""></div>
+    <div class="card dim" style="left: 127px; top: 17px; transform: translateY(3px) rotate(-4.2deg);"><img src="eicheln_ass.webp" alt=""></div>
+    <div class="card dim" style="left: 159px; top: 14px; transform: translateY(0) rotate(0deg);"><img src="eicheln_koenig.webp" alt=""></div>
+    <div class="card" style="left: 191px; top: 3px; transform: translateY(3px) rotate(4.2deg); box-shadow: 0 0 0 3px #f2c230, 3px 4px 0 #14301f;"><img src="schellen_7.webp" alt=""></div>
+    <div class="card" style="left: 223px; top: 6px; transform: translateY(6px) rotate(8.4deg);"><img src="schellen_10.webp" alt=""></div>
+    <div class="card dim" style="left: 255px; top: 22px; transform: translateY(8px) rotate(12.6deg);"><img src="schilten_8.webp" alt=""></div>
+    <div class="card dim" style="left: 287px; top: 25px; transform: translateY(11px) rotate(16.8deg);"><img src="schilten_ober.webp" alt=""></div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

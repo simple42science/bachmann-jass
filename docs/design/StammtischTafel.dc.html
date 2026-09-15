@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Vollkorn:ital,wght@0,600;0,700;1,600&family=Alegreya+Sans:wght@500;700;800&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'Alegreya Sans', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #c9973a; } a:hover { color: #e0b45a; }
+    .row { display: grid; grid-template-columns: 26px 1fr 60px 60px; gap: 8px; align-items: center; padding: 10px 4px; border-bottom: 1px solid rgba(255,255,255,0.14); }
+    .chalk { font-family: 'Caveat', 'Segoe Print', cursive; font-size: 24px; font-weight: 700; color: #f4f1e6; text-align: right; text-shadow: 0 0 2px rgba(255,255,255,0.35); }
+    .tag { display: inline-flex; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: #2a1a08; background: #e0b45a; }
+  </style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background:
+  repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0 2px, transparent 2px 11px),
+  linear-gradient(180deg, #4a2e17 0%, #2f1c0d 100%); color: #f3e9d2;">
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 66px; display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box; border-bottom: 2px solid #8a6a2f;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0b45a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+    <div style="font-family: 'Vollkorn', Georgia, serif; font-size: 26px; font-weight: 700; color: #ffd982;">Jasstafel</div>
+    <div style="flex-grow: 1;"></div>
+    <div style="font-size: 12px; color: #d8c7a3;">Ziel 1000</div>
+  </div>
+
+  <!-- Schiefertafel im Holzrahmen -->
+  <div style="position: absolute; left: 14px; top: 84px; width: 362px; height: 640px; border-radius: 10px; background: linear-gradient(180deg, #6b4626, #4a2e17); box-shadow: 0 10px 30px rgba(0,0,0,0.6);"></div>
+  <div style="position: absolute; left: 24px; top: 94px; width: 342px; height: 620px; border-radius: 6px; background: radial-gradient(120% 90% at 30% 20%, #3a3f3d 0%, #262b2a 60%, #1e2322 100%); box-shadow: inset 0 0 30px rgba(0,0,0,0.5); padding: 16px 14px; box-sizing: border-box;">
+    <div style="display: flex; gap: 12px; align-items: flex-end; justify-content: space-between; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.35);">
+      <div>
+        <div style="font-size: 11px; font-weight: 800; color: #cfc9b8; letter-spacing: 0.08em; text-transform: uppercase;">Papsli &amp; Du</div>
+        <div class="chalk" style="font-size: 44px; text-align: left; line-height: 1;">676</div>
+      </div>
+      <!-- Kreidestriche: Z fuer Hunderter, Striche fuer Zwanziger -->
+      <svg width="120" height="46" viewBox="0 0 120 46" fill="none" stroke="#f4f1e6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"><path d="M4 6h22L4 40h22"></path><path d="M36 6h22L36 40h22"></path><path d="M70 8v32M80 6v34M90 9v31M100 6v34"></path><path d="M66 36l40-26"></path></svg>
+      <div style="text-align: right;">
+        <div style="font-size: 11px; font-weight: 800; color: #cfc9b8; letter-spacing: 0.08em; text-transform: uppercase;">Yannick &amp; Gusti</div>
+        <div class="chalk" style="font-size: 44px; line-height: 1;">737</div>
+      </div>
+    </div>
+
+    <div class="row" style="color: #cfc9b8; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding-top: 12px; padding-bottom: 6px; border-bottom: none;">
+      <div>Nr.</div><div>Spielart</div><div style="text-align: right;">Wir</div><div style="text-align: right;">Sie</div>
+    </div>
+    <div class="row"><div style="color: #cfc9b8;">1</div><div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">Rosen <span class="tag">Weis</span></div><div class="chalk">58</div><div class="chalk">99</div></div>
+    <div class="row"><div style="color: #cfc9b8;">2</div><div style="font-weight: 700;">Schilten <span style="color: #e0b45a;">×2</span></div><div class="chalk">214</div><div class="chalk">100</div></div>
+    <div class="row"><div style="color: #cfc9b8;">3</div><div style="font-weight: 700;">Obe-Abe <span style="color: #e0b45a;">×3</span></div><div class="chalk">150</div><div class="chalk">321</div></div>
+    <div class="row"><div style="color: #cfc9b8;">4</div><div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">Eicheln <span class="tag">Stöck</span></div><div class="chalk">74</div><div class="chalk">83</div></div>
+    <div class="row" style="border-bottom: none;"><div style="color: #cfc9b8;">5</div><div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">Schellen <span style="color: #e0b45a;">×2</span><span class="tag">Match</span></div><div class="chalk">180</div><div class="chalk">134</div></div>
+
+    <div style="margin-top: 18px; font-family: 'Caveat', 'Segoe Print', cursive; font-size: 20px; color: #f4f1e6; opacity: 0.85;">Runde 6: Papsli schiebt, du wählst Rosen.</div>
+  </div>
+
+  <div style="position: absolute; left: 0; bottom: 0; width: 390px; height: 100px; display: flex; align-items: center; justify-content: center;">
+    <div style="padding: 12px 28px; border-radius: 6px; background: linear-gradient(180deg, #e0b45a, #b8842c); color: #2a1a08; font-weight: 800; font-size: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,240,200,0.6);">Zurück zum Tisch</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

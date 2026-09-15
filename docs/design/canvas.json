@@ -1,0 +1,16 @@
+{
+  "artboards": [
+    { "file": "StammtischTisch.dc.html", "title": "Stammtisch · Tisch", "x": 0, "y": 0, "w": 390, "h": 844 },
+    { "file": "StammtischTafel.dc.html", "title": "Stammtisch · Jasstafel", "x": 0, "y": 980, "w": 390, "h": 844 },
+    { "file": "Main.dc.html", "title": "Premium Dark · Tisch", "x": 520, "y": 0, "w": 390, "h": 844 },
+    { "file": "PremiumDarkTafel.dc.html", "title": "Premium Dark · Jasstafel", "x": 520, "y": 980, "w": 390, "h": 844 },
+    { "file": "AlpenPopTisch.dc.html", "title": "Alpen-Pop · Tisch", "x": 1040, "y": 0, "w": 390, "h": 844 },
+    { "file": "AlpenPopTafel.dc.html", "title": "Alpen-Pop · Jasstafel", "x": 1040, "y": 980, "w": 390, "h": 844 }
+  ],
+  "annotations": [
+    { "id": "stammtisch", "x": 0, "y": -200, "w": 390, "text": "A · Stammtisch\nWarm und traditionell: Holzrand, Messing, Filz, Namensschilder wie Tischkarten, Jasstafel als Schiefertafel mit Kreide.\n\nDafür: fühlt sich an wie in der Beiz; passt zu Papsli, Gusti und der Familie.\nDagegen: viel Textur, auf kleinen Handys eher unruhig; die Kreide-Optik braucht Sorgfalt, damit sie nicht kitschig wird." },
+    { "id": "premium-dark", "x": 520, "y": -200, "w": 390, "text": "B · Premium Dark (empfohlen)\nWeiterentwicklung des heutigen Looks: tiefes Grün-Schwarz, Spotlight auf dem Stich, Glas-Panels, Gold als Hairline, kursive Serifen für Hinweise.\n\nDafür: ruhig, edel, Karten stehen im Mittelpunkt; am wenigsten Risiko im Kleinen.\nDagegen: nüchterner als die anderen; die Wärme muss aus Licht und Typografie kommen." },
+    { "id": "alpen-pop", "x": 1040, "y": -200, "w": 390, "text": "C · Alpen-Pop\nHell und verspielt: Creme, Schweizer Rot, Sonnengelb, harte Schatten, Berge als Silhouette, fette Grotesk.\n\nDafür: unverwechselbar, fröhlich, gut für Animationen und Sound.\nDagegen: weit weg vom Jass-Tisch-Gefühl; helle Fläche ermüdet abends; Karten wirken auf Creme weniger kräftig." }
+  ],
+  "launch": { "view": "canvas" }
+}

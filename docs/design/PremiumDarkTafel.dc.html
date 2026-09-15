@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500;1,600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #e6c26a; } a:hover { color: #f3d98f; }
+    .row { display: grid; grid-template-columns: 28px 1fr 56px 56px; gap: 8px; align-items: center; padding: 12px 6px; border-bottom: 1px solid rgba(255,255,255,0.08); font-variant-numeric: tabular-nums; }
+    .num { text-align: right; font-weight: 700; font-size: 15px; }
+    .tag { display: inline-flex; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #f3d98f; border: 1px solid rgba(230,194,106,0.5); }
+  </style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: radial-gradient(120% 70% at 50% 20%, #12351f 0%, #0a2013 55%, #06120b 100%); color: #f2ede2;">
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 16px; box-sizing: border-box; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(230,194,106,0.25);">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e6c26a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+    <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 26px; color: #f3d98f;">Jasstafel</div>
+    <div style="flex-grow: 1;"></div>
+    <div style="font-size: 11px; color: #a9bfae;">Ziel 1000</div>
+  </div>
+
+  <div style="position: absolute; left: 16px; top: 84px; width: 358px; display: flex; gap: 10px;">
+    <div style="flex-grow: 1; padding: 14px 16px; border-radius: 16px; background: rgba(230,194,106,0.10); border: 1px solid rgba(230,194,106,0.55); backdrop-filter: blur(10px);">
+      <div style="font-size: 11px; font-weight: 700; color: #a9bfae; letter-spacing: 0.06em; text-transform: uppercase;">Papsli &amp; Du</div>
+      <div style="font-size: 40px; font-weight: 800; color: #f3d98f; letter-spacing: -0.03em; line-height: 1.05;">676</div>
+    </div>
+    <div style="flex-grow: 1; padding: 14px 16px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(10px);">
+      <div style="font-size: 11px; font-weight: 700; color: #a9bfae; letter-spacing: 0.06em; text-transform: uppercase;">Yannick &amp; Gusti</div>
+      <div style="font-size: 40px; font-weight: 800; color: #f2ede2; letter-spacing: -0.03em; line-height: 1.05;">737</div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 16px; top: 196px; width: 358px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden;">
+    <div style="width: 68%; height: 6px; background: linear-gradient(90deg, #c9a24f, #f3d98f);"></div>
+  </div>
+  <div style="position: absolute; left: 16px; top: 208px; font-size: 11px; color: #a9bfae;">Papsli &amp; Du: noch 324 Punkte bis zum Ziel</div>
+
+  <div style="position: absolute; left: 16px; top: 240px; width: 358px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10); padding: 4px 12px; box-sizing: border-box;">
+    <div class="row" style="color: #a9bfae; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding-top: 10px; padding-bottom: 8px;">
+      <div>Nr.</div><div>Spielart</div><div style="text-align: right;">Wir</div><div style="text-align: right;">Sie</div>
+    </div>
+    <div class="row"><div style="color: #a9bfae;">1</div><div style="display: flex; align-items: center; gap: 8px;">Rosen <span class="tag">Weis</span></div><div class="num" style="color: #f3d98f;">58</div><div class="num">99</div></div>
+    <div class="row"><div style="color: #a9bfae;">2</div><div>Schilten <span style="color: #e6c26a;">×2</span></div><div class="num" style="color: #f3d98f;">214</div><div class="num">100</div></div>
+    <div class="row"><div style="color: #a9bfae;">3</div><div>Obe-Abe <span style="color: #e6c26a;">×3</span></div><div class="num" style="color: #f3d98f;">150</div><div class="num">321</div></div>
+    <div class="row"><div style="color: #a9bfae;">4</div><div style="display: flex; align-items: center; gap: 8px;">Eicheln <span class="tag">Stöck</span></div><div class="num" style="color: #f3d98f;">74</div><div class="num">83</div></div>
+    <div class="row" style="border-bottom: none;"><div style="color: #a9bfae;">5</div><div style="display: flex; align-items: center; gap: 8px;">Schellen <span style="color: #e6c26a;">×2</span><span class="tag">Match</span></div><div class="num" style="color: #f3d98f;">180</div><div class="num">134</div></div>
+  </div>
+
+  <div style="position: absolute; left: 16px; top: 560px; width: 358px; padding: 14px 16px; box-sizing: border-box; border-radius: 16px; border: 1px dashed rgba(230,194,106,0.4); color: #a9bfae; font-size: 12px; line-height: 1.5;">
+    <span style="color: #f3d98f; font-weight: 700;">Runde 6</span> läuft: Papsli hat geschoben, du hast Rosen gewählt. Gusti spielt aus.
+  </div>
+
+  <div style="position: absolute; left: 0; bottom: 0; width: 390px; height: 80px; display: flex; align-items: center; justify-content: center; gap: 12px; background: linear-gradient(180deg, rgba(6,18,11,0) 0%, #06120b 60%);">
+    <div style="padding: 12px 28px; border-radius: 999px; background: linear-gradient(180deg, #f3d98f, #c9a24f); color: #1a1408; font-weight: 800; font-size: 14px; box-shadow: 0 8px 24px rgba(230,194,106,0.25);">Zurück zum Tisch</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
