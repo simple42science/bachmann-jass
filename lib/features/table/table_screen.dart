@@ -389,24 +389,31 @@ class _StatusRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        // Flexible statt fester Breite: ein langer Spielart-Text (Slalom mit
+        // laufendem Stich) darf die Zeile nie sprengen.
         if (mode.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(right: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(
-              gradient: colors.brassGradient,
-              borderRadius: BorderRadius.circular(4),
-              boxShadow: const [
-                BoxShadow(color: Color(0x66000000), blurRadius: 4, offset: Offset(0, 2)),
-              ],
-            ),
-            child: Text(
-              mode.toUpperCase(),
-              style: JassFonts.ui(
-                size: 11,
-                weight: FontWeight.w800,
-                color: colors.ink,
-                letterSpacing: 0.6,
+          Flexible(
+            child: Container(
+              margin: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(
+                gradient: colors.brassGradient,
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x66000000), blurRadius: 4, offset: Offset(0, 2)),
+                ],
+              ),
+              child: Text(
+                mode.toUpperCase(),
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: JassFonts.ui(
+                  size: 11,
+                  weight: FontWeight.w800,
+                  color: colors.ink,
+                  letterSpacing: 0.6,
+                ),
               ),
             ),
           ),
