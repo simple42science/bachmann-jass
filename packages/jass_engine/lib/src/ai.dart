@@ -17,20 +17,25 @@ import 'rules.dart';
 
 /// Einzeln schaltbare Abweichungen von der KI der Web-App.
 final class AiTuning {
-  const AiTuning({required this.correctBieterSides, required this.bidWithAllModes});
+  const AiTuning({required this.correctBieterSides});
 
   /// Verhalten exakt wie die Web-App (fuer den Paritaetstest und Vergleiche).
-  static const AiTuning webApp = AiTuning(correctBieterSides: false, bidWithAllModes: false);
+  static const AiTuning webApp = AiTuning(correctBieterSides: false);
+
+  /// Standard der App.
+  static const AiTuning standard = AiTuning(correctBieterSides: true);
 
   /// Im Bieterjass Bieter gegen Verteidiger unterscheiden statt nach `teamId`.
+  ///
+  /// Die Web-App gibt den Sitzen 1 und 2 immer dieselbe `teamId`. Ihre KI
+  /// schmiert darum auch dann Punkte, wenn der vermeintliche Partner der Bieter
+  /// ist. Gemessen mit tool/benchmark_bieter.dart (200 Verteilungen x 3 Sitze):
+  /// Siegquote 62.8 % (Zaehlweise wie im Schieber) und 66.7 % (einfach) statt 33.3 %.
   final bool correctBieterSides;
-
-  /// Im Bieterjass mit allen erlaubten Spielarten bieten statt nur mit Trumpffarben.
-  final bool bidWithAllModes;
 }
 
 /// Standard fuer die App.
-const AiTuning defaultAiTuning = AiTuning.webApp;
+const AiTuning defaultAiTuning = AiTuning.standard;
 
 /* ------------------------------------------------------------------ *
  * Handbewertung
@@ -160,16 +165,12 @@ bool shouldPushTrump(List<JassCard> hand, RuleSet rules) =>
     modeAdvantage(hand, bestSchieberMode(hand, rules), rules) <= 0;
 
 /// Gebot fuer den Bieterjass; `0` bedeutet passen.
-int aiBidDecision(GameState state, int seat, {AiTuning tuning = defaultAiTuning}) {
+int aiBidDecision(GameState state, int seat) {
   final hand = state.players[seat].hand;
-  final int expectedPoints;
-  if (tuning.bidWithAllModes) {
-    expectedPoints = state.allowedRoundModes
-        .map((mode) => estimateRoundPoints(evaluateRoundMode(hand, mode)))
-        .reduce(math.max);
-  } else {
-    expectedPoints = estimateRoundPoints(evaluateTrumpSuit(hand, bestTrumpSuit(hand)));
-  }
+  // Bewusst nur mit Trumpffarben geschaetzt, auch wenn Obe-Abe, Une-Ufe oder
+  // Slalom erlaubt sind: Mit allen Spielarten bot die KI zu hoch und gewann nur
+  // noch 27.2 statt 33.3 Prozent (tool/benchmark_bieter.dart, Zaehlweise wie im Schieber).
+  final expectedPoints = estimateRoundPoints(evaluateTrumpSuit(hand, bestTrumpSuit(hand)));
 
   // Kalibriert in der Web-App: mit Faktor 1.1 liegt die Erfuellungsquote bei rund 70 Prozent.
   final estimate = (expectedPoints * 1.1).round();
@@ -399,7 +400,7 @@ GameAction? aiDecide(GameState state, {AiTuning tuning = defaultAiTuning}) {
 
   switch (state.phase) {
     case GamePhase.bidding:
-      final value = aiBidDecision(state, seat, tuning: tuning);
+      final value = aiBidDecision(state, seat);
       return value == 0 ? PassBid(seat) : PlaceBid(seat, value);
     case GamePhase.chooseTrump:
       if (canPushTrump(state) && shouldPushTrump(hand, state.rules)) {
