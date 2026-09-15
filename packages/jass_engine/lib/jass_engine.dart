@@ -10,6 +10,7 @@ library;
 import 'src/engine.dart';
 
 export 'src/actions.dart';
+export 'src/ai.dart';
 export 'src/cards.dart';
 export 'src/dealing.dart';
 export 'src/engine.dart';
