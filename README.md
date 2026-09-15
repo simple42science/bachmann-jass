@@ -6,7 +6,7 @@ Die App ersetzt die bisherige Web-App [`bachmann_jass_game`](https://github.com/
 
 ## Stand
 
-Spielbarer Prototyp (Meilenstein M2): Schieber und Bieterjass sind komplett spielbar, mit Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Tempo, Pause und Speicherstand. Das Design ist bewusst schlicht; das Design-System, Animationen und die Jasstafel folgen in Meilenstein M3.
+Meilenstein M3: Schieber und Bieterjass sind komplett spielbar (Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Tempo, Pause, Speicherstand), im Design „Stammtisch“ (Holz, Filz, Messing, Tischkarten, Schiefertafel), mit Animationen (Austeilen, Kartenflug, Stich einsammeln, Einblendungen), Jasstafel mit Z-Tafel-Strichen und Verlauf sowie Regel-Screen. Es fehlen noch Sound, ein eigenes Icon, das Tutorial und die Einstellungen aus Phase 5.
 
 Arbeitspakete, Entscheide und Stand: [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSPLAN.md). Screenshots der Web-Version: [`docs/screenshots/`](docs/screenshots/).
 
@@ -20,12 +20,15 @@ Arbeitspakete, Entscheide und Stand: [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSP
 
 ```text
 lib/
-  app/        Start, Router, Theme, Einstellungen, Demo-Start
+  app/        Start, Router, Theme (Design-System Stammtisch), Einstellungen, Demo-Start
   game/       GameController (Spielablauf, KI-Wartezeiten, Pause), Speicherstand, Texte
-  features/   Screens: Home, Setup, Tisch (Geometrie, Karten, Hand, Panels)
+  features/   Screens: Home, Setup, Tisch (Geometrie, Karten, Hand, Panels, Animationen),
+              Jasstafel, Regeln
   l10n/       Texte (ARB, Deutsch)
 packages/jass_engine/   Regeln, Wertung, Computergegner, Zufall (reines Dart)
 assets/cards/           36 Karten als WebP
+assets/fonts/           Vollkorn, Alegreya Sans, Caveat (OFL)
+docs/design/            Design-Mockups (Stammtisch, verworfene Richtungen)
 tool/                   Konvertierung, Fixtures aus der Web-App, Screenshots
 ```
 
@@ -66,7 +69,7 @@ Die Werkzeuge, die aus der Web-App lesen, erwarten sie unter `../bachmann_jass_g
 
 ### Demo-Start
 
-Ein Build mit `--dart-define=JASS_DEMO=true` startet über die URL direkt eine reproduzierbare Spielsituation, zum Beispiel `?demo=schieber&seed=5&moves=4` (Schieber mit Seed 5, der Mensch hat seine ersten vier Entscheidungen wie die KI gespielt). Computerzüge kommen dabei sofort. Der Screenshot-Befehl nutzt das:
+Ein Build mit `--dart-define=JASS_DEMO=true` startet über die URL direkt eine reproduzierbare Spielsituation, zum Beispiel `?demo=schieber&seed=5&moves=4` (Schieber mit Seed 5, der Mensch hat seine ersten vier Entscheidungen wie die KI gespielt). `&screen=scoreboard` öffnet die Jasstafel, `&screen=rules` die Regeln. Computerzüge kommen dabei sofort. Der Screenshot-Befehl nutzt das:
 
 ```powershell
 flutter build web --release --dart-define=JASS_DEMO=true

@@ -44,44 +44,54 @@ class HomeScreen extends ConsumerWidget {
     final saved = ref.watch(savedGameProvider);
 
     return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [colors.felt, colors.feltEdge],
-          ),
-        ),
+      body: WoodBackground(
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
+                constraints: const BoxConstraints(maxWidth: 400),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      texts.homeKicker.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        letterSpacing: 6,
-                        fontWeight: FontWeight.w700,
-                        color: colors.muted,
+                    // Messingschild mit dem Namen der App.
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
+                      decoration: BoxDecoration(
+                        gradient: colors.brassGradient,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: colors.brassGlow, width: 2),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x99000000), blurRadius: 14, offset: Offset(0, 8)),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            texts.homeKicker.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: JassFonts.ui(
+                              size: 13,
+                              weight: FontWeight.w800,
+                              color: colors.ink,
+                              letterSpacing: 6,
+                            ),
+                          ),
+                          Text(
+                            texts.homeTitle,
+                            textAlign: TextAlign.center,
+                            style: JassFonts.serif(
+                              size: 76,
+                              weight: 700,
+                              color: colors.ink,
+                              height: 1,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      texts.homeTitle,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 72,
-                        height: 1,
-                        fontWeight: FontWeight.w800,
-                        color: colors.goldLight,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 36),
                     if (saved != null) ...[
                       FilledButton(
                         onPressed: () {
@@ -99,7 +109,7 @@ class HomeScreen extends ConsumerWidget {
                           ' – ${DateFormat('dd.MM.yyyy HH:mm').format(saved.savedAt)}',
                         ),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: colors.muted),
+                        style: JassFonts.ui(size: 12, color: colors.muted),
                       ),
                       const SizedBox(height: 16),
                       OutlinedButton(
@@ -111,6 +121,11 @@ class HomeScreen extends ConsumerWidget {
                         onPressed: () => _startNewGame(context, ref),
                         child: Text(texts.newGame),
                       ),
+                    const SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () => context.go(Routes.rules),
+                      child: Text(texts.menuRules),
+                    ),
                   ],
                 ),
               ),

@@ -137,7 +137,10 @@ class GameController extends Notifier<GameSession?> {
 
   void _publish(GameState next, List<GameEvent> events, {required int revision}) {
     _cancelTimer();
-    state = GameSession(state: next, events: events, revision: revision);
+    // Der Verlauf sammelt die Ereignisse seit dem letzten Rundenstart.
+    final startsRound = events.any((event) => event is RoundStarted);
+    final roundEvents = startsRound ? events : [...?state?.roundEvents, ...events];
+    state = GameSession(state: next, events: events, roundEvents: roundEvents, revision: revision);
 
     final saved = ref.read(savedGameProvider.notifier);
     if (next.phase == GamePhase.gameOver) {

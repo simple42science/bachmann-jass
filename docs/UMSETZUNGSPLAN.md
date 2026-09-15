@@ -1,6 +1,6 @@
 # Bachmann Jass – Umsetzungsplan Flutter
 
-Stand: 15.09.2026, Meilensteine M1 und M2 erreicht · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
+Stand: 15.09.2026, Meilensteine M1 bis M3 erreicht · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
 
 Die bestehende Jass-Web-App wird als Flutter-App neu aufgebaut. Sie soll **dynamischer** werden (Animationen, Sound, Haptik), **besser steuerbar** (Einstellungen, Hausregeln, Debug-Werkzeuge) und ein **eigenes, hochwertiges Design** bekommen. Regeln und Computergegner werden nicht neu erfunden: Sie werden 1:1 übernommen und per Test gegen das Original abgesichert.
 
@@ -58,9 +58,9 @@ Umfang: **S** = wenige Stunden · **M** = etwa 1–2 Arbeitstage · **L** = mehr
 | 5 | Das KI-Gebot im Bieterjass „wie im Schieber" rechnet nur mit Trumpffarben, obwohl die KI danach Obe-Abe, Une-Ufe oder Slalom wählen darf | `ai.js:169` | ❌ gemessen und verworfen: Mit allen Spielarten bietet die KI zu hoch (Siegquote 27 statt 33 %) |
 | 6 | Die Stöck-Punkte stehen in zwei UI-Texten fest als 20, statt aus dem Regelwerk zu kommen | `app.js:965`, `:1152` | ✅ aus dem `RuleSet` |
 | 7 | „Home" bricht die Partie ab und löscht den Speicherstand; eine Pause gibt es nicht | `app.js:1614` | ✅ Home behält die Partie (Fortsetzen auf dem Homescreen), Pause-Knopf; eine neue Partie fragt nach, bevor sie die gespeicherte verwirft |
-| 8 | Nur der erste Stich lässt sich nochmals ansehen; gegnerische Weise erscheinen nur als Logtext | `app.js:529`, `game-engine.js:966` | einstellbarer Stich-Rückblick, Weis-Karten kurz aufdecken |
+| 8 | Nur der erste Stich lässt sich nochmals ansehen; gegnerische Weise erscheinen nur als Logtext | `app.js:529`, `game-engine.js:966` | teilweise: gemeldete Weise der Computer werden kurz aufgedeckt; der Stich-Rückblick folgt mit den Hausregeln (AP 5.2) |
 | 9 | Der Schieber endet erst am Rundenende, auch wenn das Ziel mitten in der Runde erreicht ist | `game-engine.js:1474` | optionale Regel „Bedanken" |
-| 10 | Die Schriften kommen übers Netz von Google Fonts; offline fällt die App auf die Systemschrift zurück | `index.html:16` | Schriften in die App einbetten |
+| 10 | Die Schriften kommen übers Netz von Google Fonts; offline fällt die App auf die Systemschrift zurück | `index.html:16` | ✅ Vollkorn, Alegreya Sans und Caveat (OFL) liegen in `assets/fonts/` |
 | 11 | Im Bieterjass tragen die Sitze 1 und 2 immer dieselbe `teamId`. Die KI hält sie darum für Partner, auch wenn einer von ihnen der Bieter ist, und schmiert ihm Punkte | `game-engine.js:387`, `ai.js:312` | ✅ Bieter gegen Verteidiger korrekt unterschieden; die korrigierte KI gewinnt 61–67 % statt 33 % |
 
 ---
@@ -124,7 +124,7 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | Animation | `flutter_animate` + eigene `AnimationController` | einfache Effekte deklarativ, Kartenflüge präzise |
 | Speicher | `shared_preferences` + JSON-Dateien (`path_provider`) | wie in Busdriver und LingoTrail |
 | Audio | `just_audio` oder `flutter_soloud` | `just_audio` kennst du aus LingoTrail; `flutter_soloud` hat weniger Latenz bei kurzen Effekten |
-| Schriften | Playfair Display, Inter (OFL), eingebettet | offline verfügbar |
+| Schriften | Vollkorn, Alegreya Sans, Caveat (OFL), eingebettet | Richtung Stammtisch; offline verfügbar |
 | Icons und Splash | `flutter_launcher_icons`, `flutter_native_splash` | wie in LingoTrail |
 | Qualität | `flutter_lints` + Zusatzregeln, GitHub Actions | Analyse, Tests und Build bei jedem Push |
 
@@ -148,17 +148,17 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | 2.2 | Speicherstand und Einstellungen | 🟢 | S | 2.1 | ✅ erledigt |
 | 2.3 | Navigation und Screen-Gerüst | 🟢 | S | 0.1 | ✅ erledigt |
 | 2.4 | Texte und Lokalisierung | 🟡 | S | 1.2 | ✅ erledigt (Deutsch); Mundart offen |
-| 3.1 | Designrichtung | 🟡 | M | 0.3 | offen |
-| 3.2 | Design-System und Theme | 🟢 | M | 3.1 | offen |
+| 3.1 | Designrichtung | 🟡 | M | 0.3 | ✅ erledigt: Stammtisch |
+| 3.2 | Design-System und Theme | 🟢 | M | 3.1 | ✅ erledigt |
 | 3.3 | Karten-Assets | 🟢 | S | – | ✅ erledigt; Quelle/Lizenz nachtragen |
 | 3.4 | App-Icon und Splash | 🟡 | S | 3.1 | teilweise: bisheriges Icon übernommen |
 | 3.5 | Sound und Haptik | 🟡 | S | 4.3 | offen |
 | 4.1 | Adaptives Tisch-Layout | 🟢 | L | 2.1 | ✅ erledigt |
 | 4.2 | Karten und Hand | 🟢 | M | 3.3, 4.1 | ✅ erledigt (Tippen); Ziehen später |
-| 4.3 | Animationen | 🟢 | L | 4.1, 4.2 | offen |
+| 4.3 | Animationen | 🟢 | L | 4.1, 4.2 | ✅ erledigt |
 | 4.4 | Bedien-Panels | 🟢 | M | 4.1 | ✅ erledigt |
-| 4.5 | Jasstafel und Verlauf | 🟢 | M | 2.1 | offen |
-| 4.6 | Regeln und Tutorial | 🟡 | M | 4.4 | offen |
+| 4.5 | Jasstafel und Verlauf | 🟢 | M | 2.1 | ✅ erledigt |
+| 4.6 | Regeln und Tutorial | 🟡 | M | 4.4 | teilweise: Regeln ja, Tutorial offen |
 | 5.1 | Spieler-Einstellungen | 🟢 | M | 2.2 | offen |
 | 5.2 | Hausregel-Editor | 🟡 | M | 1.2, 2.2 | offen |
 | 5.3 | Gegner und Profile | 🟡 | S | 2.2 | offen |
@@ -290,6 +290,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
   - **Alpen-Pop:** klare Flächen, kräftige Farben, verspielte Animationen.
 - 🔴 Du wählst eine Richtung oder kombinierst.
 - **Fertig, wenn** die Richtung abgenommen ist (D4).
+- **Stand:** ✅ Drei Richtungen als Mockups (`docs/design/`, Design-Canvas), du hast **Stammtisch** gewählt.
 
 #### AP 3.2 Design-System und Theme · 🟢 Claude · M
 
@@ -297,6 +298,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Playfair Display und Inter direkt in die App einbetten (Befund 10).
 - Tischdecken als austauschbare Skins, zum Beispiel Filz grün, Holz und Nacht.
 - Ein Widget-Katalog als Debug-Screen zeigt alle Bausteine.
+- **Stand:** ✅ `JassColors` (Holz, Filz, Messing, Karton, Schiefer, Kreide) und `JassFonts` (Vollkorn, Alegreya Sans, Caveat) in `lib/app/theme.dart`; Tisch mit Holzrand, Filz und Messingkante, Tischkarten, Messingschilder, Kartenrücken mit „B“-Monogramm. Tischdecken-Skins und der Widget-Katalog sind noch offen.
 
 #### AP 3.3 Karten-Assets · 🟡 Claude + Input · S
 
@@ -340,6 +342,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Austeilen in 3er-Paketen, Kartenflug vom richtigen Sitzplatz, Stich gleitet zum Gewinner, Trumpf-Enthüllung.
 - Gemeldete Weis-Karten der Gegner werden kurz aufgedeckt (Befund 8). Stöck und Match bekommen einen Effekt, die Punkte zählen in der Abrechnung hoch.
 - Die Systemeinstellung „Bewegung reduzieren" wird respektiert.
+- **Stand:** ✅ Austeilen in 3er-Paketen, Kartenflug vom Sitzplatz, Hand rückt weich zusammen, Stich gleitet zum Gewinner, Gewinnerkarte pulsiert, Punkte zählen hoch, Einblendungen für Stöck, Match und die aufgedeckten Weise der Computer. Tempo skaliert alle Dauern (`Motion`), „Bewegung reduzieren“ schaltet sie ab. Sound und Haptik folgen mit AP 3.5.
 
 #### AP 4.4 Bedien-Panels · 🟢 Claude · M
 
@@ -353,12 +356,14 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Jasstafel mit allen Runden, Spielart, Multiplikator und Markierungen für Weis, Stöck und Match. Darstellung wahlweise mit klassischen Strichen (Z-Tafel) oder mit Zahlen.
 - Stich-Rückblick je nach Hausregel: letzter Stich, erster Stich oder alle (Befund 8).
 - Spielverlauf als Timeline aus den Events.
+- **Stand:** ✅ Schiefertafel mit Kreidezahlen, Strichen der Z-Tafel (Hunderter oben, Fünfziger auf der Schrägen, Zwanziger unten), Rundentabelle mit Weis/Stöck/Match und Verlauf der laufenden Runde. 🟡 Bitte prüfen, ob eure Familie die Striche genauso schreibt. Der Stich-Rückblick kommt mit AP 5.2.
 
 #### AP 4.6 Regeln und Tutorial · 🟡 Claude + Input · M
 
 - Der Regel-Screen wird wie heute aus der Engine erzeugt, neu aus dem aktiven `RuleSet`, und zeigt damit auch Hausregeln an.
 - Eine geführte erste Runde erklärt Bedienpflicht, Weis und Stöck.
 - 🟡 Du liest die Texte und gibst sie frei.
+- **Stand:** teilweise. Der Regel-Screen ist da (aus dem `RuleSet` erzeugt, erreichbar vom Homescreen und aus dem Menü am Tisch). Die geführte erste Runde ist noch offen.
 
 ### Phase 5 – Steuerbarkeit
 
@@ -446,7 +451,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | D1 | Zielplattformen und Reihenfolge | Android und Web zuerst, iOS danach | AP 0.1 | ✅ Android und Web |
 | D2 | App-ID | `com.simple42science.bachmannjass`, passend zu Busdriver. Nach der ersten Store-Veröffentlichung nicht mehr änderbar | AP 0.1, spätestens 7.2 | ✅ `simple42science.bachmannjass` |
 | D3 | Monetarisierung | keine – wie bisher offline und ohne Datenerhebung | AP 3.1 | ✅ keine |
-| D4 | Designrichtung | nach den Mockups aus AP 3.1 | AP 3.2 | offen |
+| D4 | Designrichtung | nach den Mockups aus AP 3.1 | AP 3.2 | ✅ Stammtisch |
 | D5 | Standard-Hausregeln | heutige Werte der Web-App als Preset „Bachmann" | AP 5.2 | offen |
 | D6 | Rechte an den Kartenbildern | klären, bevor Store-Screenshots entstehen | AP 7.2 | ✅ nutzbar (Open Source); Quelle und Lizenz im Repo vermerken |
 | D7 | Web-Hosting und Repo-Sichtbarkeit | Repo privat lassen, Web auf Cloudflare Pages | AP 7.1 | offen |
@@ -460,12 +465,12 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | --- | --- | --- |
 | **M1 Engine-Parität** | Phase 1 | Dart-Engine und KI spielen nachweislich wie die Web-App – ✅ erreicht am 15.09.2026 |
 | **M2 Spielbarer Prototyp** | 2.1–2.3, 4.1, 4.2, 4.4 (schlichtes Design) | Schieber und Bieterjass komplett spielbar auf Android und Web – ✅ erreicht am 15.09.2026 (Web per Screenshot geprüft, Android nur gebaut) |
-| **M3 Look & Feel** | Phase 3, 4.3, 4.5, 4.6 | neues Design, Animationen, Jasstafel |
+| **M3 Look & Feel** | Phase 3, 4.3, 4.5, 4.6 | neues Design, Animationen, Jasstafel – ✅ erreicht am 15.09.2026 (ohne 3.4 Icon/Splash, 3.5 Sound und das Tutorial) |
 | **M4 Feature-komplett** | Phase 5, 6.1, 6.2 | Einstellungen, Hausregeln, Statistik, Tests |
 | **M5 Version 1.0** | 6.3, Phase 7 | im Web und in den Stores |
 
-**Nächster Schritt (M3):** AP 3.1 Designrichtung (drei Mockups zur Wahl), danach 3.2 Design-System, 4.3 Animationen, 4.5 Jasstafel und 4.6 Regeln.
-**Bei dir:** Prototyp auf dem Handy und im Browser spielen und Rückmeldung geben, Android-Handy anschliessen (AP 0.2), Quelle und Lizenz der Kartenbilder nennen.
+**Nächster Schritt (M4):** Phase 5 (Einstellungen, Hausregel-Editor, Gegner-Profile, Statistik, Debug-Menü) und 6.1/6.2 (Tests, Performance, Barrierefreiheit); dazu die Reste aus M3: 3.4 Icon und Splash, 3.5 Sound und Haptik, Tutorial.
+**Bei dir:** `flutter run` auf dem Android-Handy und Rückmeldung zu Spielgefühl, Design und Jasstafel-Strichen; Quelle und Lizenz der Kartenbilder nennen.
 
 ---
 

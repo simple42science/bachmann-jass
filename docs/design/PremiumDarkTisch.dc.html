@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500;1,600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; }
+    a { color: #e6c26a; } a:hover { color: #f3d98f; }
+    .card { position: absolute; width: 72px; height: 112px; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 22px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08); transform-origin: 50% 100%; }
+    .card img { width: 100%; height: 100%; display: block; }
+    .dim::after { content: ""; position: absolute; inset: 0; background: rgba(4, 12, 8, 0.62); }
+    .back { position: absolute; width: 28px; height: 44px; border-radius: 4px; background:
+      repeating-linear-gradient(45deg, rgba(230,194,106,0.28) 0 1px, transparent 1px 7px),
+      repeating-linear-gradient(-45deg, rgba(230,194,106,0.28) 0 1px, transparent 1px 7px), #101214;
+      box-shadow: 0 0 0 1px #c9a24f, 0 4px 10px rgba(0,0,0,0.6); }
+    .trick { position: absolute; width: 64px; height: 100px; border-radius: 5px; overflow: hidden; box-shadow: 0 12px 24px rgba(0,0,0,0.6); }
+    .trick img { width: 100%; height: 100%; display: block; }
+  </style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: radial-gradient(120% 70% at 50% 42%, #17452c 0%, #0d2a19 55%, #06120b 100%); color: #f2ede2;">
+
+  <!-- Kopfzeile: Glas -->
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 64px; display: flex; align-items: center; gap: 10px; padding: 0 12px; box-sizing: border-box; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(230,194,106,0.25);">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e6c26a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path></svg>
+    <div style="display: flex; flex-direction: column; gap: 1px; padding: 5px 10px; border-radius: 10px; background: rgba(230,194,106,0.12); border: 1px solid rgba(230,194,106,0.55);">
+      <div style="display: flex; align-items: baseline; gap: 6px;"><span style="font-size: 18px; font-weight: 800; color: #f3d98f; letter-spacing: -0.02em;">280</span><span style="font-size: 11px; font-weight: 700; color: #f2ede2; white-space: nowrap;">Papsli &amp; Du</span></div>
+      <div style="font-size: 10px; color: #a9bfae;">Runde 58 · Weis 20</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1px; padding: 5px 10px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);">
+      <div style="display: flex; align-items: baseline; gap: 6px;"><span style="font-size: 18px; font-weight: 800; color: #f3d98f; letter-spacing: -0.02em;">114</span><span style="font-size: 11px; font-weight: 700; color: #f2ede2; white-space: nowrap;">Yannick &amp; Gusti</span></div>
+      <div style="font-size: 10px; color: #a9bfae;">Runde 30</div>
+    </div>
+    <div style="flex-grow: 1;"></div>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2ede2" stroke-width="1.8" stroke-linecap="round"><path d="M9 5v14M15 5v14"></path></svg>
+  </div>
+
+  <!-- Oberer Sitz -->
+  <div style="position: absolute; left: 0; top: 76px; width: 390px; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); font-size: 12px; font-weight: 700;">Papsli <span style="font-weight: 500; color: #e6c26a; font-size: 11px;">Partner · Geber</span></div>
+    <div style="position: relative; width: 110px; height: 52px;">
+      <div class="back" style="left: 0; top: 4px; transform: rotate(196deg);"></div>
+      <div class="back" style="left: 16px; top: 1px; transform: rotate(188deg);"></div>
+      <div class="back" style="left: 32px; top: 0; transform: rotate(182deg);"></div>
+      <div class="back" style="left: 48px; top: 0; transform: rotate(178deg);"></div>
+      <div class="back" style="left: 64px; top: 1px; transform: rotate(172deg);"></div>
+      <div class="back" style="left: 80px; top: 4px; transform: rotate(164deg);"></div>
+    </div>
+  </div>
+
+  <!-- Seiten -->
+  <div style="position: absolute; left: 12px; top: 340px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div style="padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); font-size: 12px; font-weight: 700;">Yannick</div>
+    <div style="position: relative; width: 48px; height: 118px;">
+      <div class="back" style="left: 2px; top: 0; transform: rotate(84deg);"></div>
+      <div class="back" style="left: 2px; top: 14px; transform: rotate(88deg);"></div>
+      <div class="back" style="left: 2px; top: 28px; transform: rotate(92deg);"></div>
+      <div class="back" style="left: 2px; top: 42px; transform: rotate(96deg);"></div>
+      <div class="back" style="left: 2px; top: 56px; transform: rotate(100deg);"></div>
+      <div class="back" style="left: 2px; top: 70px; transform: rotate(104deg);"></div>
+    </div>
+  </div>
+  <div style="position: absolute; right: 12px; top: 340px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div style="padding: 4px 10px; border-radius: 999px; background: rgba(230,194,106,0.16); border: 1px solid #e6c26a; box-shadow: 0 0 18px rgba(230,194,106,0.35); font-size: 12px; font-weight: 700;">Gusti</div>
+    <div style="position: relative; width: 48px; height: 118px;">
+      <div class="back" style="left: 2px; top: 0; transform: rotate(-84deg);"></div>
+      <div class="back" style="left: 2px; top: 14px; transform: rotate(-88deg);"></div>
+      <div class="back" style="left: 2px; top: 28px; transform: rotate(-92deg);"></div>
+      <div class="back" style="left: 2px; top: 42px; transform: rotate(-96deg);"></div>
+      <div class="back" style="left: 2px; top: 56px; transform: rotate(-100deg);"></div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div style="position: absolute; left: 0; top: 168px; width: 390px; display: flex; justify-content: center; align-items: center; gap: 10px;">
+    <div style="padding: 4px 12px; border-radius: 999px; border: 1px solid #e6c26a; color: #f3d98f; font-size: 12px; font-weight: 700; letter-spacing: 0.02em;">Rosen Trumpf</div>
+    <div style="font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 20px; color: #f2ede2;">Wähle eine Karte.</div>
+  </div>
+
+  <!-- Stich mit Spotlight -->
+  <div style="position: absolute; left: 95px; top: 360px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(230,194,106,0.10) 0%, rgba(230,194,106,0) 70%);"></div>
+  <div class="trick" style="left: 163px; top: 322px; transform: rotate(-4deg);"><img src="schellen_ass.webp" alt=""></div>
+  <div class="trick" style="left: 104px; top: 400px; transform: rotate(-9deg);"><img src="schellen_6.webp" alt=""></div>
+  <div class="trick" style="left: 222px; top: 398px; transform: rotate(7deg);"><img src="schellen_under.webp" alt=""></div>
+
+  <!-- Eigener Sitz -->
+  <div style="position: absolute; left: 0; top: 646px; width: 390px; display: flex; justify-content: center;">
+    <div style="display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; background: rgba(230,194,106,0.16); border: 1px solid #e6c26a; box-shadow: 0 0 18px rgba(230,194,106,0.35); font-size: 12px; font-weight: 700;"><span style="width: 6px; height: 6px; border-radius: 50%; background: #f3d98f;"></span>Du</div>
+  </div>
+  <div style="position: absolute; left: 0; top: 690px; width: 390px; height: 154px;">
+    <div class="card" style="left: 31px; top: 11px; transform: translateY(11px) rotate(-16.8deg);"><img src="rosen_6.webp" alt=""></div>
+    <div class="card" style="left: 63px; top: 8px; transform: translateY(8px) rotate(-12.6deg);"><img src="rosen_9.webp" alt=""></div>
+    <div class="card" style="left: 95px; top: 6px; transform: translateY(6px) rotate(-8.4deg);"><img src="rosen_under.webp" alt=""></div>
+    <div class="card dim" style="left: 127px; top: 17px; transform: translateY(3px) rotate(-4.2deg);"><img src="eicheln_ass.webp" alt=""></div>
+    <div class="card dim" style="left: 159px; top: 14px; transform: translateY(0) rotate(0deg);"><img src="eicheln_koenig.webp" alt=""></div>
+    <div class="card" style="left: 191px; top: 3px; transform: translateY(3px) rotate(4.2deg); box-shadow: 0 0 0 2px #f3d98f, 0 10px 22px rgba(0,0,0,0.55);"><img src="schellen_7.webp" alt=""></div>
+    <div class="card" style="left: 223px; top: 6px; transform: translateY(6px) rotate(8.4deg);"><img src="schellen_10.webp" alt=""></div>
+    <div class="card dim" style="left: 255px; top: 22px; transform: translateY(8px) rotate(12.6deg);"><img src="schilten_8.webp" alt=""></div>
+    <div class="card dim" style="left: 287px; top: 25px; transform: translateY(11px) rotate(16.8deg);"><img src="schilten_ober.webp" alt=""></div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

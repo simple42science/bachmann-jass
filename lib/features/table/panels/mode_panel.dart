@@ -36,7 +36,7 @@ class ModePanel extends StatelessWidget {
         RoundMode.obeAbe => Icons.arrow_downward,
         RoundMode.uneUfe => Icons.arrow_upward,
         _ => Icons.swap_vert,
-      }, color: colors.goldLight);
+      }, color: colors.brassGlow);
     }
 
     return PanelFrame(
@@ -55,7 +55,7 @@ class ModePanel extends StatelessWidget {
                   trailing: game.usesRoundMultipliers && game.rules.multiplierFor(mode) > 1
                       ? Text(
                           texts.multiplier(game.rules.multiplierFor(mode)),
-                          style: TextStyle(color: colors.goldLight, fontWeight: FontWeight.w700),
+                          style: TextStyle(color: colors.brassGlow, fontWeight: FontWeight.w700),
                         )
                       : null,
                   selected: false,

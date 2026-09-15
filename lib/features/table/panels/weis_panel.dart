@@ -90,15 +90,15 @@ class _WeisRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: primary ? colors.gold.withValues(alpha: 0.16) : Colors.black.withValues(alpha: 0.2),
+        color: primary ? colors.brass.withValues(alpha: 0.16) : Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primary ? colors.gold : colors.border),
+        border: Border.all(color: primary ? colors.brass : colors.border),
       ),
       child: Row(
         children: [
           Text(
             '$points',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: colors.goldLight),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: colors.brassGlow),
           ),
           const SizedBox(width: 12),
           Expanded(

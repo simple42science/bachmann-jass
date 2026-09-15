@@ -10,18 +10,44 @@ import '../../game/game_controller.dart';
 import '../../game/game_session.dart';
 import '../../game/game_texts.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'motion.dart';
 import 'panels/bid_panel.dart';
 import 'panels/mode_panel.dart';
 import 'panels/round_end_panel.dart';
 import 'panels/weis_panel.dart';
 import 'table_geometry.dart';
+import 'widgets/event_toast.dart';
 import 'widgets/hand_view.dart';
 import 'widgets/score_bar.dart';
 import 'widgets/seat_label.dart';
 import 'widgets/trick_view.dart';
 
+enum _MenuAction { speed, scoreboard, rules, abandon }
+
 class TableScreen extends ConsumerWidget {
   const TableScreen({super.key});
+
+  Future<void> _confirmAbandon(BuildContext context, WidgetRef ref) async {
+    final texts = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(texts.abandonTitle),
+        content: Text(texts.abandonBody),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(texts.cancel)),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(texts.abandonGame),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      ref.read(gameControllerProvider.notifier).abandon();
+      context.go(Routes.home);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,10 +77,31 @@ class TableScreen extends ConsumerWidget {
             tooltip: session.paused ? texts.continueButton : texts.pauseButton,
             onPressed: session.paused ? controller.resumeGame : controller.pause,
           ),
-          IconButton(
-            icon: const Icon(Icons.speed),
-            tooltip: texts.speedButton(texts.speedName(settings.speed.name)),
-            onPressed: () => ref.read(settingsProvider.notifier).setSpeed(settings.speed.next),
+          PopupMenuButton<_MenuAction>(
+            tooltip: texts.menuTooltip,
+            icon: const Icon(Icons.more_vert),
+            onSelected: (action) {
+              switch (action) {
+                case _MenuAction.speed:
+                  ref.read(settingsProvider.notifier).setSpeed(settings.speed.next);
+                case _MenuAction.scoreboard:
+                  context.go(Routes.scoreboard);
+                case _MenuAction.rules:
+                  context.go(Routes.rules);
+                case _MenuAction.abandon:
+                  _confirmAbandon(context, ref);
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _MenuAction.speed,
+                child: Text(texts.speedButton(texts.speedName(settings.speed.name))),
+              ),
+              PopupMenuItem(value: _MenuAction.scoreboard, child: Text(texts.menuScoreboard)),
+              PopupMenuItem(value: _MenuAction.rules, child: Text(texts.menuRules)),
+              const PopupMenuDivider(),
+              PopupMenuItem(value: _MenuAction.abandon, child: Text(texts.menuAbandon)),
+            ],
           ),
         ],
       ),
@@ -62,6 +109,7 @@ class TableScreen extends ConsumerWidget {
         child: LayoutBuilder(
           builder: (context, constraints) => _TableStage(
             session: session,
+            motion: Motion.of(context, settings.speed),
             geometry: TableGeometry.compute(
               size: constraints.biggest,
               variant: session.state.variant,
@@ -74,10 +122,11 @@ class TableScreen extends ConsumerWidget {
 }
 
 class _TableStage extends ConsumerWidget {
-  const _TableStage({required this.session, required this.geometry});
+  const _TableStage({required this.session, required this.geometry, required this.motion});
 
   final GameSession session;
   final TableGeometry geometry;
+  final Motion motion;
 
   void _act(BuildContext context, WidgetRef ref, GameAction action) {
     final violation = ref.read(gameControllerProvider.notifier).act(action);
@@ -124,21 +173,21 @@ class _TableStage extends ConsumerWidget {
     final humanPlaying = session.humanTurn && game.phase == GamePhase.playing && !session.paused;
     final playable = humanPlaying ? playableCards(game, 0).toSet() : const <JassCard>{};
     final showTrick = game.phase != GamePhase.roundEnd && game.phase != GamePhase.gameOver;
+    final feltRect = Rect.fromLTRB(8, 4, geometry.size.width - 8, geometry.size.height - 6);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _tapTable(ref),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: const Alignment(0, -0.2),
-            radius: 1.1,
-            colors: [colors.felt, colors.feltDark],
-          ),
-        ),
+      child: CustomPaint(
+        painter: WoodGrainPainter(colors: colors),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
+            // Der Filz mit Messingkante, eingelassen in den Holzrand.
+            Positioned.fromRect(
+              rect: feltRect,
+              child: _Felt(colors: colors),
+            ),
             for (final MapEntry(key: playerIndex, value: seat) in seats.entries)
               if (seat != Seat.bottom)
                 Positioned.fromRect(
@@ -146,6 +195,8 @@ class _TableStage extends ConsumerWidget {
                   child: _AiSeat(
                     geometry: geometry,
                     seat: seat,
+                    motion: motion,
+                    roundNumber: game.roundNumber,
                     name: game.players[playerIndex].name,
                     badge: texts.seatBadge(game, playerIndex),
                     active: game.isInteractive && game.currentPlayer == playerIndex,
@@ -157,6 +208,7 @@ class _TableStage extends ConsumerWidget {
               child: _StatusRow(
                 mode: texts.modeChip(game),
                 message: session.paused ? texts.msgPaused : texts.phaseMessage(game),
+                compact: geometry.compact,
               ),
             ),
             if (showTrick)
@@ -165,6 +217,8 @@ class _TableStage extends ConsumerWidget {
                   geometry: geometry,
                   trick: game.trick,
                   seats: seats,
+                  motion: motion,
+                  collectTo: seats[game.trickLeader] ?? Seat.bottom,
                   winner: game.phase == GamePhase.trickEnd ? game.trickLeader : null,
                 ),
               ),
@@ -186,10 +240,16 @@ class _TableStage extends ConsumerWidget {
                     hand: game.players[0].hand,
                     playable: playable,
                     interactive: humanPlaying,
+                    motion: motion,
+                    roundNumber: game.roundNumber,
                     onTap: (card) => _playCard(context, ref, card),
                   ),
                 ],
               ),
+            ),
+            Positioned.fromRect(
+              rect: geometry.center,
+              child: EventToast(session: session, geometry: geometry, motion: motion),
             ),
             if (!session.paused)
               Positioned.fromRect(
@@ -203,12 +263,60 @@ class _TableStage extends ConsumerWidget {
   }
 }
 
-/// Namensschild und verdeckte Hand eines Computers; an den Seiten steht der
+/// Der gruene Filz: heller in der Mitte, dunkler zum Rand, mit Messingring.
+class _Felt extends StatelessWidget {
+  const _Felt({required this.colors});
+
+  final JassColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.brass, width: 2),
+        boxShadow: const [
+          BoxShadow(color: Color(0xAA000000), blurRadius: 18, offset: Offset(0, 6)),
+        ],
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: colors.feltEdge, width: 3),
+          gradient: RadialGradient(
+            center: const Alignment(0, -0.1),
+            radius: 1.1,
+            colors: [colors.felt, colors.feltMid, colors.feltEdge],
+            stops: const [0, 0.6, 1],
+          ),
+        ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: RadialGradient(
+              radius: 1.0,
+              colors: [
+                Colors.transparent,
+                Colors.transparent,
+                Colors.black.withValues(alpha: 0.35),
+              ],
+              stops: const [0, 0.7, 1],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tischkarte und verdeckte Hand eines Computers; an den Seiten steht der
 /// Faecher senkrecht.
 class _AiSeat extends StatelessWidget {
   const _AiSeat({
     required this.geometry,
     required this.seat,
+    required this.motion,
+    required this.roundNumber,
     required this.name,
     required this.badge,
     required this.active,
@@ -217,6 +325,8 @@ class _AiSeat extends StatelessWidget {
 
   final TableGeometry geometry;
   final Seat seat;
+  final Motion motion;
+  final int roundNumber;
   final String name;
   final String badge;
   final bool active;
@@ -228,6 +338,8 @@ class _AiSeat extends StatelessWidget {
     final hand = HiddenHandView(
       geometry: geometry,
       count: cards,
+      motion: motion,
+      roundNumber: roundNumber,
       quarterTurns: switch (seat) {
         Seat.left => 1,
         Seat.right => 3,
@@ -263,36 +375,58 @@ class _AiSeat extends StatelessWidget {
 }
 
 class _StatusRow extends StatelessWidget {
-  const _StatusRow({required this.mode, required this.message});
+  const _StatusRow({required this.mode, required this.message, required this.compact});
 
   final String mode;
   final String message;
+
+  /// Wenig Platz: eine Zeile in kleinerer Schrift.
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.jass;
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (mode.isNotEmpty)
           Container(
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            margin: const EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: BoxDecoration(
-              color: colors.gold.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: colors.gold),
+              gradient: colors.brassGradient,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: const [
+                BoxShadow(color: Color(0x66000000), blurRadius: 4, offset: Offset(0, 2)),
+              ],
             ),
             child: Text(
-              mode,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colors.goldLight),
+              mode.toUpperCase(),
+              style: JassFonts.ui(
+                size: 11,
+                weight: FontWeight.w800,
+                color: colors.ink,
+                letterSpacing: 0.6,
+              ),
             ),
           ),
         Expanded(
           child: Text(
             message,
-            maxLines: 2,
+            maxLines: compact ? 1 : 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 13, color: colors.text),
+            style:
+                JassFonts.serif(
+                  size: compact ? 14 : 15,
+                  weight: 600,
+                  italic: true,
+                  color: colors.cream,
+                  height: 1.2,
+                ).copyWith(
+                  shadows: const [
+                    Shadow(color: Color(0x99000000), blurRadius: 3, offset: Offset(0, 1)),
+                  ],
+                ),
           ),
         ),
       ],

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../app/theme.dart';
 
-/// Rahmen fuer Bedien-Panels ueber dem Tisch: begrenzt breit, bei wenig
-/// Hoehe scrollbar, mit Titel und optionalem Untertitel.
+/// Rahmen fuer Bedien-Panels ueber dem Tisch: ein dunkles Holzbrett mit
+/// Messingkante, begrenzt breit, bei wenig Hoehe scrollbar.
 class PanelFrame extends StatelessWidget {
   const PanelFrame({
     super.key,
@@ -25,15 +25,15 @@ class PanelFrame extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
         child: Material(
-          color: colors.feltEdge.withValues(alpha: 0.95),
-          elevation: 12,
+          color: colors.panel,
+          elevation: 14,
           shadowColor: Colors.black,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
           clipBehavior: Clip.antiAlias,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: colors.border),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: colors.brass, width: 1.5),
             ),
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
@@ -43,16 +43,12 @@ class PanelFrame extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: colors.goldLight,
-                    ),
+                    style: JassFonts.serif(size: 19, weight: 700, color: colors.brassGlow),
                   ),
                   if (subtitle != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
-                      child: Text(subtitle!, style: TextStyle(fontSize: 12, color: colors.muted)),
+                      child: Text(subtitle!, style: JassFonts.ui(size: 13, color: colors.muted)),
                     ),
                   const SizedBox(height: 12),
                   child,

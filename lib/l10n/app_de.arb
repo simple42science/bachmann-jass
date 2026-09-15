@@ -1,6 +1,5 @@
 {
   "@@locale": "de",
-
   "appTitle": "Bachmann Jass",
   "homeKicker": "Bachmann",
   "homeTitle": "Jass",
@@ -9,131 +8,386 @@
   "resumeHint": "{variant}, Runde {round}{time}",
   "@resumeHint": {
     "placeholders": {
-      "variant": {"type": "String"},
-      "round": {"type": "int"},
-      "time": {"type": "String"}
+      "variant": {
+        "type": "String"
+      },
+      "round": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
     }
   },
   "discardSavedTitle": "Laufende Partie verwerfen?",
   "discardSavedBody": "Es gibt eine gespeicherte Partie. Eine neue Partie löscht sie.",
   "discardSavedConfirm": "Neue Partie starten",
   "cancel": "Zurück",
-
   "setupTitle": "Neue Partie",
   "variantName": "{variant, select, bieter{Bieterjass} schieber{Schieber Jass} other{{variant}}}",
-  "@variantName": {"placeholders": {"variant": {"type": "String"}}},
+  "@variantName": {
+    "placeholders": {
+      "variant": {
+        "type": "String"
+      }
+    }
+  },
   "variantCopy": "{variant, select, bieter{3 Spieler, Gebot, Solo gegen 2} schieber{4 Spieler, Partner gegen Partner} other{}}",
-  "@variantCopy": {"placeholders": {"variant": {"type": "String"}}},
+  "@variantCopy": {
+    "placeholders": {
+      "variant": {
+        "type": "String"
+      }
+    }
+  },
   "variantSubtitle": "{variant, select, bieter{3 Spieler – du spielst alleine gegen 2 Computer} schieber{4 Spieler – du mit Partner gegen 2 Computer} other{}}",
-  "@variantSubtitle": {"placeholders": {"variant": {"type": "String"}}},
+  "@variantSubtitle": {
+    "placeholders": {
+      "variant": {
+        "type": "String"
+      }
+    }
+  },
   "playerNameLabel": "Dein Name",
   "playerNameDefault": "Du",
   "difficultyLabel": "Schwierigkeit",
   "difficultyName": "{difficulty, select, einfach{Einfach} normal{Normal} schwer{Schwer} other{{difficulty}}}",
-  "@difficultyName": {"placeholders": {"difficulty": {"type": "String"}}},
+  "@difficultyName": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
   "difficultyCopy": "{difficulty, select, einfach{Spielt geradeaus, ohne Plan. Gut zum Reinkommen.} normal{Zieht Trumpf, schmiert dem Partner und sticht sparsam.} schwer{Merkt sich zusätzlich alle gespielten Karten.} other{}}",
-  "@difficultyCopy": {"placeholders": {"difficulty": {"type": "String"}}},
+  "@difficultyCopy": {
+    "placeholders": {
+      "difficulty": {
+        "type": "String"
+      }
+    }
+  },
   "speedLabel": "Tempo",
   "speedName": "{speed, select, langsam{Langsam} normal{Normal} schnell{Schnell} other{{speed}}}",
-  "@speedName": {"placeholders": {"speed": {"type": "String"}}},
+  "@speedName": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
   "speedCopy": "{speed, select, langsam{Viel Zeit, jeden Zug in Ruhe mitlesen.} normal{Ausgewogenes Tempo.} schnell{Zügig. Ein Tipp auf den Tisch überspringt zusätzlich jede Wartezeit.} other{}}",
-  "@speedCopy": {"placeholders": {"speed": {"type": "String"}}},
+  "@speedCopy": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
   "speedButton": "Tempo: {speed}",
-  "@speedButton": {"placeholders": {"speed": {"type": "String"}}},
+  "@speedButton": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
   "scoringLabel": "Zählweise im Bieterjass",
   "scoringName": "{scoring, select, einfach{Einfach} schieber{Wie im Schieber} other{{scoring}}}",
-  "@scoringName": {"placeholders": {"scoring": {"type": "String"}}},
+  "@scoringName": {
+    "placeholders": {
+      "scoring": {
+        "type": "String"
+      }
+    }
+  },
   "scoringCopy": "{scoring, select, einfach{Nur die vier Farben, alles zählt einfach.} schieber{Alle Spielarten inklusive Slalom, mit Multiplikatoren.} other{}}",
-  "@scoringCopy": {"placeholders": {"scoring": {"type": "String"}}},
+  "@scoringCopy": {
+    "placeholders": {
+      "scoring": {
+        "type": "String"
+      }
+    }
+  },
   "targetLabel": "Punkteziel im Schieber",
   "targetPoints": "{points} Punkte",
-  "@targetPoints": {"placeholders": {"points": {"type": "int"}}},
+  "@targetPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "targetCopy": "{points, select, 1000{Kurze Partie.} 2500{Lange Partie.} other{}}",
-  "@targetCopy": {"placeholders": {"points": {"type": "String"}}},
+  "@targetCopy": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
   "startGame": "Spiel starten",
-
   "suitName": "{suit, select, eicheln{Eicheln} rosen{Rosen} schellen{Schellen} schilten{Schilten} other{{suit}}}",
-  "@suitName": {"placeholders": {"suit": {"type": "String"}}},
+  "@suitName": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "rankName": "{rank, select, six{6} seven{7} eight{8} nine{9} ten{10} under{Under} ober{Ober} koenig{König} ass{Ass} other{{rank}}}",
-  "@rankName": {"placeholders": {"rank": {"type": "String"}}},
+  "@rankName": {
+    "placeholders": {
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
   "cardName": "{suit} {rank}",
-  "@cardName": {"placeholders": {"suit": {"type": "String"}, "rank": {"type": "String"}}},
+  "@cardName": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
   "modeName": "{mode, select, eicheln{Eicheln} rosen{Rosen} schellen{Schellen} schilten{Schilten} obeAbe{Obe-Abe} uneUfe{Une-Ufe} slalom{Slalom} other{{mode}}}",
-  "@modeName": {"placeholders": {"mode": {"type": "String"}}},
+  "@modeName": {
+    "placeholders": {
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
   "modeTrump": "{mode} Trumpf",
-  "@modeTrump": {"placeholders": {"mode": {"type": "String"}}},
+  "@modeTrump": {
+    "placeholders": {
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
   "multiplier": "×{factor}",
-  "@multiplier": {"placeholders": {"factor": {"type": "int"}}},
+  "@multiplier": {
+    "placeholders": {
+      "factor": {
+        "type": "int"
+      }
+    }
+  },
   "modeLabel": "Spielart",
   "targetShort": "Ziel {points}",
-  "@targetShort": {"placeholders": {"points": {"type": "int"}}},
+  "@targetShort": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "roundLabel": "Runde {round}",
-  "@roundLabel": {"placeholders": {"round": {"type": "int"}}},
-
+  "@roundLabel": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
   "teamName": "{first} und {second}",
-  "@teamName": {"placeholders": {"first": {"type": "String"}, "second": {"type": "String"}}},
+  "@teamName": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
   "badgeDealer": "Geber",
   "badgePartner": "Partner",
   "badgePass": "Pass",
   "badgeBid": "Gebot {bid}",
-  "@badgeBid": {"placeholders": {"bid": {"type": "int"}}},
+  "@badgeBid": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickCount": "{count, plural, =1{1 Stich} other{{count} Stiche}}",
-  "@trickCount": {"placeholders": {"count": {"type": "int"}}},
+  "@trickCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "scoreRound": "Runde {points}",
-  "@scoreRound": {"placeholders": {"points": {"type": "String"}}},
+  "@scoreRound": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
   "scoreTotal": "Gesamt {total}/{target}",
-  "@scoreTotal": {"placeholders": {"total": {"type": "int"}, "target": {"type": "int"}}},
+  "@scoreTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
   "scoreOf": "/ {target}",
-  "@scoreOf": {"placeholders": {"target": {"type": "int"}}},
+  "@scoreOf": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
   "scorePoints": "{points} Pkt",
-  "@scorePoints": {"placeholders": {"points": {"type": "int"}}},
+  "@scorePoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "scoreWeis": "Weis {points}",
-  "@scoreWeis": {"placeholders": {"points": {"type": "int"}}},
+  "@scoreWeis": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "scoreStoeck": "Stöck {points}",
-  "@scoreStoeck": {"placeholders": {"points": {"type": "int"}}},
+  "@scoreStoeck": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "scoreMatch": "Match",
   "pileOwnTeam": "Dein Team",
   "pileOpponentTeam": "Gegner-Team",
   "pileBidder": "Bieter",
   "pileDefenders": "Verteidiger",
   "pileOpponents": "Gegner",
-
-  "msgBiddingHuman": "Schätze deine Karten und biete.",
+  "msgBiddingHuman": "Biete oder passe.",
   "msgBiddingAi": "{name} bietet …",
-  "@msgBiddingAi": {"placeholders": {"name": {"type": "String"}}},
-  "msgChooseModeHuman": "Wähle die Spielart für diese Runde.",
-  "msgChooseModeHumanPush": "Wähle eine Spielart oder schiebe an deinen Partner.",
+  "@msgBiddingAi": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "msgChooseModeHuman": "Wähle die Spielart.",
+  "msgChooseModeHumanPush": "Wähle die Spielart oder schiebe.",
   "msgChooseModeAi": "{name} wählt die Spielart …",
-  "@msgChooseModeAi": {"placeholders": {"name": {"type": "String"}}},
-  "msgWeisHuman": "Prüfe deine Weise und bestätige deinen höchsten Weis.",
-  "msgWeisHumanNone": "Du hast keinen Weis. Bestätige, damit weitergemeldet wird.",
+  "@msgChooseModeAi": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "msgWeisHuman": "Bestätige deinen Weis.",
+  "msgWeisHumanNone": "Kein Weis – bestätige.",
   "msgWeisAi": "{name} meldet Weis …",
-  "@msgWeisAi": {"placeholders": {"name": {"type": "String"}}},
-  "msgPlayingHuman": "Wähle eine Karte zum Spielen.",
+  "@msgWeisAi": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "msgPlayingHuman": "Wähle eine Karte.",
   "msgPlayingAi": "{name} spielt …",
-  "@msgPlayingAi": {"placeholders": {"name": {"type": "String"}}},
+  "@msgPlayingAi": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "msgTrickEnd": "{name} gewinnt den Stich.",
-  "@msgTrickEnd": {"placeholders": {"name": {"type": "String"}}},
+  "@msgTrickEnd": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "msgRoundEndBieter": "{name} {succeeded, select, true{erfüllt} other{verpasst}} {bid}.",
-  "@msgRoundEndBieter": {"placeholders": {"name": {"type": "String"}, "succeeded": {"type": "String"}, "bid": {"type": "int"}}},
+  "@msgRoundEndBieter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "succeeded": {
+        "type": "String"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "msgRoundEndSchieber": "{team} gewinnen diese Runde.",
-  "@msgRoundEndSchieber": {"placeholders": {"team": {"type": "String"}}},
+  "@msgRoundEndSchieber": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
   "msgGameOverBieter": "{name} gewinnt das Spiel.",
-  "@msgGameOverBieter": {"placeholders": {"name": {"type": "String"}}},
+  "@msgGameOverBieter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "msgGameOverSchieber": "{team} gewinnen das Spiel.",
-  "@msgGameOverSchieber": {"placeholders": {"team": {"type": "String"}}},
+  "@msgGameOverSchieber": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
   "msgPaused": "Pause – tippe auf den Tisch, um weiterzuspielen.",
   "msgTapToContinue": "Tippe auf den Tisch, um die Wartezeit zu überspringen.",
-
   "restrictionMustFollowSuit": "{suit} muss bedient werden.",
-  "@restrictionMustFollowSuit": {"placeholders": {"suit": {"type": "String"}}},
+  "@restrictionMustFollowSuit": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "restrictionMustFollowTrump": "Trumpf muss bedient werden.",
   "restrictionNoUndertrump": "Untertrumpfen ist nicht erlaubt.",
   "restrictionNotYourTurn": "Du bist nicht am Zug.",
-
   "bidPrompt": "Dein Gebot",
   "bidHighest": "Höchstes Gebot: {bid}",
-  "@bidHighest": {"placeholders": {"bid": {"type": "int"}}},
+  "@bidHighest": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "bidNone": "Noch kein Gebot",
   "bidPass": "Passen",
   "modePrompt": "Spielart wählen",
@@ -150,52 +404,229 @@
   "weisTypeFourOfKind": "Vier Gleiche",
   "weisWillBeDeclared": "wird gemeldet",
   "weisDescribeSequence": "{points}er Folge {suit} {low}–{high}",
-  "@weisDescribeSequence": {"placeholders": {"points": {"type": "int"}, "suit": {"type": "String"}, "low": {"type": "String"}, "high": {"type": "String"}}},
+  "@weisDescribeSequence": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "suit": {
+        "type": "String"
+      },
+      "low": {
+        "type": "String"
+      },
+      "high": {
+        "type": "String"
+      }
+    }
+  },
   "weisDescribeFourOfKind": "{points} für 4× {rank}",
-  "@weisDescribeFourOfKind": {"placeholders": {"points": {"type": "int"}, "rank": {"type": "String"}}},
+  "@weisDescribeFourOfKind": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
   "stoeckTitle": "Stöck",
   "stoeckMeta": "König + Ober im Trumpf · zählt automatisch",
   "stoeckPoints": "{points} Punkte",
-  "@stoeckPoints": {"placeholders": {"points": {"type": "int"}}},
-
+  "@stoeckPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "roundEndTitle": "Runde {round}",
-  "@roundEndTitle": {"placeholders": {"round": {"type": "int"}}},
+  "@roundEndTitle": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      }
+    }
+  },
   "nextRound": "Nächste Runde",
   "summaryMode": "Spielart: {mode}",
-  "@summaryMode": {"placeholders": {"mode": {"type": "String"}}},
+  "@summaryMode": {
+    "placeholders": {
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
   "summaryBieterSuccess": "{name} erfüllt {bid}. {points} Punkte in der Runde, +{gain} Spielpunkte.",
-  "@summaryBieterSuccess": {"placeholders": {"name": {"type": "String"}, "bid": {"type": "int"}, "points": {"type": "int"}, "gain": {"type": "int"}}},
+  "@summaryBieterSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "bid": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "gain": {
+        "type": "int"
+      }
+    }
+  },
   "summaryBieterFail": "{name} scheitert mit {points}/{bid}: {gain} Spielpunkte. {defenders}: je +{defenderGain} Spielpunkte.",
-  "@summaryBieterFail": {"placeholders": {"name": {"type": "String"}, "points": {"type": "int"}, "bid": {"type": "int"}, "gain": {"type": "int"}, "defenders": {"type": "String"}, "defenderGain": {"type": "int"}}},
+  "@summaryBieterFail": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      },
+      "gain": {
+        "type": "int"
+      },
+      "defenders": {
+        "type": "String"
+      },
+      "defenderGain": {
+        "type": "int"
+      }
+    }
+  },
   "summaryTeamLine": "{team}: {parts} = {base}{multiplier} → {round}",
-  "@summaryTeamLine": {"placeholders": {"team": {"type": "String"}, "parts": {"type": "String"}, "base": {"type": "int"}, "multiplier": {"type": "String"}, "round": {"type": "int"}}},
+  "@summaryTeamLine": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "parts": {
+        "type": "String"
+      },
+      "base": {
+        "type": "int"
+      },
+      "multiplier": {
+        "type": "String"
+      },
+      "round": {
+        "type": "int"
+      }
+    }
+  },
   "summaryTrickPoints": "{points} Stichpunkte",
-  "@summaryTrickPoints": {"placeholders": {"points": {"type": "int"}}},
+  "@summaryTrickPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "summaryWeisPoints": "{points} Weis",
-  "@summaryWeisPoints": {"placeholders": {"points": {"type": "int"}}},
+  "@summaryWeisPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "summaryStoeckPoints": "{points} Stöck",
-  "@summaryStoeckPoints": {"placeholders": {"points": {"type": "int"}}},
+  "@summaryStoeckPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "summaryMatchPoints": "{points} Match",
-  "@summaryMatchPoints": {"placeholders": {"points": {"type": "int"}}},
+  "@summaryMatchPoints": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "summaryRoundWinner": "Rundensieger: {team}",
-  "@summaryRoundWinner": {"placeholders": {"team": {"type": "String"}}},
+  "@summaryRoundWinner": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      }
+    }
+  },
   "summaryWeisWinner": "Weis: {team} schreibt {points} Punkte ({weis}).",
-  "@summaryWeisWinner": {"placeholders": {"team": {"type": "String"}, "points": {"type": "int"}, "weis": {"type": "String"}}},
+  "@summaryWeisWinner": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      },
+      "weis": {
+        "type": "String"
+      }
+    }
+  },
   "summaryWeisNone": "Weis: Kein Team schreibt.",
   "summaryStoeck": "Stöck: {name} schreibt {points} Punkte.",
-  "@summaryStoeck": {"placeholders": {"name": {"type": "String"}, "points": {"type": "int"}}},
+  "@summaryStoeck": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "summaryMatch": "Match: {team} holt alle Stiche und schreibt {points} Zusatzpunkte.",
-  "@summaryMatch": {"placeholders": {"team": {"type": "String"}, "points": {"type": "int"}}},
+  "@summaryMatch": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "summaryPushed": "Die Spielartwahl wurde an {name} geschoben.",
-  "@summaryPushed": {"placeholders": {"name": {"type": "String"}}},
-
+  "@summaryPushed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "gameOverTitle": "Spielende",
   "gameOverTarget": "Ziel erreicht: {points} Punkte",
-  "@gameOverTarget": {"placeholders": {"points": {"type": "int"}}},
+  "@gameOverTarget": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "rankingLine": "{rank}. {name}: {points} Punkte",
-  "@rankingLine": {"placeholders": {"rank": {"type": "int"}, "name": {"type": "String"}, "points": {"type": "int"}}},
+  "@rankingLine": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
   "toHome": "Zum Homescreen",
-
   "homeButton": "Home",
   "pauseButton": "Pause",
   "continueButton": "Weiter",
@@ -203,9 +634,353 @@
   "abandonTitle": "Partie wirklich abbrechen?",
   "abandonBody": "Der Spielstand wird gelöscht.",
   "cardPlayLabel": "{card} spielen",
-  "@cardPlayLabel": {"placeholders": {"card": {"type": "String"}}},
+  "@cardPlayLabel": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "cardNotPlayableLabel": "{card} – nicht spielbar",
-  "@cardNotPlayableLabel": {"placeholders": {"card": {"type": "String"}}},
+  "@cardNotPlayableLabel": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "hiddenHand": "{count, plural, =1{1 verdeckte Karte} other{{count} verdeckte Karten}}",
-  "@hiddenHand": {"placeholders": {"count": {"type": "int"}}}
+  "@hiddenHand": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "menuScoreboard": "Jasstafel",
+  "menuRules": "Regeln",
+  "menuAbandon": "Partie abbrechen",
+  "menuTooltip": "Mehr",
+  "backToTable": "Zurück zum Tisch",
+  "scoreboardTitle": "Jasstafel",
+  "scoreboardEmpty": "Noch keine Runde abgeschlossen.",
+  "scoreboardRemaining": "{name}: noch {points} Punkte bis zum Ziel",
+  "@scoreboardRemaining": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "scoreboardReached": "{name} hat das Ziel erreicht.",
+  "@scoreboardReached": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "colRound": "Nr.",
+  "colMode": "Spielart",
+  "colUs": "Wir",
+  "colThem": "Sie",
+  "colTotal": "Total",
+  "colBidder": "Bieter",
+  "colBid": "Gebot",
+  "colReached": "Erreicht",
+  "colResult": "Ergebnis",
+  "colPoints": "Punkte",
+  "resultMade": "erfüllt",
+  "resultMissed": "verpasst",
+  "tagWeis": "Weis",
+  "tagStoeck": "Stöck",
+  "tagMatch": "Match",
+  "logTitle": "Verlauf dieser Runde",
+  "logEmpty": "Die Runde hat gerade begonnen.",
+  "logRoundStarted": "Runde {round}: {dealer} gibt.",
+  "@logRoundStarted": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      },
+      "dealer": {
+        "type": "String"
+      }
+    }
+  },
+  "logBidPlaced": "{name} bietet {value}.",
+  "@logBidPlaced": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "logBidPassed": "{name} passt.",
+  "@logBidPassed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logBiddingWon": "{name} spielt mit {bid}.",
+  "@logBiddingWon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
+  "logBiddingForced": "Alle passen – {name} muss mit {bid} spielen.",
+  "@logBiddingForced": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
+  "logTrumpPushed": "{fromName} schiebt an {toName}.",
+  "@logTrumpPushed": {
+    "placeholders": {
+      "fromName": {
+        "type": "String"
+      },
+      "toName": {
+        "type": "String"
+      }
+    }
+  },
+  "logModeChosen": "{name} wählt {mode}.",
+  "@logModeChosen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
+  "logWeisDeclared": "{name} weist {weis}.",
+  "@logWeisDeclared": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "weis": {
+        "type": "String"
+      }
+    }
+  },
+  "logWeisNone": "{name} weist nicht.",
+  "@logWeisNone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "logWeisAwarded": "{team} schreiben {points} Weispunkte.",
+  "@logWeisAwarded": {
+    "placeholders": {
+      "team": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "logNoWeis": "Niemand weist.",
+  "logStoeck": "{name} sagt Stöck an: {points} Punkte.",
+  "@logStoeck": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "logCardPlayed": "{name} spielt {card}.",
+  "@logCardPlayed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
+    }
+  },
+  "logTrickWon": "Stich {number}: {name} ({points} Punkte).",
+  "@logTrickWon": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "logRoundScored": "Runde abgerechnet.",
+  "logGameOver": "Die Partie ist zu Ende.",
+  "toastStoeck": "Stöck! +{points}",
+  "@toastStoeck": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "toastMatch": "Match! +{points}",
+  "@toastMatch": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "toastWeis": "{name} weist {weis}",
+  "@toastWeis": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "weis": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesTitle": "Regeln und Punkte",
+  "rulesKicker": "Schweizer Jassregeln",
+  "rulesFollowTitle": "Bedienpflicht",
+  "rulesFollow1": "Die angespielte Farbe muss bedient werden.",
+  "rulesFollow2": "Trumpf darf jederzeit gespielt werden, auch wenn du bedienen könntest.",
+  "rulesFollow3": "Untertrumpfen ist verboten, ausser du hast nur noch Trumpf.",
+  "rulesFollow4": "Wird Trumpf angespielt, musst du Trumpf bedienen. Ausnahme: der Puur als einziger Trumpf.",
+  "rulesFollow5": "Wer nicht bedienen kann, darf abwerfen. Einen Trumpfzwang gibt es nicht.",
+  "rulesModesTitle": "Spielarten",
+  "rulesModeTrump": "Trumpf: die gewählte Farbe sticht, Under (Puur) und Nell sind die höchsten Karten.",
+  "rulesModeObeAbe": "Obe-Abe: kein Trumpf, das Ass ist die höchste Karte.",
+  "rulesModeUneUfe": "Une-Ufe: kein Trumpf, die Sechs ist die höchste Karte.",
+  "rulesModeSlalom": "Slalom: kein Trumpf. Der erste Stich geht obenabe, der zweite unten-ufe, danach abwechselnd. Auch die Kartenwerte folgen der Spielart des Stichs.",
+  "rulesCardValuesTitle": "Kartenwerte",
+  "rulesRowSide": "Nebenfarbe",
+  "rulesRowTrump": "Trumpf",
+  "rulesWeisTitle": "Weis",
+  "rulesSequence": "{count} Karten in Folge",
+  "@rulesSequence": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesFourOf": "Vier {rank}",
+  "@rulesFourOf": {
+    "placeholders": {
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesFourSixes": "Vier Sechser",
+  "rulesNotCounted": "zählen nicht",
+  "rulesWeisOnlyHighest": "Nur das Team mit dem höchsten Weis schreibt, dafür alle seine gemeldeten Weise.",
+  "rulesWeisTie": "Bei gleicher Punktzahl gewinnen {winner}, danach die höhere Karte, dann Trumpf, dann Vorhand.",
+  "@rulesWeisTie": {
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesTieFour": "vier Gleiche gegen eine Folge",
+  "rulesTieSequence": "die Folge gegen vier Gleiche",
+  "rulesBonusTitle": "Zusatzpunkte",
+  "rulesStoeck": "Stöck (König und Ober der Trumpffarbe): {points} Punkte, unabhängig vom Weis-Vergleich. Angesagt wird es beim Ausspielen der zweiten der beiden Karten, oder schon beim Weisen, wenn beide in einem gemeldeten Weis stecken.",
+  "@rulesStoeck": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesLastTrick": "Letzter Stich: {points} Punkte.",
+  "@rulesLastTrick": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesMatch": "Match (alle Stiche einer Runde): {points} Punkte.",
+  "@rulesMatch": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesRoundTotal": "Eine Runde ergibt damit {points} Stichpunkte.",
+  "@rulesRoundTotal": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesMultipliersTitle": "Spielart-Multiplikatoren",
+  "rulesMultipliersCopy": "Sie gelten in der 1000er- wie in der 2500er-Partie gleich. Der Zielscore bestimmt nur die Länge der Partie.",
+  "rulesBieterTitle": "Bieterjass (Hausregel)",
+  "rulesBieter1": "36 Karten, 12 Karten pro Spieler, in 3er-Paketen verteilt.",
+  "rulesBieter2": "Es wird gesteigert, bis alle bis auf einen passen. Der Höchstbietende spielt alleine gegen die anderen zwei.",
+  "rulesBieter3": "Passen alle, spielt der Geber mit {bid}.",
+  "@rulesBieter3": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesBieter4": "Erfüllt der Bieter sein Gebot, erhält er den Gebotswert, sonst wird er ihm abgezogen; die Verteidiger teilen sich den Gebotswert.",
+  "rulesBieter5": "Kein Weis, kein Stöck, kein Match. Ziel: {points} Spielpunkte.",
+  "@rulesBieter5": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesSchieberTitle": "Schieber",
+  "rulesSchieber1": "36 Karten, 9 Karten pro Spieler. Zwei feste Teams, der Partner sitzt gegenüber.",
+  "rulesSchieber2": "Vorhand wählt die Spielart oder schiebt einmal an den Partner.",
+  "rulesSchieber3": "Vor dem ersten Stich wird gewiesen. Geber und Vorhand rücken jede Runde weiter.",
+  "rulesSchieber4": "Ziel: {points} Punkte.",
+  "@rulesSchieber4": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  }
 }

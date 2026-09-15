@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../app/theme.dart';
 
-/// Auswahlkachel fuer Setup und Spielartwahl.
+/// Auswahlkachel fuer Setup und Spielartwahl: ein Holzplaettchen, gewaehlt
+/// mit Messingrand.
 class OptionTile extends StatelessWidget {
   const OptionTile({
     super.key,
@@ -33,18 +34,21 @@ class OptionTile extends StatelessWidget {
       label: subtitleText == null ? title : '$title. $subtitleText',
       child: Material(
         color: selected
-            ? colors.gold.withValues(alpha: 0.18)
-            : Colors.black.withValues(alpha: 0.25),
-        borderRadius: BorderRadius.circular(16),
+            ? colors.brassGlow.withValues(alpha: 0.16)
+            : Colors.black.withValues(alpha: 0.28),
+        borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(8),
           onTap: onTap,
           child: Container(
             constraints: BoxConstraints(minWidth: minWidth, minHeight: 48),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: selected ? colors.gold : colors.border, width: 1.5),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: selected ? colors.brassGlow : colors.brass.withValues(alpha: 0.35),
+                width: 1.5,
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -57,13 +61,14 @@ class OptionTile extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: selected ? colors.goldLight : colors.text,
+                        style: JassFonts.ui(
+                          size: 15,
+                          weight: FontWeight.w800,
+                          color: selected ? colors.brassGlow : colors.text,
                         ),
                       ),
                       if (subtitleText != null)
-                        Text(subtitleText, style: TextStyle(fontSize: 12, color: colors.muted)),
+                        Text(subtitleText, style: JassFonts.ui(size: 12, color: colors.muted)),
                     ],
                   ),
                 ),
@@ -88,21 +93,24 @@ class SectionHead extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.jass;
     return Padding(
-      padding: const EdgeInsets.only(top: 18, bottom: 8),
+      padding: const EdgeInsets.only(top: 20, bottom: 8),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.4, color: colors.text),
+          Flexible(
+            child: Text(
+              title,
+              style: JassFonts.serif(size: 17, weight: 700, color: colors.brassGlow),
+            ),
           ),
           if (hint != null) ...[
             const SizedBox(width: 12),
-            Expanded(
+            Flexible(
               child: Text(
                 hint!,
                 textAlign: TextAlign.right,
-                style: TextStyle(fontSize: 12, color: colors.muted),
+                style: JassFonts.ui(size: 12, color: colors.muted),
               ),
             ),
           ],

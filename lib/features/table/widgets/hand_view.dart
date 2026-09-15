@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:jass_engine/jass_engine.dart';
 
 import '../../../game/game_texts.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../motion.dart';
 import '../table_geometry.dart';
 import 'playing_card_view.dart';
 
+/// Verzoegerung beim Austeilen: in 3er-Paketen, wie am echten Tisch.
+Duration dealDelay(Motion motion, int index) => motion.ms((index ~/ 3) * 130 + (index % 3) * 45);
+
 /// Die eigene Hand: aufgedeckt, gefaechert, spielbare Karten leicht angehoben.
+///
+/// Beim Austeilen gleiten die Karten von oben herein; danach ruecken sie mit
+/// jeder gespielten Karte weich zusammen.
 class HumanHandView extends StatelessWidget {
   const HumanHandView({
     super.key,
@@ -14,6 +22,8 @@ class HumanHandView extends StatelessWidget {
     required this.hand,
     required this.playable,
     required this.interactive,
+    required this.motion,
+    required this.roundNumber,
     required this.onTap,
   });
 
@@ -25,6 +35,10 @@ class HumanHandView extends StatelessWidget {
 
   /// Der Mensch ist am Zug; nicht spielbare Karten werden abgedunkelt.
   final bool interactive;
+  final Motion motion;
+
+  /// Neue Runde = neues Austeilen.
+  final int roundNumber;
   final void Function(JassCard card) onTap;
 
   @override
@@ -42,24 +56,48 @@ class HumanHandView extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           for (var index = 0; index < hand.length; index += 1)
-            Positioned(
+            AnimatedPositioned(
+              key: ValueKey('hand-${hand[index].id}'),
+              duration: motion.ms(260),
+              curve: Curves.easeOutCubic,
               left: left + index * geometry.handStep,
               top: playable.contains(hand[index]) ? 0 : lift,
-              child: _HandCard(
-                card: hand[index],
-                size: cardSize,
-                fan: fanTransform(index, hand.length),
-                isPlayable: playable.contains(hand[index]),
-                dimmed: interactive && !playable.contains(hand[index]),
-                label: playable.contains(hand[index])
-                    ? texts.cardPlayLabel(texts.card(hand[index]))
-                    : texts.cardNotPlayableLabel(texts.card(hand[index])),
-                onTap: () => onTap(hand[index]),
+              child: _dealIn(
+                index,
+                _HandCard(
+                  card: hand[index],
+                  size: cardSize,
+                  fan: fanTransform(index, hand.length),
+                  isPlayable: playable.contains(hand[index]),
+                  dimmed: interactive && !playable.contains(hand[index]),
+                  label: playable.contains(hand[index])
+                      ? texts.cardPlayLabel(texts.card(hand[index]))
+                      : texts.cardNotPlayableLabel(texts.card(hand[index])),
+                  onTap: () => onTap(hand[index]),
+                ),
               ),
             ),
         ],
       ),
     );
+  }
+
+  Widget _dealIn(int index, Widget child) {
+    if (!motion.enabled) {
+      return child;
+    }
+    return child
+        .animate(
+          key: ValueKey('deal-$roundNumber-${hand[index].id}'),
+          delay: dealDelay(motion, index),
+        )
+        .fadeIn(duration: motion.ms(220))
+        .move(
+          begin: Offset(0, -geometry.cardSize.height * 1.4),
+          end: Offset.zero,
+          duration: motion.ms(420),
+          curve: Curves.easeOutCubic,
+        );
   }
 }
 
@@ -111,11 +149,15 @@ class HiddenHandView extends StatelessWidget {
     required this.geometry,
     required this.count,
     required this.quarterTurns,
+    required this.motion,
+    required this.roundNumber,
   });
 
   final TableGeometry geometry;
   final int count;
   final int quarterTurns;
+  final Motion motion;
+  final int roundNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -137,10 +179,13 @@ class HiddenHandView extends StatelessWidget {
                 Positioned(
                   left: index * geometry.aiStep,
                   top: fanTransform(index, count).drop * 0.5,
-                  child: Transform.rotate(
-                    angle: fanTransform(index, count).angle * 0.6,
-                    alignment: Alignment.bottomCenter,
-                    child: CardBackView(size: cardSize),
+                  child: _dealIn(
+                    index,
+                    Transform.rotate(
+                      angle: fanTransform(index, count).angle * 0.6,
+                      alignment: Alignment.bottomCenter,
+                      child: CardBackView(size: cardSize),
+                    ),
                   ),
                 ),
             ],
@@ -148,5 +193,15 @@ class HiddenHandView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _dealIn(int index, Widget child) {
+    if (!motion.enabled) {
+      return child;
+    }
+    return child
+        .animate(key: ValueKey('deal-$roundNumber-$index-$count'), delay: dealDelay(motion, index))
+        .fadeIn(duration: motion.ms(220))
+        .scale(begin: const Offset(0.6, 0.6), end: const Offset(1, 1), duration: motion.ms(360));
   }
 }

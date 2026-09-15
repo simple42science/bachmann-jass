@@ -8,6 +8,7 @@ final class GameSession {
     required this.state,
     required this.events,
     required this.revision,
+    this.roundEvents = const [],
     this.paused = false,
     this.waiting = false,
   });
@@ -16,6 +17,9 @@ final class GameSession {
 
   /// Ereignisse der letzten Aktion, fuer Animationen und Hinweise.
   final List<GameEvent> events;
+
+  /// Alle Ereignisse seit dem Start der laufenden Runde, fuer den Verlauf.
+  final List<GameEvent> roundEvents;
 
   /// Zaehlt jede Aktion; damit lassen sich Animationen eindeutig zuordnen.
   final int revision;
@@ -32,6 +36,7 @@ final class GameSession {
   GameSession copyWith({bool? paused, bool? waiting}) => GameSession(
     state: state,
     events: events,
+    roundEvents: roundEvents,
     revision: revision,
     paused: paused ?? this.paused,
     waiting: waiting ?? this.waiting,

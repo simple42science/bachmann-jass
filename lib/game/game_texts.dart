@@ -131,6 +131,47 @@ extension GameTexts on AppLocalizations {
     PlayRestriction.noUndertrump => restrictionNoUndertrump,
   };
 
+  /// Ein Ereignis als Satz fuer den Verlauf; `null` fuer Ereignisse ohne Zeile.
+  String? logLine(GameState game, GameEvent event) {
+    String name(int seat) => game.players[seat].name;
+    return switch (event) {
+      RoundStarted(:final roundNumber, :final dealer) => logRoundStarted(roundNumber, name(dealer)),
+      BidPlaced(:final playerIndex, :final value) => logBidPlaced(name(playerIndex), value),
+      BidPassed(:final playerIndex) => logBidPassed(name(playerIndex)),
+      BiddingWon(:final playerIndex, :final bid, :final allPassed) =>
+        allPassed
+            ? logBiddingForced(name(playerIndex), bid)
+            : logBiddingWon(name(playerIndex), bid),
+      TrumpPushed(:final fromPlayer, :final toPlayer) => logTrumpPushed(
+        name(fromPlayer),
+        name(toPlayer),
+      ),
+      ModeChosen(:final playerIndex, :final mode) => logModeChosen(
+        name(playerIndex),
+        modeWithTrump(mode),
+      ),
+      WeisDeclared(:final playerIndex, :final weis) =>
+        weis == null
+            ? logWeisNone(name(playerIndex))
+            : logWeisDeclared(name(playerIndex), this.weis(weis)),
+      WeisAwarded(:final teamId, :final points) => logWeisAwarded(team(game, teamId), points),
+      NoWeisAwarded() => logNoWeis,
+      StoeckAnnounced(:final playerIndex, :final points) => logStoeck(name(playerIndex), points),
+      CardPlayed(:final playerIndex, :final card) => logCardPlayed(
+        name(playerIndex),
+        this.card(card),
+      ),
+      TrickWon(:final winner, :final points, :final trickNumber) => logTrickWon(
+        trickNumber,
+        name(winner),
+        points,
+      ),
+      RoundScored() => logRoundScored,
+      GameOver() => logGameOver,
+      NextTrickStarted() => null,
+    };
+  }
+
   /// Die Zeilen der Rundenabrechnung.
   List<String> roundSummaryLines(GameState game) {
     final summary = game.roundSummary;

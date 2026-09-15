@@ -19,7 +19,11 @@ Future<void> main() async {
       ...overrides,
       if (demo != null) ...[
         aiDelayProvider.overrideWithValue((kind, speed, random) => Duration.zero),
-        initialLocationProvider.overrideWithValue(Routes.table),
+        initialLocationProvider.overrideWithValue(switch (demo.screen) {
+          'scoreboard' => Routes.scoreboard,
+          'rules' => Routes.rules,
+          _ => Routes.table,
+        }),
       ],
     ],
   );

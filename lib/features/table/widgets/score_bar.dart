@@ -5,10 +5,11 @@ import '../../../app/theme.dart';
 import '../../../game/game_texts.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
-/// Punktestand in der Kopfzeile: je Team (Schieber) oder je Spieler (Bieterjass).
+/// Punktestand in der Kopfzeile als Messingschilder: je Team (Schieber) oder
+/// je Spieler (Bieterjass). Die Zahl zaehlt bei Aenderungen hoch.
 ///
-/// Auf schmalen Bildschirmen teilen sich die Chips die Breite und lassen die
-/// Detailzeile weg; sonst zeigen sie Rundenpunkte, Stiche, Weis und Stöck.
+/// Auf schmalen Bildschirmen teilen sich die Schilder die Breite und lassen
+/// die Detailzeile weg.
 class ScoreBar extends StatelessWidget {
   const ScoreBar({super.key, required this.game});
 
@@ -61,9 +62,9 @@ class ScoreBar extends StatelessWidget {
             if (result.stoeckPoints > 0) texts.scoreStoeck(result.stoeckPoints),
             if (result.matchPoints > 0) texts.scoreMatch,
           ].join(' · ');
-          return _ScoreChip(
+          return _ScorePlate(
             title: texts.team(game, team.id),
-            value: '${team.totalScore}',
+            value: team.totalScore,
             detail: compact
                 ? texts.scoreRound('${result.basePoints}$factor')
                 : '${texts.scoreRound('${result.basePoints}$factor')} · $stats',
@@ -79,9 +80,9 @@ class ScoreBar extends StatelessWidget {
     final inRound = game.phase != GamePhase.bidding && game.phase != GamePhase.setup;
     return [
       for (final player in game.players)
-        _ScoreChip(
+        _ScorePlate(
           title: player.name,
-          value: '${player.totalScore}',
+          value: player.totalScore,
           detail: [
             if (player.bid != null) texts.seatBadge(game, player.id),
             if (inRound)
@@ -97,8 +98,8 @@ class ScoreBar extends StatelessWidget {
   }
 }
 
-class _ScoreChip extends StatelessWidget {
-  const _ScoreChip({
+class _ScorePlate extends StatelessWidget {
+  const _ScorePlate({
     required this.title,
     required this.value,
     required this.detail,
@@ -108,7 +109,7 @@ class _ScoreChip extends StatelessWidget {
   });
 
   final String title;
-  final String value;
+  final int value;
   final String detail;
   final bool active;
   final bool allied;
@@ -117,12 +118,20 @@ class _ScoreChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.jass;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 10, vertical: 4),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: 4),
       decoration: BoxDecoration(
-        color: allied ? colors.gold.withValues(alpha: 0.14) : colors.panel,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: active ? colors.gold : colors.border),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: allied
+              ? [const Color(0xFF6B4626), const Color(0xFF4A2E17)]
+              : [const Color(0xFF5A3B1F), const Color(0xFF3F2812)],
+        ),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: active ? colors.brassGlow : colors.brass.withValues(alpha: 0.6)),
+        boxShadow: const [BoxShadow(color: Color(0x80000000), blurRadius: 4, offset: Offset(0, 2))],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -133,12 +142,17 @@ class _ScoreChip extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: compact ? 15 : 16,
-                  fontWeight: FontWeight.w800,
-                  color: colors.goldLight,
+              TweenAnimationBuilder<double>(
+                tween: Tween(end: value.toDouble()),
+                duration: const Duration(milliseconds: 700),
+                curve: Curves.easeOutCubic,
+                builder: (context, animated, _) => Text(
+                  '${animated.round()}',
+                  style: JassFonts.serif(
+                    size: compact ? 18 : 20,
+                    weight: 700,
+                    color: colors.brassGlow,
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
@@ -147,10 +161,11 @@ class _ScoreChip extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: compact ? 11 : 12,
-                    fontWeight: FontWeight.w700,
+                  style: JassFonts.ui(
+                    size: compact ? 11 : 12,
+                    weight: FontWeight.w800,
                     color: colors.text,
+                    letterSpacing: 0.2,
                   ),
                 ),
               ),
@@ -161,7 +176,7 @@ class _ScoreChip extends StatelessWidget {
               detail,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 10, color: colors.muted),
+              style: JassFonts.ui(size: 10, color: colors.muted),
             ),
         ],
       ),

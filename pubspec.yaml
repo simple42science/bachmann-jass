@@ -12,6 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  flutter_animate: ^4.5.2
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.1
   intl: any
@@ -30,3 +31,30 @@ flutter:
   uses-material-design: true
   assets:
     - assets/cards/
+  fonts:
+    # Vollkorn und Caveat sind variable Schriften: das Gewicht kommt ueber
+    # FontVariation('wght', ...), siehe JassFonts in lib/app/theme.dart.
+    - family: Vollkorn
+      fonts:
+        - asset: assets/fonts/Vollkorn-Variable.ttf
+        - asset: assets/fonts/Vollkorn-Italic-Variable.ttf
+          style: italic
+    - family: AlegreyaSans
+      fonts:
+        - asset: assets/fonts/AlegreyaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/AlegreyaSans-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/AlegreyaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/AlegreyaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/AlegreyaSans-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/AlegreyaSans-ExtraBold.ttf
+          weight: 800
+    - family: Caveat
+      fonts:
+        - asset: assets/fonts/Caveat-Variable.ttf

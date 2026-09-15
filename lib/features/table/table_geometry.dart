@@ -50,7 +50,8 @@ final class TableGeometry {
     final handSize = variant.handSize;
     final landscape = size.width > size.height;
     final compact = size.height < 420;
-    final statusHeight = compact ? 30.0 : 36.0;
+    // Zwei Zeilen Hinweistext brauchen Platz; im Querformat auf dem Handy nur eine.
+    final statusHeight = compact ? 30.0 : 48.0;
 
     // Eigene Hand: so breit, dass alle Karten mit Ueberlappung Platz haben,
     // aber nie hoeher als ein Fuenftel (hoch) bzw. knapp ein Drittel (quer).
