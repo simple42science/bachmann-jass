@@ -46,3 +46,6 @@ key.properties
 
 # Lockfile nur fuer die App, nicht fuer das Engine-Paket
 packages/jass_engine/pubspec.lock
+
+# Von gen-l10n erzeugt (flutter pub get)
+lib/l10n/generated/
