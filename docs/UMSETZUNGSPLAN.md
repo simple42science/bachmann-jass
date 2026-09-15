@@ -1,6 +1,6 @@
 # Bachmann Jass – Umsetzungsplan Flutter
 
-Stand: 15.09.2026 · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
+Stand: 15.09.2026, Phase 1 abgeschlossen · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
 
 Die bestehende Jass-Web-App wird als Flutter-App neu aufgebaut. Sie soll **dynamischer** werden (Animationen, Sound, Haptik), **besser steuerbar** (Einstellungen, Hausregeln, Debug-Werkzeuge) und ein **eigenes, hochwertiges Design** bekommen. Regeln und Computergegner werden nicht neu erfunden: Sie werden 1:1 übernommen und per Test gegen das Original abgesichert.
 
@@ -23,7 +23,7 @@ Umfang: **S** = wenige Stunden · **M** = etwa 1–2 Arbeitstage · **L** = mehr
 | Baustein | Datei | Umfang | Beurteilung | Im Flutter-Projekt |
 | --- | --- | --- | --- | --- |
 | Regel-Engine | `public/game-engine.js` | 1509 Zeilen | sauber, ohne DOM, gut getestet | 1:1 nach Dart portieren |
-| Computergegner | `public/ai.js` | 391 Zeilen | 3 Stufen, gemessene Siegquoten 74 / 63 / 80 % | portieren, danach verbessern |
+| Computergegner | `public/ai.js` | 391 Zeilen | 3 Stufen; Siegquoten laut README 74 / 63 / 80 %, nachgemessen 69,8 / 58,2 / 74,5 % | portieren, danach verbessern |
 | UI und Spielablauf | `public/app.js` | 1845 Zeilen | imperativ, HTML-Strings, globaler Zustand | neu bauen |
 | Layout | `public/style.css` | 2105 Zeilen | 4 Breakpoints, viele Einzelkorrekturen | durch adaptives Layout ersetzen |
 | Tests | `tests/engine/` | 53 Tests, alle grün (15.09.2026) | decken Regeln, KI, Speicherstand ab | dienen als Spezifikation |
@@ -51,16 +51,17 @@ Umfang: **S** = wenige Stunden · **M** = etwa 1–2 Arbeitstage · **L** = mehr
 
 | # | Befund | Stelle | Lösung im Port |
 | --- | --- | --- | --- |
-| 1 | Die Engine schreibt deutsche Logtexte direkt in den Spielzustand | `game-engine.js`, alle `game.log.push` | typisierte Events; Text entsteht erst in der UI |
-| 2 | Das Regelwerk ist global und gehört nicht zur Partie | `game-engine.js:121` | `RuleSet` im Spielzustand, damit Hausregeln möglich werden |
-| 3 | Die Namen der Computergegner sind fest verdrahtet (Yannick, Papsli, Gusti) | `game-engine.js:387` | konfigurierbar |
-| 4 | Die Handsortierung ignoriert die Spielart; das Umsortieren nach der Trumpfwahl bewirkt nichts | `game-engine.js:352`, `:1072` | Trumpf zuerst, bei Une-Ufe umgekehrte Reihenfolge |
-| 5 | Das KI-Gebot im Bieterjass „wie im Schieber" rechnet nur mit Trumpffarben, obwohl die KI danach Obe-Abe, Une-Ufe oder Slalom wählen darf | `ai.js:169` | Gebot aus der besten erlaubten Spielart |
+| 1 | Die Engine schreibt deutsche Logtexte direkt in den Spielzustand | `game-engine.js`, alle `game.log.push` | ✅ typisierte Events; Text entsteht erst in der UI |
+| 2 | Das Regelwerk ist global und gehört nicht zur Partie | `game-engine.js:121` | ✅ `RuleSet` im Spielzustand, damit Hausregeln möglich werden |
+| 3 | Die Namen der Computergegner sind fest verdrahtet (Yannick, Papsli, Gusti) | `game-engine.js:387` | ✅ konfigurierbar |
+| 4 | Die Handsortierung ignoriert die Spielart; das Umsortieren nach der Trumpfwahl bewirkt nichts | `game-engine.js:352`, `:1072` | ✅ `sortHandForDisplay` für die Anzeige: Trumpf zuerst, bei Une-Ufe umgekehrt. Die Engine sortiert wie bisher, weil die KI davon abhängt |
+| 5 | Das KI-Gebot im Bieterjass „wie im Schieber" rechnet nur mit Trumpffarben, obwohl die KI danach Obe-Abe, Une-Ufe oder Slalom wählen darf | `ai.js:169` | ❌ gemessen und verworfen: Mit allen Spielarten bietet die KI zu hoch (Siegquote 27 statt 33 %) |
 | 6 | Die Stöck-Punkte stehen in zwei UI-Texten fest als 20, statt aus dem Regelwerk zu kommen | `app.js:965`, `:1152` | aus dem `RuleSet` |
 | 7 | „Home" bricht die Partie ab und löscht den Speicherstand; eine Pause gibt es nicht | `app.js:1614` | Pause-Menü; Abbrechen als eigene Aktion |
 | 8 | Nur der erste Stich lässt sich nochmals ansehen; gegnerische Weise erscheinen nur als Logtext | `app.js:529`, `game-engine.js:966` | einstellbarer Stich-Rückblick, Weis-Karten kurz aufdecken |
 | 9 | Der Schieber endet erst am Rundenende, auch wenn das Ziel mitten in der Runde erreicht ist | `game-engine.js:1474` | optionale Regel „Bedanken" |
 | 10 | Die Schriften kommen übers Netz von Google Fonts; offline fällt die App auf die Systemschrift zurück | `index.html:16` | Schriften in die App einbetten |
+| 11 | Im Bieterjass tragen die Sitze 1 und 2 immer dieselbe `teamId`. Die KI hält sie darum für Partner, auch wenn einer von ihnen der Bieter ist, und schmiert ihm Punkte | `game-engine.js:387`, `ai.js:312` | ✅ Bieter gegen Verteidiger korrekt unterschieden; die korrigierte KI gewinnt 61–67 % statt 33 % |
 
 ---
 
@@ -116,9 +117,9 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 
 | Bereich | Wahl | Begründung |
 | --- | --- | --- |
-| SDK | Flutter Stable (lokal 3.41.6, Upgrade in AP 0.2) | bereits installiert |
+| SDK | Flutter Stable 3.47.4 (Dart 3.13) | in AP 0.2 aktualisiert |
 | Zustand | `flutter_riverpod` | testbar, klare Abhängigkeiten zwischen Partie, Einstellungen und Regeln |
-| Modelle und JSON | `freezed` + `json_serializable` | unveränderlicher Zustand, `copyWith`, sichere Speicherstände |
+| Modelle und JSON | handgeschriebene, unveränderliche Klassen mit `copyWith` und JSON | ohne Codegenerierung; das Speicherformat mit Schema-Version bleibt explizit (statt `freezed`, wie ursprünglich geplant) |
 | Navigation | `go_router` | sprechende URLs und Browser-Zurück im Web |
 | Animation | `flutter_animate` + eigene `AnimationController` | einfache Effekte deklarativ, Kartenflüge präzise |
 | Speicher | `shared_preferences` + JSON-Dateien (`path_provider`) | wie in Busdriver und LingoTrail |
@@ -135,21 +136,21 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 
 | AP | Titel | Wer | Umfang | Setzt voraus | Stand |
 | --- | --- | --- | --- | --- | --- |
-| 0.1 | Repo und Projektgerüst | 🟢 | S | – | Repo angelegt |
-| 0.2 | Entwicklungsumgebung | 🟡 | S | – | offen |
-| 0.3 | Grundsatzentscheide | 🔴 | S | – | offen |
-| 1.1 | Datenmodell | 🟢 | M | 0.1 | offen |
-| 1.2 | Regel-Engine portieren | 🟢 | L | 1.1 | offen |
-| 1.3 | Reproduzierbarer Zufall | 🟢 | S | 1.1 | offen |
-| 1.4 | Tests und Paritätsprüfung gegen die Web-App | 🟢 | M | 1.2, 1.3 | offen |
-| 1.5 | Computergegner portieren | 🟢 | M | 1.2 | offen |
+| 0.1 | Repo und Projektgerüst | 🟢 | S | – | ✅ erledigt |
+| 0.2 | Entwicklungsumgebung | 🟡 | S | – | teilweise: Handy fehlt |
+| 0.3 | Grundsatzentscheide | 🔴 | S | – | teilweise: D3 offen |
+| 1.1 | Datenmodell | 🟢 | M | 0.1 | ✅ erledigt |
+| 1.2 | Regel-Engine portieren | 🟢 | L | 1.1 | ✅ erledigt |
+| 1.3 | Reproduzierbarer Zufall | 🟢 | S | 1.1 | ✅ erledigt |
+| 1.4 | Tests und Paritätsprüfung gegen die Web-App | 🟢 | M | 1.2, 1.3 | ✅ erledigt |
+| 1.5 | Computergegner portieren | 🟢 | M | 1.2 | ✅ erledigt |
 | 2.1 | GameController und Spielablauf | 🟢 | M | 1.2 | offen |
 | 2.2 | Speicherstand und Einstellungen | 🟢 | S | 2.1 | offen |
 | 2.3 | Navigation und Screen-Gerüst | 🟢 | S | 0.1 | offen |
 | 2.4 | Texte und Lokalisierung | 🟡 | S | 1.2 | offen |
 | 3.1 | Designrichtung | 🟡 | M | 0.3 | offen |
 | 3.2 | Design-System und Theme | 🟢 | M | 3.1 | offen |
-| 3.3 | Karten-Assets | 🟡 | S | – | offen |
+| 3.3 | Karten-Assets | 🟢 | S | – | offen, Bilder freigegeben (D6) |
 | 3.4 | App-Icon und Splash | 🟡 | S | 3.1 | offen |
 | 3.5 | Sound und Haptik | 🟡 | S | 4.3 | offen |
 | 4.1 | Adaptives Tisch-Layout | 🟢 | L | 2.1 | offen |
@@ -177,24 +178,25 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 #### AP 0.1 Repo und Projektgerüst · 🟢 Claude · S
 
 - ✅ GitHub-Repo `simple42science/bachmann-jass` (privat) mit diesem Plan angelegt.
-- Flutter-Projekt erzeugen (`flutter create --org com.simple42science --project-name bachmann_jass`), Plattformen gemäss D1.
-- Dart-Paket `packages/jass_engine` anlegen und als Pfad-Abhängigkeit einbinden.
-- Strenge Lints, `dart format` als Standard.
-- GitHub Action mit `flutter analyze`, `flutter test`, `dart test` im Engine-Paket und Web-Build.
+- ✅ Flutter-Projekt für Android und Web, App-ID `simple42science.bachmannjass`, Name „Bachmann Jass“.
+- ✅ Dart-Paket `packages/jass_engine` als Pfad-Abhängigkeit.
+- ✅ Strenge Lints, `dart format` mit Seitenbreite 100.
+- ✅ GitHub Action: Formatierung, Analyse, Engine-Tests auf VM und Node, App-Tests und Web-Build.
 - **Fertig, wenn** das leere Gerüst auf Edge und Android startet und die CI grün ist.
+- **Stand:** Web-Build und Android-Debug-APK bauen, die CI ist grün. Der Start auf einem echten Android-Gerät steht noch aus (AP 0.2).
 
 #### AP 0.2 Entwicklungsumgebung · 🟡 Claude + Input · S
 
 - Befund: Das Flutter-SDK liegt in `C:\Dev\Flutter_Apps\flutter` (3.41.6), steht aber nicht im PATH. Im PATH stehen stattdessen zwei Ordner, die es nicht mehr gibt (`Desktop\flutter`, `OneDrive\flutter`).
-- PATH bereinigen und `flutter upgrade` ausführen – mache ich mit deinem OK.
-- Web-Tests laufen über Edge (`-d edge`), Chrome ist nicht nötig.
+- ✅ PATH bereinigt (tote Einträge entfernt, SDK eingetragen) und Flutter auf 3.47.4 aktualisiert. 195 Ordner im SDK-Cache waren schreibgeschützt und blockierten das Upgrade; der Schutz ist entfernt.
+- ✅ Web-Tests laufen über Edge (`-d edge`), Chrome ist nicht nötig.
 - 🔴 Android-Handy mit USB-Debugging anschliessen oder in Android Studio einen Emulator anlegen. Das Android SDK ist vorhanden.
 - Visual Studio fehlt. Es wird nur für Windows-Desktop-Builds gebraucht und ist deshalb vorerst nicht nötig.
 - **Fertig, wenn** `flutter doctor` für Android und Web grün ist und die App auf deinem Handy läuft.
 
 #### AP 0.3 Grundsatzentscheide · 🔴 Deine Hilfe · S
 
-- Entscheide D1, D2, D3 und D6 aus Kapitel 4 treffen: Plattformen, App-ID, Monetarisierung, Rechte an den Kartenbildern.
+- ✅ D1, D2 und D6 entschieden. Offen ist noch D3 (Monetarisierung).
 - **Fertig, wenn** die Entscheide in Kapitel 4 eingetragen sind.
 
 ### Phase 1 – Spielkern in Dart
@@ -208,6 +210,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - `RuleSet` wird Teil des Zustands statt globaler Konstante (Befund 2). Presets: „Offiziell" und „Bachmann" mit den heutigen Werten.
 - Spieler mit konfigurierbarem Namen und Typ (Mensch oder KI mit Stufe).
 - **Fertig, wenn** jeder Zustand verlustfrei nach JSON und zurück geht.
+- **Stand:** ✅ erledigt. Vorerst gibt es nur das Preset „Bachmann“; „Offiziell“ folgt mit dem Hausregel-Editor (AP 5.2), sobald die Unterschiede feststehen.
 
 #### AP 1.2 Regel-Engine portieren · 🟢 Claude · L
 
@@ -218,12 +221,14 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Neue Hilfsfunktion, die erklärt, warum eine Karte nicht erlaubt ist („Rosen muss bedient werden").
 - Handsortierung nach Spielart (Befund 4). Die Regel „Bedanken" wird vorbereitet und ist im Preset „Bachmann" ausgeschaltet (Befund 9).
 - **Fertig, wenn** ganze Partien beider Jassarten per Code durchspielbar sind.
+- **Stand:** ✅ erledigt. „Bedanken“ ist noch nicht eingebaut, weil ein Schalter ohne Wirkung nur verwirrt. Die Regel kommt mit dem Hausregel-Editor (AP 5.2).
 
 #### AP 1.3 Reproduzierbarer Zufall · 🟢 Claude · S
 
 - mulberry32 aus `setRandomSeed` exakt nach Dart portieren. Auf dem Web rechnet Dart mit JavaScript-Zahlen. `Math.imul` und `>>> 0` müssen darum 32-Bit-sicher nachgebaut und auf der Dart-VM **und** im Web getestet werden.
 - Der Seed wird im Spielzustand gespeichert. Damit ist jede Partie nachspielbar, für Debugging, Replays und Fehlerberichte.
 - **Fertig, wenn** derselbe Seed in JavaScript, auf der Dart-VM und im Dart-Web dieselbe Kartenverteilung ergibt.
+- **Stand:** ✅ erledigt. Geprüft für 12 Seeds auf der Dart-VM und in Node (JavaScript-Zahlen).
 
 #### AP 1.4 Tests und Paritätsprüfung gegen die Web-App · 🟢 Claude · M
 
@@ -233,6 +238,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
   - KI-Fixtures: Die Dart-KI muss in denselben Situationen dieselbe Entscheidung treffen.
 - Die Web-App selbst bleibt dabei unverändert.
 - **Fertig, wenn** alle portierten Tests und 100 % der Fixtures grün sind → **Meilenstein M1**.
+- **Stand:** ✅ erledigt. 52 Partien mit 1048 Runden aus der JS-Engine, alle identisch nachgespielt, mit JSON-Sicherung nach jeder Runde. Die 8 Strukturtests der Web-App prüfen HTML und DOM und entfallen; „ein abgeschlossenes Spiel wird nicht als Speicherstand angeboten“ gehört zu AP 2.2.
 
 #### AP 1.5 Computergegner portieren · 🟢 Claude · M
 
@@ -242,6 +248,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Rechenzeit messen; nur falls eine Stufe spürbar Zeit braucht, wird sie in ein Isolate ausgelagert.
 - Danach, in einem eigenen Commit: Das Bieterjass-Gebot berücksichtigt alle erlaubten Spielarten (Befund 5).
 - **Fertig, wenn** die KI-Fixtures identisch sind und der Benchmark die Quoten bestätigt.
+- **Stand:** ✅ erledigt. Alle KI-Entscheidungen in den Fixtures sind identisch. Der Benchmark liefert für dieselben Seeds exakt die Werte der heutigen Web-App: 69,8 / 58,2 / 74,5 %. Die 74 / 63 / 80 % im README der Web-App sind veraltet. Verbesserungen gemessen mit `tool/benchmark_bieter.dart`: Befund 11 übernommen (Siegquote 61–67 % statt 33 %), Befund 5 verworfen (27 statt 33 %).
 
 ### Phase 2 – App-Architektur
 
@@ -426,12 +433,12 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 
 | # | Frage | Mein Vorschlag | Nötig vor | Entscheid |
 | --- | --- | --- | --- | --- |
-| D1 | Zielplattformen und Reihenfolge | Android und Web zuerst, iOS danach | AP 0.1 | offen |
-| D2 | App-ID | `com.simple42science.bachmannjass`, passend zu Busdriver. Nach der ersten Store-Veröffentlichung nicht mehr änderbar | AP 0.1, spätestens 7.2 | offen |
+| D1 | Zielplattformen und Reihenfolge | Android und Web zuerst, iOS danach | AP 0.1 | ✅ Android und Web |
+| D2 | App-ID | `com.simple42science.bachmannjass`, passend zu Busdriver. Nach der ersten Store-Veröffentlichung nicht mehr änderbar | AP 0.1, spätestens 7.2 | ✅ `simple42science.bachmannjass` |
 | D3 | Monetarisierung | keine – wie bisher offline und ohne Datenerhebung | AP 3.1 | offen |
 | D4 | Designrichtung | nach den Mockups aus AP 3.1 | AP 3.2 | offen |
 | D5 | Standard-Hausregeln | heutige Werte der Web-App als Preset „Bachmann" | AP 5.2 | offen |
-| D6 | Rechte an den Kartenbildern | klären, bevor Store-Screenshots entstehen | AP 7.2 | offen |
+| D6 | Rechte an den Kartenbildern | klären, bevor Store-Screenshots entstehen | AP 7.2 | ✅ nutzbar (Open Source); Quelle und Lizenz im Repo vermerken |
 | D7 | Web-Hosting und Repo-Sichtbarkeit | Repo privat lassen, Web auf Cloudflare Pages | AP 7.1 | offen |
 | D8 | Online-Spiel nach 1.0 | erst nach den Spieltests entscheiden | Phase 8 | offen |
 
@@ -441,14 +448,14 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 
 | Meilenstein | Enthält | Ergebnis |
 | --- | --- | --- |
-| **M1 Engine-Parität** | Phase 1 | Dart-Engine und KI spielen nachweislich wie die Web-App |
+| **M1 Engine-Parität** | Phase 1 | Dart-Engine und KI spielen nachweislich wie die Web-App – ✅ erreicht am 15.09.2026 |
 | **M2 Spielbarer Prototyp** | 2.1–2.3, 4.1, 4.2, 4.4 (schlichtes Design) | Schieber und Bieterjass komplett spielbar auf Android und Web |
 | **M3 Look & Feel** | Phase 3, 4.3, 4.5, 4.6 | neues Design, Animationen, Jasstafel |
 | **M4 Feature-komplett** | Phase 5, 6.1, 6.2 | Einstellungen, Hausregeln, Statistik, Tests |
 | **M5 Version 1.0** | 6.3, Phase 7 | im Web und in den Stores |
 
-**Sofort startklar, ohne Entscheid von dir:** Engine-Paket und CI aus AP 0.1, danach Phase 1 und AP 3.3 (Konvertierung).
-**Parallel bei dir:** AP 0.2 (Handy anschliessen, OK für PATH und Upgrade) und die Entscheide D1, D2, D3 und D6.
+**Nächster Schritt (M2):** AP 2.1 → 2.3 → 4.1 → 4.4 → 4.2 im schlichten Design, dazu AP 3.3 (Karten konvertieren) und parallel AP 3.1 (Design-Mockups).
+**Bei dir:** Android-Handy anschliessen (AP 0.2), Quelle und Lizenz der Kartenbilder nennen, D3 entscheiden.
 
 ---
 
@@ -456,8 +463,8 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 
 | Risiko | Auswirkung | Gegenmassnahme |
 | --- | --- | --- |
-| Die Kartenbilder dürfen nicht in einer Store-App verwendet werden | Release blockiert | D6 früh klären; Rückfallebene eigenes Deck |
-| Kleine Abweichungen zwischen JS- und Dart-Engine (32-Bit-Arithmetik im Web, Sortier-Stabilität) | falsche Punkte, andere KI-Züge | Golden-Master-Fixtures (AP 1.4), Tests auf VM und Web |
+| Die Lizenz der Kartenbilder verlangt eine Namensnennung oder schliesst kommerzielle Nutzung aus | Anpassung vor dem Release | Quelle und Lizenz im Repo festhalten (D6: Open Source) |
+| Kleine Abweichungen zwischen JS- und Dart-Engine (32-Bit-Arithmetik im Web, Sortier-Stabilität) | falsche Punkte, andere KI-Züge | ✅ gelöst mit Golden-Master-Fixtures und Tests auf VM und Node |
 | Kein Mac für iOS-Builds | kein iOS-Release | Cloud-Build (AP 7.3) |
 | Animationen ruckeln auf älteren Geräten | schlechtes Spielgefühl | früh Profile-Builds auf echtem Gerät, „Bewegung reduzieren" |
 | Der Umfang wächst (Online-Spiel, weitere Jassarten) | Version 1.0 verzögert sich | Phase 8 strikt nach 1.0 |
