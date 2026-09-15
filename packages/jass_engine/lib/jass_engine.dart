@@ -5,3 +5,8 @@
 library;
 
 export 'src/cards.dart';
+export 'src/game_state.dart';
+export 'src/model.dart';
+export 'src/round.dart';
+export 'src/rule_set.dart';
+export 'src/weis.dart';
