@@ -118,6 +118,65 @@ class _ScorePlate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.jass;
+    final value = TweenAnimationBuilder<double>(
+      tween: Tween(end: this.value.toDouble()),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeOutCubic,
+      builder: (context, animated, _) => Text(
+        '${animated.round()}',
+        style: JassFonts.serif(size: compact ? 18 : 20, weight: 700, color: colors.brassGlow),
+      ),
+    );
+    final titleStyle = JassFonts.ui(
+      size: compact ? 11 : 12,
+      weight: FontWeight.w800,
+      color: colors.text,
+      letterSpacing: 0.2,
+    );
+    final detailStyle = JassFonts.ui(size: 10, color: colors.muted);
+
+    // Auf sehr schmalen Kopfzeilen schrumpft das Schild als Ganzes, statt
+    // dass der Name auf Auslassungspunkte zusammenfaellt.
+    final Widget content = compact
+        ? FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    value,
+                    const SizedBox(width: 6),
+                    Text(title, style: titleStyle),
+                  ],
+                ),
+                if (detail.isNotEmpty) Text(detail, style: detailStyle),
+              ],
+            ),
+          )
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  value,
+                  const SizedBox(width: 6),
+                  Text(title, style: titleStyle),
+                ],
+              ),
+              if (detail.isNotEmpty) Text(detail, style: detailStyle),
+            ],
+          );
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
       padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: 4),
@@ -133,53 +192,7 @@ class _ScorePlate extends StatelessWidget {
         border: Border.all(color: active ? colors.brassGlow : colors.brass.withValues(alpha: 0.6)),
         boxShadow: const [BoxShadow(color: Color(0x80000000), blurRadius: 4, offset: Offset(0, 2))],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              TweenAnimationBuilder<double>(
-                tween: Tween(end: value.toDouble()),
-                duration: const Duration(milliseconds: 700),
-                curve: Curves.easeOutCubic,
-                builder: (context, animated, _) => Text(
-                  '${animated.round()}',
-                  style: JassFonts.serif(
-                    size: compact ? 18 : 20,
-                    weight: 700,
-                    color: colors.brassGlow,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: JassFonts.ui(
-                    size: compact ? 11 : 12,
-                    weight: FontWeight.w800,
-                    color: colors.text,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (detail.isNotEmpty)
-            Text(
-              detail,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: JassFonts.ui(size: 10, color: colors.muted),
-            ),
-        ],
-      ),
+      child: content,
     );
   }
 }

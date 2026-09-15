@@ -197,6 +197,7 @@ GameState _startRound(GameState state, List<GameEvent> events) {
     capturedPileOwners: const [0, 1],
     firstCapturedTrick: null,
     lastCapturedPile: null,
+    roundTricks: const [],
     teamWeisScores: const [0, 0],
     teamWeisBreakdown: const [[], []],
     teamStoeckPoints: const [0, 0],

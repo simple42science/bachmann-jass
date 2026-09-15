@@ -25,10 +25,18 @@ class HumanHandView extends StatelessWidget {
     required this.motion,
     required this.roundNumber,
     required this.onTap,
+    this.selected,
+    this.highlighted,
   });
 
   final TableGeometry geometry;
   final List<JassCard> hand;
+
+  /// Beim Bestaetigen zuerst angetippte Karte; steht hoeher.
+  final JassCard? selected;
+
+  /// Vom Tipp empfohlene Karte; bekommt einen Messingrand.
+  final JassCard? highlighted;
 
   /// Karten, die gerade gespielt werden duerfen (leer, wenn nicht am Zug).
   final Set<JassCard> playable;
@@ -61,7 +69,11 @@ class HumanHandView extends StatelessWidget {
               duration: motion.ms(260),
               curve: Curves.easeOutCubic,
               left: left + index * geometry.handStep,
-              top: playable.contains(hand[index]) ? 0 : lift,
+              top: hand[index] == selected
+                  ? -lift
+                  : playable.contains(hand[index])
+                  ? 0
+                  : lift,
               child: _dealIn(
                 index,
                 _HandCard(
@@ -70,6 +82,7 @@ class HumanHandView extends StatelessWidget {
                   fan: fanTransform(index, hand.length),
                   isPlayable: playable.contains(hand[index]),
                   dimmed: interactive && !playable.contains(hand[index]),
+                  highlighted: hand[index] == highlighted || hand[index] == selected,
                   label: playable.contains(hand[index])
                       ? texts.cardPlayLabel(texts.card(hand[index]))
                       : texts.cardNotPlayableLabel(texts.card(hand[index])),
@@ -108,6 +121,7 @@ class _HandCard extends StatelessWidget {
     required this.fan,
     required this.isPlayable,
     required this.dimmed,
+    required this.highlighted,
     required this.label,
     required this.onTap,
   });
@@ -117,6 +131,7 @@ class _HandCard extends StatelessWidget {
   final ({double angle, double drop}) fan;
   final bool isPlayable;
   final bool dimmed;
+  final bool highlighted;
   final String label;
   final VoidCallback onTap;
 
@@ -134,7 +149,12 @@ class _HandCard extends StatelessWidget {
           child: Transform.rotate(
             angle: fan.angle,
             alignment: Alignment.bottomCenter,
-            child: PlayingCardView(card: card, size: size, dimmed: dimmed),
+            child: PlayingCardView(
+              card: card,
+              size: size,
+              dimmed: dimmed,
+              highlighted: highlighted,
+            ),
           ),
         ),
       ),
@@ -151,6 +171,7 @@ class HiddenHandView extends StatelessWidget {
     required this.quarterTurns,
     required this.motion,
     required this.roundNumber,
+    this.revealed,
   });
 
   final TableGeometry geometry;
@@ -158,6 +179,9 @@ class HiddenHandView extends StatelessWidget {
   final int quarterTurns;
   final Motion motion;
   final int roundNumber;
+
+  /// Debug: die Karten offen statt als Ruecken zeigen.
+  final List<JassCard>? revealed;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +208,9 @@ class HiddenHandView extends StatelessWidget {
                     Transform.rotate(
                       angle: fanTransform(index, count).angle * 0.6,
                       alignment: Alignment.bottomCenter,
-                      child: CardBackView(size: cardSize),
+                      child: revealed != null && index < revealed!.length
+                          ? PlayingCardView(card: revealed![index], size: cardSize)
+                          : CardBackView(size: cardSize),
                     ),
                   ),
                 ),

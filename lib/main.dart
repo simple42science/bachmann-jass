@@ -22,6 +22,8 @@ Future<void> main() async {
         initialLocationProvider.overrideWithValue(switch (demo.screen) {
           'scoreboard' => Routes.scoreboard,
           'rules' => Routes.rules,
+          'settings' => Routes.settings,
+          'stats' => Routes.stats,
           _ => Routes.table,
         }),
       ],

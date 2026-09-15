@@ -51,6 +51,7 @@ const SCENES = [
   { name: 'bieter-stich', query: '?demo=bieter&seed=1000&moves=3' },
   { name: 'jasstafel', query: '?demo=schieber&seed=5&moves=40&screen=scoreboard' },
   { name: 'regeln', query: '?demo=schieber&seed=5&screen=rules' },
+  { name: 'einstellungen', query: '?demo=schieber&seed=5&screen=settings' },
 ];
 
 function serve() {

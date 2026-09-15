@@ -44,6 +44,7 @@ final class GameState {
     required this.capturedPileOwners,
     required this.firstCapturedTrick,
     required this.lastCapturedPile,
+    this.roundTricks = const [],
     required this.teamWeisScores,
     required this.teamWeisBreakdown,
     required this.teamStoeckPoints,
@@ -101,6 +102,10 @@ final class GameState {
           ? null
           : CapturedTrick.fromJson(json['firstCapturedTrick']! as Map<String, Object?>),
       lastCapturedPile: json['lastCapturedPile'] as int?,
+      roundTricks: [
+        for (final trick in json['roundTricks'] as List<Object?>? ?? const [])
+          CapturedTrick.fromJson(trick! as Map<String, Object?>),
+      ],
       teamWeisScores: intsFromJson(json['teamWeisScores']),
       teamWeisBreakdown: [
         for (final team in json['teamWeisBreakdown']! as List<Object?>)
@@ -177,6 +182,9 @@ final class GameState {
   final CapturedTrick? firstCapturedTrick;
   final int? lastCapturedPile;
 
+  /// Alle eingesammelten Stiche der laufenden Runde, in Reihenfolge.
+  final List<CapturedTrick> roundTricks;
+
   final List<int> teamWeisScores;
   final List<List<Weis>> teamWeisBreakdown;
   final List<int> teamStoeckPoints;
@@ -248,6 +256,7 @@ final class GameState {
     List<int>? capturedPileOwners,
     Object? firstCapturedTrick = unchanged,
     Object? lastCapturedPile = unchanged,
+    List<CapturedTrick>? roundTricks,
     List<int>? teamWeisScores,
     List<List<Weis>>? teamWeisBreakdown,
     List<int>? teamStoeckPoints,
@@ -290,6 +299,7 @@ final class GameState {
     lastCapturedPile: identical(lastCapturedPile, unchanged)
         ? this.lastCapturedPile
         : lastCapturedPile as int?,
+    roundTricks: roundTricks ?? this.roundTricks,
     teamWeisScores: teamWeisScores ?? this.teamWeisScores,
     teamWeisBreakdown: teamWeisBreakdown ?? this.teamWeisBreakdown,
     teamStoeckPoints: teamStoeckPoints ?? this.teamStoeckPoints,
@@ -333,6 +343,7 @@ final class GameState {
     'capturedPileOwners': capturedPileOwners,
     'firstCapturedTrick': firstCapturedTrick?.toJson(),
     'lastCapturedPile': lastCapturedPile,
+    'roundTricks': [for (final trick in roundTricks) trick.toJson()],
     'teamWeisScores': teamWeisScores,
     'teamWeisBreakdown': [
       for (final team in teamWeisBreakdown) [for (final weis in team) weis.toJson()],

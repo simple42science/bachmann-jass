@@ -2,11 +2,11 @@
 
 Schweizer Jass (Schieber und Bieterjass) als Flutter-App für Android und Web.
 
-Die App ersetzt die bisherige Web-App [`bachmann_jass_game`](https://github.com/YannickLuca/bachmann_jass_game). Regeln und Computergegner sind aus der Web-App übernommen und per Paritätstest abgesichert: Für dieselben Seeds spielt die Dart-Engine exakt dieselben Partien. Neu gebaut sind Oberfläche, Spielablauf, Einstellungen und später Animationen und Hausregeln.
+Die App ersetzt die bisherige Web-App [`bachmann_jass_game`](https://github.com/YannickLuca/bachmann_jass_game). Regeln und Computergegner sind aus der Web-App übernommen und per Paritätstest abgesichert: Für dieselben Seeds spielt die Dart-Engine exakt dieselben Partien. Neu gebaut sind Oberfläche, Spielablauf, Animationen, Einstellungen und Hausregeln.
 
 ## Stand
 
-Meilenstein M3: Schieber und Bieterjass sind komplett spielbar (Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Tempo, Pause, Speicherstand), im Design „Stammtisch“ (Holz, Filz, Messing, Tischkarten, Schiefertafel), mit Animationen (Austeilen, Kartenflug, Stich einsammeln, Einblendungen), Jasstafel mit Z-Tafel-Strichen und Verlauf sowie Regel-Screen. Es fehlen noch Sound, ein eigenes Icon, das Tutorial und die Einstellungen aus Phase 5.
+Meilenstein M4: Schieber und Bieterjass sind komplett spielbar (Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Pause, Speicherstand), im Design „Stammtisch“ (Holz, Filz, Messing, Tischkarten, Schiefertafel), mit Animationen, Jasstafel mit Z-Tafel-Strichen und Verlauf, Regel-Screen, Einstellungen (Tempo, automatisch spielen, Bestätigen, Zug zurücknehmen, Tipp), Hausregel-Editor (Preset Bachmann, Bedanken, Stich-Rückblick), Gegnernamen und -stärke, Statistik und Debug-Screen. Es fehlen noch Sound, ein eigenes Icon, das Tutorial und Avatare.
 
 Arbeitspakete, Entscheide und Stand: [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSPLAN.md). Screenshots der Web-Version: [`docs/screenshots/`](docs/screenshots/).
 
@@ -21,9 +21,10 @@ Arbeitspakete, Entscheide und Stand: [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSP
 ```text
 lib/
   app/        Start, Router, Theme (Design-System Stammtisch), Einstellungen, Demo-Start
-  game/       GameController (Spielablauf, KI-Wartezeiten, Pause), Speicherstand, Texte
+  game/       GameController (Spielablauf, KI-Wartezeiten, Pause, Zurücknehmen, Tipp),
+              Speicherstand, Statistik, Texte
   features/   Screens: Home, Setup, Tisch (Geometrie, Karten, Hand, Panels, Animationen),
-              Jasstafel, Regeln
+              Jasstafel, Regeln, Einstellungen, Statistik, Debug
   l10n/       Texte (ARB, Deutsch)
 packages/jass_engine/   Regeln, Wertung, Computergegner, Zufall (reines Dart)
 assets/cards/           36 Karten als WebP
@@ -69,7 +70,7 @@ Die Werkzeuge, die aus der Web-App lesen, erwarten sie unter `../bachmann_jass_g
 
 ### Demo-Start
 
-Ein Build mit `--dart-define=JASS_DEMO=true` startet über die URL direkt eine reproduzierbare Spielsituation, zum Beispiel `?demo=schieber&seed=5&moves=4` (Schieber mit Seed 5, der Mensch hat seine ersten vier Entscheidungen wie die KI gespielt). `&screen=scoreboard` öffnet die Jasstafel, `&screen=rules` die Regeln. Computerzüge kommen dabei sofort. Der Screenshot-Befehl nutzt das:
+Ein Build mit `--dart-define=JASS_DEMO=true` startet über die URL direkt eine reproduzierbare Spielsituation, zum Beispiel `?demo=schieber&seed=5&moves=4` (Schieber mit Seed 5, der Mensch hat seine ersten vier Entscheidungen wie die KI gespielt). `&screen=scoreboard` öffnet die Jasstafel, `&screen=rules` die Regeln, `&screen=settings` die Einstellungen. Computerzüge kommen dabei sofort. Solche Builds zeigen wie Debug-Builds den Debug-Screen (Seed anzeigen und setzen, Gegnerkarten aufdecken, KI spielt für mich). Der Screenshot-Befehl nutzt das:
 
 ```powershell
 flutter build web --release --dart-define=JASS_DEMO=true

@@ -393,8 +393,9 @@ JassCard aiChooseCard(
 /// Naechste Aktion des Computers, der gerade am Zug ist.
 ///
 /// Folgt dem Spielablauf der Web-App. Liefert `null` in Phasen ohne
-/// Spielerentscheidung (Rundenstart, Stichende, Spielende).
-GameAction? aiDecide(GameState state, {AiTuning tuning = defaultAiTuning}) {
+/// Spielerentscheidung (Rundenstart, Stichende, Spielende). Mit [difficulty]
+/// laesst sich die Stufe vorgeben, etwa fuer einen Tipp an den Menschen.
+GameAction? aiDecide(GameState state, {AiTuning tuning = defaultAiTuning, Difficulty? difficulty}) {
   final seat = state.currentPlayer;
   final hand = state.players[seat].hand;
 
@@ -421,7 +422,7 @@ GameAction? aiDecide(GameState state, {AiTuning tuning = defaultAiTuning}) {
     case GamePhase.announceWeis:
       return DeclareWeis(seat);
     case GamePhase.playing:
-      return PlayCard(seat, aiChooseCard(state, seat, tuning: tuning));
+      return PlayCard(seat, aiChooseCard(state, seat, tuning: tuning, difficulty: difficulty));
     case GamePhase.setup || GamePhase.trickEnd || GamePhase.roundEnd || GamePhase.gameOver:
       return null;
   }

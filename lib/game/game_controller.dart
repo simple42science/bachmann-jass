@@ -7,9 +7,10 @@ import 'package:jass_engine/jass_engine.dart';
 import '../app/settings.dart';
 import 'game_session.dart';
 import 'saved_game.dart';
+import 'stats.dart';
 
 /// Wofuer der Computer gerade Bedenkzeit braucht.
-enum AiDelayKind { bidding, trump, weis, card, trickEnd }
+enum AiDelayKind { bidding, trump, weis, card, trickEnd, autoPlay }
 
 /// Wartezeiten in Millisekunden (min, max) wie in der Web-App.
 const Map<AiDelayKind, (int, int)> _delayRanges = {
@@ -18,18 +19,24 @@ const Map<AiDelayKind, (int, int)> _delayRanges = {
   AiDelayKind.weis: (900, 1700),
   AiDelayKind.card: (1500, 2700),
   AiDelayKind.trickEnd: (1700, 2500),
+  AiDelayKind.autoPlay: (600, 900),
 };
 
-typedef AiDelay = Duration Function(AiDelayKind kind, GameSpeed speed, math.Random random);
+typedef AiDelay = Duration Function(AiDelayKind kind, double speedFactor, math.Random random);
 
-Duration defaultAiDelay(AiDelayKind kind, GameSpeed speed, math.Random random) {
+Duration defaultAiDelay(AiDelayKind kind, double speedFactor, math.Random random) {
   final (min, max) = _delayRanges[kind]!;
   final base = min + random.nextInt(max - min + 1);
-  return Duration(milliseconds: (base * speed.factor).round());
+  return Duration(milliseconds: (base * speedFactor).round());
 }
 
 /// Wartezeit vor Computerzuegen; Tests ueberschreiben sie mit null.
 final aiDelayProvider = Provider<AiDelay>((ref) => defaultAiDelay);
+
+/// Hoechstens so viele eigene Zuege lassen sich zuruecknehmen.
+const int _undoDepth = 20;
+
+typedef _UndoEntry = ({GameState state, List<GameEvent> roundEvents});
 
 /// Fuehrt die Partie: nimmt Eingaben entgegen, laesst die Computer mit
 /// Bedenkzeit ziehen, raeumt Stiche ab und sichert nach jeder Aktion.
@@ -38,6 +45,8 @@ final aiDelayProvider = Provider<AiDelay>((ref) => defaultAiDelay);
 class GameController extends Notifier<GameSession?> {
   Timer? _timer;
   bool _pausedBySystem = false;
+  bool _aiPlaysHuman = false;
+  final List<_UndoEntry> _undo = [];
   final math.Random _random = math.Random();
 
   @override
@@ -46,18 +55,31 @@ class GameController extends Notifier<GameSession?> {
     return null;
   }
 
+  /// Debug: die KI trifft auch die Entscheidungen des Menschen.
+  bool get aiPlaysHuman => _aiPlaysHuman;
+
+  set aiPlaysHuman(bool value) {
+    _aiPlaysHuman = value;
+    _cancelTimer();
+    _schedule();
+  }
+
   void startNewGame({
     required GameVariant variant,
     required MatchConfig matchConfig,
     required String playerName,
+    List<SeatSetup>? seats,
+    RuleSet rules = RuleSet.bachmann,
     int? seed,
   }) {
     final created = createGame(
       variant: variant,
       matchConfig: matchConfig,
-      seats: defaultSeats(variant, humanName: playerName),
+      rules: rules,
+      seats: seats ?? defaultSeats(variant, humanName: playerName),
       seed: seed,
     );
+    _undo.clear();
     final result = applyAction(created, const StartRound());
     _publish(result.state, result.events, revision: 1);
   }
@@ -68,6 +90,7 @@ class GameController extends Notifier<GameSession?> {
     if (saved == null) {
       return false;
     }
+    _undo.clear();
     _publish(saved.state, const [], revision: 1);
     return true;
   }
@@ -81,11 +104,47 @@ class GameController extends Notifier<GameSession?> {
     try {
       final result = applyAction(session.state, action);
       _pausedBySystem = false;
+      if (action is StartRound) {
+        _undo.clear();
+      } else if (actingPlayer(action) == 0) {
+        _undo.add((state: session.state, roundEvents: session.roundEvents));
+        if (_undo.length > _undoDepth) {
+          _undo.removeAt(0);
+        }
+      }
       _publish(result.state, result.events, revision: session.revision + 1);
       return null;
     } on GameRuleException catch (error) {
       return error.violation;
     }
+  }
+
+  /// Nimmt den letzten eigenen Zug zurueck, samt allen Computerzuegen danach.
+  void undo() {
+    final session = state;
+    if (session == null || _undo.isEmpty) {
+      return;
+    }
+    final entry = _undo.removeLast();
+    _cancelTimer();
+    state = GameSession(
+      state: entry.state,
+      events: const [],
+      roundEvents: entry.roundEvents,
+      revision: session.revision + 1,
+      canUndo: _undo.isNotEmpty,
+    );
+    ref.read(savedGameProvider.notifier).save(entry.state);
+    _schedule();
+  }
+
+  /// Was die Stufe "Schwer" an Stelle des Menschen tun wuerde.
+  GameAction? hint() {
+    final session = state;
+    if (session == null || !session.humanTurn) {
+      return null;
+    }
+    return aiDecide(session.state, difficulty: Difficulty.schwer);
   }
 
   /// Ein Tipp auf den Tisch ueberspringt die laufende Wartezeit.
@@ -125,12 +184,14 @@ class GameController extends Notifier<GameSession?> {
   /// Zurueck zum Homescreen; die Partie bleibt gespeichert.
   void leaveTable() {
     _cancelTimer();
+    _undo.clear();
     state = null;
   }
 
   /// Partie endgueltig aufgeben.
   void abandon() {
     _cancelTimer();
+    _undo.clear();
     ref.read(savedGameProvider.notifier).clear();
     state = null;
   }
@@ -140,8 +201,15 @@ class GameController extends Notifier<GameSession?> {
     // Der Verlauf sammelt die Ereignisse seit dem letzten Rundenstart.
     final startsRound = events.any((event) => event is RoundStarted);
     final roundEvents = startsRound ? events : [...?state?.roundEvents, ...events];
-    state = GameSession(state: next, events: events, roundEvents: roundEvents, revision: revision);
+    state = GameSession(
+      state: next,
+      events: events,
+      roundEvents: roundEvents,
+      revision: revision,
+      canUndo: _undo.isNotEmpty,
+    );
 
+    ref.read(statsProvider.notifier).record(next, events);
     final saved = ref.read(savedGameProvider.notifier);
     if (next.phase == GamePhase.gameOver) {
       saved.clear();
@@ -151,11 +219,22 @@ class GameController extends Notifier<GameSession?> {
     _schedule();
   }
 
+  /// Welche Wartezeit ansteht - oder `null`, wenn der Mensch handeln muss.
   AiDelayKind? _pendingKind(GameState game) {
     if (game.phase == GamePhase.trickEnd) {
       return AiDelayKind.trickEnd;
     }
-    if (!game.isInteractive || game.players[game.currentPlayer].isHuman) {
+    if (!game.isInteractive) {
+      return null;
+    }
+    if (game.players[game.currentPlayer].isHuman) {
+      if (_aiPlaysHuman) {
+        return AiDelayKind.autoPlay;
+      }
+      final autoPlay = ref.read(settingsProvider).autoPlaySingleCard;
+      if (autoPlay && game.phase == GamePhase.playing && playableCards(game, 0).length == 1) {
+        return AiDelayKind.autoPlay;
+      }
       return null;
     }
     return switch (game.phase) {
@@ -175,7 +254,7 @@ class GameController extends Notifier<GameSession?> {
     if (kind == null) {
       return;
     }
-    final delay = ref.read(aiDelayProvider)(kind, ref.read(settingsProvider).speed, _random);
+    final delay = ref.read(aiDelayProvider)(kind, ref.read(settingsProvider).speedFactor, _random);
     state = session.copyWith(waiting: true);
     _timer = Timer(delay, _runScheduled);
   }
@@ -187,7 +266,16 @@ class GameController extends Notifier<GameSession?> {
       return;
     }
     final game = session.state;
-    final action = game.phase == GamePhase.trickEnd ? const NextTrick() : aiDecide(game);
+    final GameAction? action;
+    if (game.phase == GamePhase.trickEnd) {
+      action = const NextTrick();
+    } else if (game.isInteractive && game.players[game.currentPlayer].isHuman && !_aiPlaysHuman) {
+      // Automatisches Spielen der einzigen erlaubten Karte.
+      final legal = playableCards(game, 0);
+      action = legal.length == 1 ? PlayCard(0, legal.single) : null;
+    } else {
+      action = aiDecide(game);
+    }
     if (action == null) {
       return;
     }

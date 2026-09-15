@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../app/debug_state.dart';
 import '../../app/router.dart';
 import '../../app/theme.dart';
 import '../../game/game_controller.dart';
@@ -122,9 +123,28 @@ class HomeScreen extends ConsumerWidget {
                         child: Text(texts.newGame),
                       ),
                     const SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () => context.go(Routes.rules),
-                      child: Text(texts.menuRules),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 4,
+                      children: [
+                        TextButton(
+                          onPressed: () => context.go(Routes.rules),
+                          child: Text(texts.menuRules),
+                        ),
+                        TextButton(
+                          onPressed: () => context.go(Routes.settings),
+                          child: Text(texts.menuSettings),
+                        ),
+                        TextButton(
+                          onPressed: () => context.go(Routes.stats),
+                          child: Text(texts.menuStats),
+                        ),
+                        if (debugMenuAvailable)
+                          TextButton(
+                            onPressed: () => context.go(Routes.debug),
+                            child: Text(texts.menuDebug),
+                          ),
+                      ],
                     ),
                   ],
                 ),

@@ -36,12 +36,15 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     final texts = AppLocalizations.of(context);
     final settings = _draft.copyWith(playerName: _name.text.trim());
     ref.read(settingsProvider.notifier).update(settings);
+    final name = settings.playerName.isEmpty ? texts.playerNameDefault : settings.playerName;
     ref
         .read(gameControllerProvider.notifier)
         .startNewGame(
           variant: settings.variant,
           matchConfig: settings.matchConfigFor(settings.variant),
-          playerName: settings.playerName.isEmpty ? texts.playerNameDefault : settings.playerName,
+          playerName: name,
+          seats: settings.seatsFor(settings.variant, name),
+          rules: settings.rules,
         );
     context.go(Routes.table);
   }
@@ -119,7 +122,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         OptionTile(
                           title: texts.speedName(speed.name),
                           selected: _draft.speed == speed,
-                          onTap: () => _change((s) => s.copyWith(speed: speed)),
+                          onTap: () => _change((s) => s.copyWith(speedFactor: speed.factor)),
                         ),
                     ],
                   ),
@@ -157,7 +160,17 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       ],
                     ),
                   ],
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .update(_draft.copyWith(playerName: _name.text.trim()));
+                      context.go(Routes.settings);
+                    },
+                    child: Text(texts.menuSettings),
+                  ),
+                  const SizedBox(height: 12),
                   FilledButton(
                     onPressed: _start,
                     style: FilledButton.styleFrom(

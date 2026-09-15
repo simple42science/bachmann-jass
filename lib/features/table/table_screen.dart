@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jass_engine/jass_engine.dart';
 
+import '../../app/debug_state.dart';
 import '../../app/router.dart';
 import '../../app/settings.dart';
 import '../../app/theme.dart';
@@ -14,6 +15,7 @@ import 'motion.dart';
 import 'panels/bid_panel.dart';
 import 'panels/mode_panel.dart';
 import 'panels/round_end_panel.dart';
+import 'panels/trick_review_dialog.dart';
 import 'panels/weis_panel.dart';
 import 'table_geometry.dart';
 import 'widgets/event_toast.dart';
@@ -22,7 +24,7 @@ import 'widgets/score_bar.dart';
 import 'widgets/seat_label.dart';
 import 'widgets/trick_view.dart';
 
-enum _MenuAction { speed, scoreboard, rules, abandon }
+enum _MenuAction { speed, trickReview, scoreboard, rules, settings, debug, abandon }
 
 class TableScreen extends ConsumerWidget {
   const TableScreen({super.key});
@@ -58,6 +60,7 @@ class TableScreen extends ConsumerWidget {
     final texts = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
     final controller = ref.read(gameControllerProvider.notifier);
+    final canUndo = settings.allowUndo && session.canUndo && !session.paused;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,6 +75,12 @@ class TableScreen extends ConsumerWidget {
         ),
         title: ScoreBar(game: session.state),
         actions: [
+          if (settings.allowUndo)
+            IconButton(
+              icon: const Icon(Icons.undo),
+              tooltip: texts.undoButton,
+              onPressed: canUndo ? controller.undo : null,
+            ),
           IconButton(
             icon: Icon(session.paused ? Icons.play_arrow : Icons.pause),
             tooltip: session.paused ? texts.continueButton : texts.pauseButton,
@@ -84,10 +93,16 @@ class TableScreen extends ConsumerWidget {
               switch (action) {
                 case _MenuAction.speed:
                   ref.read(settingsProvider.notifier).setSpeed(settings.speed.next);
+                case _MenuAction.trickReview:
+                  showTrickReview(context, session.state);
                 case _MenuAction.scoreboard:
                   context.go(Routes.scoreboard);
                 case _MenuAction.rules:
                   context.go(Routes.rules);
+                case _MenuAction.settings:
+                  context.go(Routes.settings);
+                case _MenuAction.debug:
+                  context.go(Routes.debug);
                 case _MenuAction.abandon:
                   _confirmAbandon(context, ref);
               }
@@ -97,8 +112,13 @@ class TableScreen extends ConsumerWidget {
                 value: _MenuAction.speed,
                 child: Text(texts.speedButton(texts.speedName(settings.speed.name))),
               ),
+              if (session.state.rules.trickReview != TrickReview.none)
+                PopupMenuItem(value: _MenuAction.trickReview, child: Text(texts.menuTrickReview)),
               PopupMenuItem(value: _MenuAction.scoreboard, child: Text(texts.menuScoreboard)),
               PopupMenuItem(value: _MenuAction.rules, child: Text(texts.menuRules)),
+              PopupMenuItem(value: _MenuAction.settings, child: Text(texts.menuSettings)),
+              if (debugMenuAvailable)
+                PopupMenuItem(value: _MenuAction.debug, child: Text(texts.menuDebug)),
               const PopupMenuDivider(),
               PopupMenuItem(value: _MenuAction.abandon, child: Text(texts.menuAbandon)),
             ],
@@ -109,7 +129,7 @@ class TableScreen extends ConsumerWidget {
         child: LayoutBuilder(
           builder: (context, constraints) => _TableStage(
             session: session,
-            motion: Motion.of(context, settings.speed),
+            motion: Motion.of(context, settings.speedFactor),
             geometry: TableGeometry.compute(
               size: constraints.biggest,
               variant: session.state.variant,
@@ -121,21 +141,45 @@ class TableScreen extends ConsumerWidget {
   }
 }
 
-class _TableStage extends ConsumerWidget {
+class _TableStage extends ConsumerStatefulWidget {
   const _TableStage({required this.session, required this.geometry, required this.motion});
 
   final GameSession session;
   final TableGeometry geometry;
   final Motion motion;
 
-  void _act(BuildContext context, WidgetRef ref, GameAction action) {
-    final violation = ref.read(gameControllerProvider.notifier).act(action);
-    if (violation == RuleViolation.notYourTurn) {
-      _notify(context, AppLocalizations.of(context).restrictionNotYourTurn);
+  @override
+  ConsumerState<_TableStage> createState() => _TableStageState();
+}
+
+class _TableStageState extends ConsumerState<_TableStage> {
+  /// Beim Bestaetigen: die zuerst angetippte Karte.
+  JassCard? _selected;
+
+  /// Vom Tipp empfohlene Karte.
+  JassCard? _hint;
+
+  GameSession get session => widget.session;
+
+  TableGeometry get geometry => widget.geometry;
+
+  @override
+  void didUpdateWidget(_TableStage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.session.revision != widget.session.revision) {
+      _selected = null;
+      _hint = null;
     }
   }
 
-  void _playCard(BuildContext context, WidgetRef ref, JassCard card) {
+  void _act(GameAction action) {
+    final violation = ref.read(gameControllerProvider.notifier).act(action);
+    if (violation == RuleViolation.notYourTurn) {
+      _notify(AppLocalizations.of(context).restrictionNotYourTurn);
+    }
+  }
+
+  void _playCard(JassCard card) {
     final texts = AppLocalizations.of(context);
     final game = session.state;
     if (!session.humanTurn || game.phase != GamePhase.playing) {
@@ -143,33 +187,65 @@ class _TableStage extends ConsumerWidget {
     }
     final restriction = playRestriction(game.players[0].hand, game.trick, game.trickMode, card);
     if (restriction != null) {
-      _notify(context, texts.restriction(restriction, game));
+      _notify(texts.restriction(restriction, game));
       return;
     }
-    _act(context, ref, PlayCard(0, card));
+    if (ref.read(settingsProvider).confirmPlay && _selected != card) {
+      setState(() => _selected = card);
+      _notify(texts.confirmPlayHint(texts.card(card)));
+      return;
+    }
+    _act(PlayCard(0, card));
   }
 
-  void _notify(BuildContext context, String message) {
+  void _showHint() {
+    final texts = AppLocalizations.of(context);
+    final action = ref.read(gameControllerProvider.notifier).hint();
+    switch (action) {
+      case PlayCard(:final card):
+        setState(() => _hint = card);
+        _notify(texts.hintCard(texts.card(card)));
+      case PlaceBid(:final value):
+        _notify(texts.hintBid(value));
+      case PassBid():
+        _notify(texts.hintPass);
+      case PushTrump():
+        _notify(texts.hintPush);
+      case ChooseMode(:final mode):
+        _notify(texts.hintMode(texts.modeWithTrump(mode)));
+      case DeclareWeis():
+        _notify(texts.hintWeis);
+      default:
+        _notify(texts.hintNone);
+    }
+  }
+
+  void _notify(String message) {
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(SnackBar(content: Text(message), duration: const Duration(seconds: 2)));
   }
 
-  void _tapTable(WidgetRef ref) {
+  void _tapTable() {
     final controller = ref.read(gameControllerProvider.notifier);
     if (session.paused) {
       controller.resumeGame();
     } else {
+      if (_selected != null) {
+        setState(() => _selected = null);
+      }
       controller.skipDelay();
     }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final texts = AppLocalizations.of(context);
     final colors = context.jass;
+    final motion = widget.motion;
     final game = session.state;
     final seats = seatsFor(game.variant);
+    final reveal = ref.watch(revealHandsProvider);
     final humanPlaying = session.humanTurn && game.phase == GamePhase.playing && !session.paused;
     final playable = humanPlaying ? playableCards(game, 0).toSet() : const <JassCard>{};
     final showTrick = game.phase != GamePhase.roundEnd && game.phase != GamePhase.gameOver;
@@ -177,7 +253,7 @@ class _TableStage extends ConsumerWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => _tapTable(ref),
+      onTap: _tapTable,
       child: CustomPaint(
         painter: WoodGrainPainter(colors: colors),
         child: Stack(
@@ -201,6 +277,7 @@ class _TableStage extends ConsumerWidget {
                     badge: texts.seatBadge(game, playerIndex),
                     active: game.isInteractive && game.currentPlayer == playerIndex,
                     cards: game.players[playerIndex].hand.length,
+                    revealed: reveal ? game.players[playerIndex].hand : null,
                   ),
                 ),
             Positioned.fromRect(
@@ -242,11 +319,20 @@ class _TableStage extends ConsumerWidget {
                     interactive: humanPlaying,
                     motion: motion,
                     roundNumber: game.roundNumber,
-                    onTap: (card) => _playCard(context, ref, card),
+                    selected: _selected,
+                    highlighted: _hint,
+                    onTap: _playCard,
                   ),
                 ],
               ),
             ),
+            // Tipp: unten rechts ueber der Hand, nur wenn der Mensch dran ist.
+            if (session.humanTurn && !session.paused)
+              Positioned(
+                right: 12,
+                top: geometry.handRect.top - 44,
+                child: _HintButton(onPressed: _showHint),
+              ),
             Positioned.fromRect(
               rect: geometry.center,
               child: EventToast(session: session, geometry: geometry, motion: motion),
@@ -254,9 +340,44 @@ class _TableStage extends ConsumerWidget {
             if (!session.paused)
               Positioned.fromRect(
                 rect: geometry.panelRect,
-                child: _Panel(session: session, onAction: (action) => _act(context, ref, action)),
+                child: _Panel(session: session, onAction: _act),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HintButton extends StatelessWidget {
+  const _HintButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppLocalizations.of(context);
+    final colors = context.jass;
+    return Material(
+      color: colors.cream,
+      borderRadius: BorderRadius.circular(4),
+      elevation: 3,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(4),
+        onTap: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lightbulb_outline, size: 18, color: colors.inkSoft),
+              const SizedBox(width: 4),
+              Text(
+                texts.hintButton,
+                style: JassFonts.ui(size: 13, weight: FontWeight.w800, color: colors.ink),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -321,6 +442,7 @@ class _AiSeat extends StatelessWidget {
     required this.badge,
     required this.active,
     required this.cards,
+    this.revealed,
   });
 
   final TableGeometry geometry;
@@ -332,6 +454,9 @@ class _AiSeat extends StatelessWidget {
   final bool active;
   final int cards;
 
+  /// Debug: die Karten offen zeigen.
+  final List<JassCard>? revealed;
+
   @override
   Widget build(BuildContext context) {
     final label = SeatLabel(name: name, badge: badge, active: active);
@@ -340,6 +465,7 @@ class _AiSeat extends StatelessWidget {
       count: cards,
       motion: motion,
       roundNumber: roundNumber,
+      revealed: revealed,
       quarterTurns: switch (seat) {
         Seat.left => 1,
         Seat.right => 3,
@@ -380,63 +506,66 @@ class _StatusRow extends StatelessWidget {
   final String mode;
   final String message;
 
-  /// Wenig Platz: eine Zeile in kleinerer Schrift.
+  /// Wenig Hoehe (Handy quer): Schild und Hinweis in einer Zeile.
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.jass;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Flexible statt fester Breite: ein langer Spielart-Text (Slalom mit
-        // laufendem Stich) darf die Zeile nie sprengen.
-        if (mode.isNotEmpty)
-          Flexible(
-            child: Container(
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-              decoration: BoxDecoration(
-                gradient: colors.brassGradient,
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x66000000), blurRadius: 4, offset: Offset(0, 2)),
-                ],
-              ),
-              child: Text(
-                mode.toUpperCase(),
-                maxLines: 1,
-                softWrap: false,
-                overflow: TextOverflow.ellipsis,
-                style: JassFonts.ui(
-                  size: 11,
-                  weight: FontWeight.w800,
-                  color: colors.ink,
-                  letterSpacing: 0.6,
-                ),
+    final chip = mode.isEmpty
+        ? null
+        : Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              gradient: colors.brassGradient,
+              borderRadius: BorderRadius.circular(4),
+              boxShadow: const [
+                BoxShadow(color: Color(0x66000000), blurRadius: 4, offset: Offset(0, 2)),
+              ],
+            ),
+            // Das Schild wird immer ausgeschrieben; reicht der Platz nicht,
+            // rutscht der Hinweis in die naechste Zeile.
+            child: Text(
+              mode.toUpperCase(),
+              maxLines: 1,
+              softWrap: false,
+              style: JassFonts.ui(
+                size: 11,
+                weight: FontWeight.w800,
+                color: colors.ink,
+                letterSpacing: 0.6,
               ),
             ),
+          );
+    final text = Text(
+      message,
+      maxLines: compact ? 1 : 2,
+      overflow: TextOverflow.ellipsis,
+      style:
+          JassFonts.serif(
+            size: compact ? 14 : 15,
+            weight: 600,
+            italic: true,
+            color: colors.cream,
+            height: 1.2,
+          ).copyWith(
+            shadows: const [Shadow(color: Color(0x99000000), blurRadius: 3, offset: Offset(0, 1))],
           ),
-        Expanded(
-          child: Text(
-            message,
-            maxLines: compact ? 1 : 2,
-            overflow: TextOverflow.ellipsis,
-            style:
-                JassFonts.serif(
-                  size: compact ? 14 : 15,
-                  weight: 600,
-                  italic: true,
-                  color: colors.cream,
-                  height: 1.2,
-                ).copyWith(
-                  shadows: const [
-                    Shadow(color: Color(0x99000000), blurRadius: 3, offset: Offset(0, 1)),
-                  ],
-                ),
-          ),
-        ),
-      ],
+    );
+
+    if (compact) {
+      return Row(
+        children: [
+          if (chip != null) Padding(padding: const EdgeInsets.only(right: 10), child: chip),
+          Expanded(child: text),
+        ],
+      );
+    }
+    return Wrap(
+      spacing: 10,
+      runSpacing: 3,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [?chip, text],
     );
   }
 }

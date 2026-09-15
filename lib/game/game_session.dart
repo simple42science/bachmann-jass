@@ -11,6 +11,7 @@ final class GameSession {
     this.roundEvents = const [],
     this.paused = false,
     this.waiting = false,
+    this.canUndo = false,
   });
 
   final GameState state;
@@ -30,15 +31,19 @@ final class GameSession {
   /// Ein Computerzug oder das Abraeumen des Stichs ist geplant.
   final bool waiting;
 
+  /// Der letzte eigene Zug laesst sich zuruecknehmen.
+  final bool canUndo;
+
   /// Der Mensch (Sitz 0) ist an der Reihe und darf handeln.
   bool get humanTurn => state.isInteractive && state.players[state.currentPlayer].isHuman;
 
-  GameSession copyWith({bool? paused, bool? waiting}) => GameSession(
+  GameSession copyWith({bool? paused, bool? waiting, bool? canUndo}) => GameSession(
     state: state,
     events: events,
     roundEvents: roundEvents,
     revision: revision,
     paused: paused ?? this.paused,
     waiting: waiting ?? this.waiting,
+    canUndo: canUndo ?? this.canUndo,
   );
 }

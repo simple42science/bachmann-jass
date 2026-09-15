@@ -52,39 +52,47 @@ class EventToast extends StatelessWidget {
 
     final colors = context.jass;
     final cardWidth = (geometry.trickCardSize.width * 0.8).clamp(28.0, 56.0);
-    Widget toast = Material(
-      color: colors.panel,
-      elevation: 10,
-      shadowColor: Colors.black,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: colors.brass, width: 1.5),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(text, style: JassFonts.serif(size: 19, weight: 700, color: colors.brassGlow)),
-            if (cards.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (final card in cards)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: PlayingCardView(
-                          card: card,
-                          size: Size(cardWidth, cardWidth * cardAspect),
-                        ),
-                      ),
-                  ],
+    Widget toast = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: geometry.center.width - 16),
+      child: Material(
+        color: colors.panel,
+        elevation: 10,
+        shadowColor: Colors.black,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: colors.brass, width: 1.5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(text, style: JassFonts.serif(size: 19, weight: 700, color: colors.brassGlow)),
+              if (cards.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  // Ein langer Weis (bis neun Karten) schrumpft, statt die
+                  // Mitte des Tisches zu sprengen.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (final card in cards)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: PlayingCardView(
+                              card: card,
+                              size: Size(cardWidth, cardWidth * cardAspect),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

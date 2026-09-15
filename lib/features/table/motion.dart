@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import '../../app/settings.dart';
-
 /// Skaliert alle Animationsdauern am Tisch nach Tempo und Systemeinstellung.
 ///
 /// Bei "Bewegung reduzieren" ist der Faktor 0: Animationen entfallen ganz.
@@ -9,15 +7,12 @@ import '../../app/settings.dart';
 final class Motion {
   const Motion(this.scale);
 
-  factory Motion.of(BuildContext context, GameSpeed speed) {
+  /// [speedFactor] ist das Tempo der Einstellungen (1.0 = normal).
+  factory Motion.of(BuildContext context, double speedFactor) {
     if (MediaQuery.disableAnimationsOf(context)) {
       return const Motion(0);
     }
-    return Motion(switch (speed) {
-      GameSpeed.langsam => 1.25,
-      GameSpeed.normal => 1.0,
-      GameSpeed.schnell => 0.6,
-    });
+    return Motion(speedFactor.clamp(0.55, 1.3));
   }
 
   final double scale;

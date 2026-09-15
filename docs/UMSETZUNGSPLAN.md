@@ -1,6 +1,6 @@
 # Bachmann Jass – Umsetzungsplan Flutter
 
-Stand: 15.09.2026, Meilensteine M1 bis M3 erreicht · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
+Stand: 15.09.2026, Meilensteine M1 bis M4 erreicht · Repo: `simple42science/bachmann-jass` (privat) · Referenz: `../bachmann_jass_game` (Web-App v1.1.0)
 
 Die bestehende Jass-Web-App wird als Flutter-App neu aufgebaut. Sie soll **dynamischer** werden (Animationen, Sound, Haptik), **besser steuerbar** (Einstellungen, Hausregeln, Debug-Werkzeuge) und ein **eigenes, hochwertiges Design** bekommen. Regeln und Computergegner werden nicht neu erfunden: Sie werden 1:1 übernommen und per Test gegen das Original abgesichert.
 
@@ -58,8 +58,8 @@ Umfang: **S** = wenige Stunden · **M** = etwa 1–2 Arbeitstage · **L** = mehr
 | 5 | Das KI-Gebot im Bieterjass „wie im Schieber" rechnet nur mit Trumpffarben, obwohl die KI danach Obe-Abe, Une-Ufe oder Slalom wählen darf | `ai.js:169` | ❌ gemessen und verworfen: Mit allen Spielarten bietet die KI zu hoch (Siegquote 27 statt 33 %) |
 | 6 | Die Stöck-Punkte stehen in zwei UI-Texten fest als 20, statt aus dem Regelwerk zu kommen | `app.js:965`, `:1152` | ✅ aus dem `RuleSet` |
 | 7 | „Home" bricht die Partie ab und löscht den Speicherstand; eine Pause gibt es nicht | `app.js:1614` | ✅ Home behält die Partie (Fortsetzen auf dem Homescreen), Pause-Knopf; eine neue Partie fragt nach, bevor sie die gespeicherte verwirft |
-| 8 | Nur der erste Stich lässt sich nochmals ansehen; gegnerische Weise erscheinen nur als Logtext | `app.js:529`, `game-engine.js:966` | teilweise: gemeldete Weise der Computer werden kurz aufgedeckt; der Stich-Rückblick folgt mit den Hausregeln (AP 5.2) |
-| 9 | Der Schieber endet erst am Rundenende, auch wenn das Ziel mitten in der Runde erreicht ist | `game-engine.js:1474` | optionale Regel „Bedanken" |
+| 8 | Nur der erste Stich lässt sich nochmals ansehen; gegnerische Weise erscheinen nur als Logtext | `app.js:529`, `game-engine.js:966` | ✅ Weise der Computer werden kurz aufgedeckt; Stich-Rückblick als Hausregel (keiner, letzter, erster, alle) |
+| 9 | Der Schieber endet erst am Rundenende, auch wenn das Ziel mitten in der Runde erreicht ist | `game-engine.js:1474` | ✅ Hausregel „Bedanken“ (Standard aus) |
 | 10 | Die Schriften kommen übers Netz von Google Fonts; offline fällt die App auf die Systemschrift zurück | `index.html:16` | ✅ Vollkorn, Alegreya Sans und Caveat (OFL) liegen in `assets/fonts/` |
 | 11 | Im Bieterjass tragen die Sitze 1 und 2 immer dieselbe `teamId`. Die KI hält sie darum für Partner, auch wenn einer von ihnen der Bieter ist, und schmiert ihm Punkte | `game-engine.js:387`, `ai.js:312` | ✅ Bieter gegen Verteidiger korrekt unterschieden; die korrigierte KI gewinnt 61–67 % statt 33 % |
 
@@ -159,12 +159,12 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | 4.4 | Bedien-Panels | 🟢 | M | 4.1 | ✅ erledigt |
 | 4.5 | Jasstafel und Verlauf | 🟢 | M | 2.1 | ✅ erledigt |
 | 4.6 | Regeln und Tutorial | 🟡 | M | 4.4 | teilweise: Regeln ja, Tutorial offen |
-| 5.1 | Spieler-Einstellungen | 🟢 | M | 2.2 | offen |
-| 5.2 | Hausregel-Editor | 🟡 | M | 1.2, 2.2 | offen |
-| 5.3 | Gegner und Profile | 🟡 | S | 2.2 | offen |
-| 5.4 | Statistik | 🟢 | S | 2.2 | offen |
-| 5.5 | Debug-Menü | 🟢 | S | 2.1 | teilweise: Demo-Start per URL |
-| 6.1 | Automatisierte Tests | 🟢 | M | Phase 4 | offen |
+| 5.1 | Spieler-Einstellungen | 🟢 | M | 2.2 | ✅ erledigt |
+| 5.2 | Hausregel-Editor | 🟡 | M | 1.2, 2.2 | ✅ erledigt; D5 offen |
+| 5.3 | Gegner und Profile | 🟡 | S | 2.2 | teilweise: Namen und Stärke; Avatare offen |
+| 5.4 | Statistik | 🟢 | S | 2.2 | ✅ erledigt |
+| 5.5 | Debug-Menü | 🟢 | S | 2.1 | ✅ erledigt |
+| 6.1 | Automatisierte Tests | 🟢 | M | Phase 4 | teilweise: Widget- und Ablauftests; Golden-Tests offen |
 | 6.2 | Performance und Barrierefreiheit | 🟡 | M | Phase 4 | offen |
 | 6.3 | Spieltests | 🔴 | M | M3 | offen |
 | 7.1 | Web-Version | 🟡 | S | 6.1 | offen |
@@ -374,26 +374,30 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Tipp-Knopf: zeigt die Karte, die die Stufe „Schwer" spielen würde.
 - Zug zurücknehmen, nur gegen Computer und abschaltbar.
 - Bestätigung vor dem Ausspielen, Layout für Links- und Rechtshänder.
+- **Stand:** ✅ Tempo-Regler (30–200 %), Vorgaben Langsam/Normal/Schnell bleiben im Menü, automatisch spielen bei einziger erlaubter Karte, Tipp-Knopf (zeigt den Zug der Stufe Schwer), Zug zurücknehmen (bis 20 Züge, nimmt auch die Computerzüge danach zurück), Bestätigen per zweitem Tippen. Links-/Rechtshänder-Layout ist offen.
 
 #### AP 5.2 Hausregel-Editor · 🟡 Claude + Input · M
 
 - Alle Werte des `RuleSet` sind im App-Menü einstellbar: letzter Stich, Match, Stöck, vier Sechser, Vier Gleiche gegen Folge, Multiplikatoren je Spielart, Zielpunkte, Zählweise und Gebotsschritte im Bieterjass, „Bedanken" und welcher Stich angeschaut werden darf.
 - Eigene Presets lassen sich speichern. Eine laufende Partie behält ihre Regeln.
 - 🟡 Du bestätigst, dass das Preset „Bachmann" genau euren Hausregeln entspricht (D5).
+- **Stand:** ✅ Editor in den Einstellungen: letzter Stich, Match, Stöck, vier Sechser, Vier Gleiche gegen Folge, Multiplikatoren je Spielart, Pflichtgebot, Bedanken, Stich-Rückblick; „Auf Bachmann zurücksetzen“. Regeln gelten für neue Partien; eine laufende behält ihre. Zielpunkte und Zählweise bleiben im Setup. Eigene Presets speichern ist offen.
 
 #### AP 5.3 Gegner und Profile · 🟡 Claude + Input · S
 
 - Name, Avatar und Stufe pro Computergegner (Befund 3).
 - 🟡 Du legst den Avatar-Stil fest oder lieferst Fotos oder Zeichnungen.
+- **Stand:** teilweise. Name und Stärke je Sitz (links, gegenüber, rechts) in den Einstellungen. Avatare fehlen noch.
 
 #### AP 5.4 Statistik · 🟢 Claude · S
 
 - Anzahl Partien, Siegquote je Jassart und Stufe, Gebotserfüllung, höchster Weis, Matchs. Alles bleibt lokal gespeichert.
+- **Stand:** ✅ Screen „Statistik“ vom Homescreen; löschbar.
 
 #### AP 5.5 Debug-Menü · 🟢 Claude · S
 
 - Nur in Debug-Builds: Seed setzen, Gegnerkarten aufdecken, Handverteilung vorgeben (zum Beispiel für ein Stöck-Szenario), KI gegen KI zuschauen, Partie aus Seed und Aktionen nachspielen.
-- **Stand:** teilweise. Builds mit `--dart-define=JASS_DEMO=true` starten über die URL eine reproduzierbare Situation (`?demo=schieber&seed=5&moves=4`), genutzt vom Screenshot-Werkzeug.
+- **Stand:** ✅ Debug-Screen (nur Debug- und Demo-Builds): Seed der laufenden Partie, Partie aus Seed starten, Gegnerkarten aufdecken, „KI spielt für mich“. Dazu der Demo-Start per URL (`?demo=schieber&seed=5&moves=4&screen=scoreboard`), genutzt vom Screenshot-Werkzeug.
 
 ### Phase 6 – Qualität
 
@@ -402,6 +406,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - Die Engine-Tests aus Phase 1 laufen weiter in der CI.
 - Widget-Tests für alle Panels. Golden-Tests für das Layout ersetzen den bisherigen Browsertest.
 - Integrationstest: je eine volle Runde Schieber und Bieterjass per Tipp.
+- **Stand:** teilweise. 46 App-Tests (Controller mit simulierter Uhr, Geometrie und Tisch in sechs Grössen, Abläufe per Tipp, Jasstafel, Regeln, Zurücknehmen, Auto-Spielen, Tipp, Statistik, Einstellungen) und 96 Engine-Tests. Golden-Tests sind offen; die Screenshots der Web-Version ersetzen sie vorerst.
 
 #### AP 6.2 Performance und Barrierefreiheit · 🟡 Claude + Input · M
 
@@ -466,11 +471,11 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | **M1 Engine-Parität** | Phase 1 | Dart-Engine und KI spielen nachweislich wie die Web-App – ✅ erreicht am 15.09.2026 |
 | **M2 Spielbarer Prototyp** | 2.1–2.3, 4.1, 4.2, 4.4 (schlichtes Design) | Schieber und Bieterjass komplett spielbar auf Android und Web – ✅ erreicht am 15.09.2026 (Web per Screenshot geprüft, Android nur gebaut) |
 | **M3 Look & Feel** | Phase 3, 4.3, 4.5, 4.6 | neues Design, Animationen, Jasstafel – ✅ erreicht am 15.09.2026 (ohne 3.4 Icon/Splash, 3.5 Sound und das Tutorial) |
-| **M4 Feature-komplett** | Phase 5, 6.1, 6.2 | Einstellungen, Hausregeln, Statistik, Tests |
+| **M4 Feature-komplett** | Phase 5, 6.1, 6.2 | Einstellungen, Hausregeln, Statistik, Tests – ✅ erreicht am 15.09.2026 (ohne 6.2 Performance/Barrierefreiheit auf echtem Gerät) |
 | **M5 Version 1.0** | 6.3, Phase 7 | im Web und in den Stores |
 
-**Nächster Schritt (M4):** Phase 5 (Einstellungen, Hausregel-Editor, Gegner-Profile, Statistik, Debug-Menü) und 6.1/6.2 (Tests, Performance, Barrierefreiheit); dazu die Reste aus M3: 3.4 Icon und Splash, 3.5 Sound und Haptik, Tutorial.
-**Bei dir:** `flutter run` auf dem Android-Handy und Rückmeldung zu Spielgefühl, Design und Jasstafel-Strichen; Quelle und Lizenz der Kartenbilder nennen.
+**Nächster Schritt:** die Reste vor Version 1.0 – 3.4 Icon und Splash, 3.5 Sound und Haptik, 4.6 Tutorial, 5.3 Avatare, 6.2 Performance und Barrierefreiheit auf dem Gerät, 6.3 Spieltests, dann Phase 7 (Web-Hosting, Android-Release).
+**Bei dir:** `flutter run` auf dem Android-Handy und Rückmeldung zu Spielgefühl, Design und Jasstafel-Strichen; D5 (stimmen die Hausregeln?); Quelle und Lizenz der Kartenbilder; Icon-Wunsch und Sounds.
 
 ---
 

@@ -164,7 +164,7 @@ void main() {
       final container = ProviderContainer(
         overrides: testOverrides(
           store: store,
-          settings: const AppSettings(speed: GameSpeed.schnell),
+          settings: const AppSettings(speedFactor: 0.45),
           instantAi: false,
         ),
       );

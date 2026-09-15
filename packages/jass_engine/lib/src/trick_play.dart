@@ -78,6 +78,7 @@ GameState _resolveTrick(GameState state, List<GameEvent> events) {
     ),
   );
 
+  final captured = CapturedTrick(pileId: pileId, winner: winner, cards: state.trick);
   final next = state.copyWith(
     players: replacedAt(
       state.players,
@@ -88,9 +89,8 @@ GameState _resolveTrick(GameState state, List<GameEvent> events) {
       ),
     ),
     capturedPileOwners: replacedAt(state.capturedPileOwners, pileId, winner),
-    firstCapturedTrick: state.trickNumber == 0
-        ? CapturedTrick(pileId: pileId, winner: winner, cards: state.trick)
-        : state.firstCapturedTrick,
+    firstCapturedTrick: state.trickNumber == 0 ? captured : state.firstCapturedTrick,
+    roundTricks: [...state.roundTricks, captured],
     capturedCards: replacedAt(state.capturedCards, pileId, [
       ...state.capturedCards[pileId],
       for (final entry in state.trick) entry.card,
@@ -102,7 +102,21 @@ GameState _resolveTrick(GameState state, List<GameEvent> events) {
     phase: GamePhase.trickEnd,
   );
 
-  return isLastTrick ? _resolveRound(next, events) : next;
+  if (isLastTrick || _bedanken(next)) {
+    return _resolveRound(next, events);
+  }
+  return next;
+}
+
+/// Bedanken: Im Schieber endet die Partie sofort, sobald ein Team mit den
+/// bisherigen Punkten der Runde das Ziel erreicht.
+bool _bedanken(GameState state) {
+  if (!state.isSchieber || !state.rules.bedanken) {
+    return false;
+  }
+  return state.teams.any(
+    (team) => team.totalScore + schieberTeamResult(state, team.id).roundPoints >= state.targetScore,
+  );
 }
 
 GameState _resolveRound(GameState state, List<GameEvent> events) {
