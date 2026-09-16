@@ -36,14 +36,14 @@ const deckIndex = new Map(engine.createDeck().map((card, index) => [card.id, ind
 const cardChar = (card) => CHARS[deckIndex.get(card.id)];
 const encodeHand = (hand) => hand.map(cardChar).join('');
 
-// Nur Schieber: Der Bieterjass der App folgt den Familienregeln (Steigern fuer die
-// ganze Partie), nicht mehr dem Bieterjass der Web-App.
+// Nur Schieber ohne Slalom: Der Bieterjass folgt den Familienregeln (Steigern fuer
+// die ganze Partie), und im Slalom zaehlen die Karten nach der angesagten Richtung
+// (eine Runde ergibt 157) statt je Stich wie in der Web-App.
 const CONFIGS = [
   ['schieber_1000_einfach', 'schieber', { targetScore: 1000, difficulty: 'einfach' }, 8],
   ['schieber_1000_normal', 'schieber', { targetScore: 1000, difficulty: 'normal' }, 8],
   ['schieber_1000_schwer', 'schieber', { targetScore: 1000, difficulty: 'schwer' }, 8],
   ['schieber_2500_normal', 'schieber', { targetScore: 2500, difficulty: 'normal' }, 3],
-  ['schieber_slalom_schwer', 'schieber', { targetScore: 1000, difficulty: 'schwer' }, 3, { mode: 'slalom' }],
 ];
 
 const coverage = {

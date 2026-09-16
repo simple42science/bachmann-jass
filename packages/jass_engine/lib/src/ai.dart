@@ -314,7 +314,8 @@ final class _Play {
 
   bool isTrump(JassCard card) => trump != null && card.suit == trump;
 
-  int points(JassCard card) => cardPoints(card, mode);
+  /// Gezaehlt wird nach der angesagten Spielart, gestochen nach der des Stichs.
+  int points(JassCard card) => cardPoints(card, state.roundMode);
 
   int rank(JassCard card) => rankIndex(card, mode);
 
@@ -532,7 +533,7 @@ JassCard _chooseFollow(_Play play) {
   final partnerWinning =
       play.sameSide(state, currentWinner, play.seat) && currentWinner != play.seat;
   final isLastSeat = state.trick.length == state.players.length - 1;
-  final pointsAtStake = trickPoints(state.trick, play.mode);
+  final pointsAtStake = trickPoints(state.trick, state.roundMode);
   final winningCards = play.legal.where(play.wouldWin).toList();
 
   if (partnerWinning) {

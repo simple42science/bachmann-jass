@@ -18,7 +18,7 @@ void expectCleanRoundEnd(GameState state) {
   final tricks = state.players.fold(0, (sum, player) => sum + player.tricksWon);
   expect(tricks, state.variant.handSize, reason: 'Anzahl Stiche');
   final trickPoints = state.players.fold(0, (sum, player) => sum + player.pointsWon);
-  expect(trickPoints, 157, reason: 'Stichpunkte einer Rosen-Runde');
+  expect(trickPoints, 157, reason: 'Stichpunkte einer Runde');
 
   if (state.stoeckPlayer >= 0) {
     expect(

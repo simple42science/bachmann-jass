@@ -131,8 +131,10 @@ const List<int> _uneUfePoints = [11, 0, 8, 0, 10, 2, 3, 4, 0];
 // Staerke im Trumpf, indexiert mit Rank.index: 6 < 7 < 8 < 10 < Ober < Koenig < Ass < Nell < Puur.
 const List<int> _trumpStrength = [0, 1, 2, 7, 3, 8, 4, 5, 6];
 
-/// Kartenwert in einer Spielart. Slalom ohne Stichnummer zaehlt wie der erste
-/// Stich (obenabe); ohne Spielart gelten die Grundwerte.
+/// Kartenwert in einer Spielart. Hier zaehlt immer die **angesagte** Spielart:
+/// Im Slalom gelten die Werte der Startrichtung fuer die ganze Runde, damit
+/// alle Karten zusammen 152 Punkte ergeben (mit dem letzten Stich 157).
+/// Nur die Rangfolge wechselt im Slalom von Stich zu Stich, siehe [rankIndex].
 int cardPoints(JassCard card, RoundMode? roundMode) {
   final mode = roundMode?.trickMode(0);
   switch (mode) {
@@ -147,7 +149,8 @@ int cardPoints(JassCard card, RoundMode? roundMode) {
   }
 }
 
-/// Staerke einer Karte innerhalb ihrer Farbe; hoeher sticht.
+/// Staerke einer Karte innerhalb ihrer Farbe; hoeher sticht. Im Slalom gehoert
+/// hier die Spielart des laufenden Stichs hin (`roundMode.trickMode(nummer)`).
 int rankIndex(JassCard card, RoundMode? roundMode) {
   final mode = roundMode?.trickMode(0);
   if (mode == RoundMode.uneUfe) {

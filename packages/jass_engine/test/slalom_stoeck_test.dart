@@ -54,11 +54,37 @@ void main() {
       expect(trickWinner(trick, RoundMode.slalom.trickMode(1)), 0);
     });
 
-    test('Kartenwerte folgen der Spielart des Stichs', () {
-      expect(cardPoints(card('rosen_ass'), RoundMode.slalom.trickMode(0)), 11);
-      expect(cardPoints(card('rosen_ass'), RoundMode.slalom.trickMode(1)), 0);
-      expect(cardPoints(card('rosen_6'), RoundMode.slalom.trickMode(0)), 0);
-      expect(cardPoints(card('rosen_6'), RoundMode.slalom.trickMode(1)), 11);
+    test('Kartenwerte folgen der angesagten Richtung, nicht dem einzelnen Stich', () {
+      // Von oben angesagt: das Ass zaehlt, die Sechs nicht - in jedem Stich.
+      expect(cardPoints(card('rosen_ass'), RoundMode.slalom), 11);
+      expect(cardPoints(card('rosen_6'), RoundMode.slalom), 0);
+      // Von unten angesagt: umgekehrt.
+      expect(cardPoints(card('rosen_ass'), RoundMode.slalomUneUfe), 0);
+      expect(cardPoints(card('rosen_6'), RoundMode.slalomUneUfe), 11);
+      // Darum ergibt eine Slalom-Runde wie jede andere 157 Punkte.
+      for (final mode in [RoundMode.slalom, RoundMode.slalomUneUfe]) {
+        expect(handValue(JassCard.deck, mode) + RuleSet.bachmann.lastTrickBonus, 157);
+      }
+    });
+
+    test('eine ganze Slalom-Runde ergibt 157 Punkte', () {
+      for (var seed = 1; seed <= 20; seed += 1) {
+        for (final mode in [RoundMode.slalom, RoundMode.slalomUneUfe]) {
+          var state = step(
+            createGame(variant: GameVariant.schieber, seed: seed),
+            const StartRound(),
+          );
+          state = step(state, ChooseMode(state.currentPlayer, mode));
+          while (state.phase != GamePhase.roundEnd && state.phase != GamePhase.gameOver) {
+            state = step(state, aiDecide(state) ?? const NextTrick());
+          }
+          expect(
+            state.players.fold(0, (sum, player) => sum + player.pointsWon),
+            157,
+            reason: 'Seed $seed, $mode',
+          );
+        }
+      }
     });
 
     test('kennt keinen Trumpf und zaehlt dreifach', () {

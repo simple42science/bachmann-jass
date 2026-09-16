@@ -60,11 +60,14 @@ GameState nextTrick(GameState state, List<GameEvent> events) {
 }
 
 GameState _resolveTrick(GameState state, List<GameEvent> events) {
-  final mode = state.trickMode;
-  final winner = trickWinner(state.trick, mode);
+  // Gestochen wird nach der Spielart des Stichs (im Slalom wechselnd),
+  // gezaehlt nach der angesagten Spielart der Runde: So ergeben die Karten
+  // einer Runde immer 152 Punkte, mit dem letzten Stich 157.
+  final winner = trickWinner(state.trick, state.trickMode);
   final pileId = pileIdForWinner(state, winner);
   final isLastTrick = state.trickNumber == state.variant.handSize - 1;
-  final points = trickPoints(state.trick, mode) + (isLastTrick ? state.rules.lastTrickBonus : 0);
+  final points =
+      trickPoints(state.trick, state.roundMode) + (isLastTrick ? state.rules.lastTrickBonus : 0);
   final winningPlayer = state.players[winner];
 
   events.add(

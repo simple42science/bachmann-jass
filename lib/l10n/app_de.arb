@@ -934,7 +934,7 @@
   "rulesModeTrump": "Trumpf: die gewählte Farbe sticht, Under (Puur) und Nell sind die höchsten Karten.",
   "rulesModeObeAbe": "Obe-Abe: kein Trumpf, das Ass ist die höchste Karte.",
   "rulesModeUneUfe": "Une-Ufe: kein Trumpf, die Sechs ist die höchste Karte.",
-  "rulesModeSlalom": "Slalom: kein Trumpf. Wer ansagt, bestimmt, ob der erste Stich obenabe oder unten-ufe geht; danach wechselt die Spielart mit jedem Stich. Auch die Kartenwerte folgen der Spielart des Stichs.",
+  "rulesModeSlalom": "Slalom: kein Trumpf. Wer ansagt, bestimmt, ob es obenabe oder unten-ufe losgeht; danach wechselt mit jedem Stich, wer sticht. Die Kartenwerte bleiben die der angesagten Richtung, darum zählt eine Runde wie jede andere 157 Punkte.",
   "rulesCardValuesTitle": "Kartenwerte",
   "rulesRowSide": "Nebenfarbe",
   "rulesRowTrump": "Trumpf",
@@ -1006,7 +1006,7 @@
   "rulesBieterTitle": "Bieterjass (Hausregel)",
   "rulesBieter1": "36 Karten, 12 Karten pro Spieler, in 3er-Paketen verteilt.",
   "rulesBieter2": "Zu Beginn der Partie wird gesteigert: ab dem Anfangsgebot (400, 450, 500 oder eine eigene Zahl) in Zehnerschritten, bis alle bis auf einen passen. Passen alle, spielt der Geber mit dem Anfangsgebot.",
-  "rulesBieter3": "Wer am höchsten bietet, spielt die ganze Partie alleine gegen die anderen zwei. Die Spielart sagt reihum die Vorhand an (wer nach dem Geber kommt), auch der Bieter nur, wenn er Vorhand ist.",
+  "rulesBieter3": "Wer am höchsten bietet, spielt die ganze Partie alleine gegen die anderen zwei. In der ersten Runde sagt der Bieter die Spielart an und spielt die erste Karte aus; danach sagt reihum die Vorhand an (wer nach dem Geber kommt).",
   "rulesBieter4": "Der Bieter muss sein Gebot erreichen, bevor die beiden anderen zusammen {points} Punkte haben. Die Partie endet mit dem Stich, in dem eine Seite ihr Ziel erreicht.",
   "@rulesBieter4": {
     "placeholders": {

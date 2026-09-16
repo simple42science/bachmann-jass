@@ -154,8 +154,8 @@ GameState _startRound(GameState state, List<GameEvent> events) {
   final rng = Mulberry32(state.rngState);
   final hands = dealHands(playerCount, state.variant.dealPacketSize, dealer, rng);
 
-  // Bieterjass: die Vorhand (nach dem Geber) sagt reihum an, auch fuer den
-  // Bieter gilt keine Ausnahme. Beim Steigern ist sie die erste Bieterin.
+  // Bieterjass: die Vorhand (nach dem Geber) eroeffnet das Steigern und sagt
+  // ab der zweiten Runde reihum an; in der ersten Runde ist der Bieter Vorhand.
   var forehand = state.isBieter ? (dealer + 1) % playerCount : -1;
   if (state.isSchieber) {
     // Die Rosen 7 bestimmt nur den ersten Geber. Danach ruecken Geber und
@@ -313,15 +313,17 @@ GameState _finishBidding(GameState state, List<GameEvent> events) {
     BiddingWon(playerIndex: next.highestBidder, bid: next.highestBid, allPassed: allPassed),
   );
   // Ab jetzt stehen die Seiten fest: der Bieter (Team 0) gegen die beiden
-  // anderen (Team 1). Angesagt wird wie in jeder Runde von der Vorhand.
+  // anderen (Team 1). In der ersten Runde ist der Bieter die Vorhand: er sagt
+  // die Spielart an und spielt die erste Karte aus.
   final solo = next.highestBidder;
   return next.copyWith(
     players: [
       for (final player in next.players) player.copyWith(teamId: player.id == solo ? 0 : 1),
     ],
     soloPlayer: solo,
-    currentPlayer: next.forehandPlayer,
-    chooserPlayer: next.forehandPlayer,
+    forehandPlayer: solo,
+    currentPlayer: solo,
+    chooserPlayer: solo,
     phase: GamePhase.chooseTrump,
   );
 }

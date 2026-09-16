@@ -134,8 +134,10 @@ int trickWinner(List<TrickEntry> trick, RoundMode? trickMode) {
   return best.playerIndex;
 }
 
-int trickPoints(List<TrickEntry> trick, RoundMode? trickMode) =>
-    trick.fold(0, (sum, entry) => sum + cardPoints(entry.card, trickMode));
+/// Punkte eines Stichs. [roundMode] ist die angesagte Spielart der Runde,
+/// nicht die des Stichs: Im Slalom behalten die Karten ihre Werte.
+int trickPoints(List<TrickEntry> trick, RoundMode? roundMode) =>
+    trick.fold(0, (sum, entry) => sum + cardPoints(entry.card, roundMode));
 
 int handValue(List<JassCard> hand, RoundMode? mode) =>
     hand.fold(0, (sum, card) => sum + cardPoints(card, mode));

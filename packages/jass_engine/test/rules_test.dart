@@ -151,7 +151,11 @@ void main() {
 
       expect(state.phase, GamePhase.chooseTrump);
       expect(state.soloPlayer, first);
+      expect(state.currentPlayer, first, reason: 'der Bieter sagt in der ersten Runde an');
       expect(state.highestBid, 530);
+      final playing = step(state, ChooseMode(first, RoundMode.rosen));
+      expect(playing.trickLeader, first, reason: 'der Bieter spielt die erste Karte aus');
+      expect(playing.currentPlayer, first);
       expect(state.soloTarget, 530);
       expect(state.pairTarget, 1000);
       expect(state.players[first].teamId, 0);
@@ -185,6 +189,7 @@ void main() {
       state = step(state, PassBid(second));
       state = step(state, PassBid(third));
       final solo = state.soloPlayer;
+      expect(state.currentPlayer, solo, reason: 'Runde 1: der Bieter sagt an');
 
       var rounds = 0;
       while (state.phase != GamePhase.gameOver && rounds < 40) {
@@ -314,7 +319,7 @@ void main() {
     });
 
     test('Kartenwerte ergeben in jeder Spielart 157 inklusive letztem Stich', () {
-      for (final mode in [RoundMode.rosen, RoundMode.obeAbe, RoundMode.uneUfe]) {
+      for (final mode in RoundMode.values) {
         final total = handValue(JassCard.deck, mode);
         expect(total + RuleSet.bachmann.lastTrickBonus, 157, reason: 'Summe fuer $mode');
       }

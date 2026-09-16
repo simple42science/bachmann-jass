@@ -172,7 +172,7 @@ final class _Sim {
       final mode = this.mode;
       final winner = trickWinner(trick, mode);
       final last = trickNumber == handSize - 1;
-      pointsBySide[sides[winner]] += trickPoints(trick, mode) + (last ? lastTrickBonus : 0);
+      pointsBySide[sides[winner]] += trickPoints(trick, roundMode) + (last ? lastTrickBonus : 0);
       tricksBySide[sides[winner]] += 1;
       trickNumber += 1;
       leader = winner;
@@ -218,7 +218,7 @@ JassCard _policy(_Sim sim, int player, List<JassCard> legal) {
   final trump = mode.trumpSuit;
   final hand = sim.hands[player];
   bool isTrump(JassCard card) => trump != null && card.suit == trump;
-  int points(JassCard card) => cardPoints(card, mode);
+  int points(JassCard card) => cardPoints(card, sim.roundMode);
   int rank(JassCard card) => rankIndex(card, mode);
   int suitLength(Suit suit) => hand.where((card) => card.suit == suit).length;
 
@@ -268,7 +268,7 @@ JassCard _policy(_Sim sim, int player, List<JassCard> legal) {
   if (cheap.isNotEmpty) {
     return _first(cheap, (a, b) => rank(a) - rank(b));
   }
-  final stake = trickPoints(sim.trick, mode);
+  final stake = trickPoints(sim.trick, sim.roundMode);
   final worth = lastSeat ? stake >= 4 : stake >= 10 || hand.where(isTrump).length >= 4;
   if (!worth) {
     final cheapest = discard();
