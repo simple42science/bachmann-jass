@@ -104,12 +104,13 @@ void main() {
   });
 
   /// Spielt eine kurze Bieterjass-Partie zu Ende; der Mensch zieht wie die KI.
-  void playToEnd(FakeAsync async, ProviderContainer container) {
+  void playToEnd(FakeAsync async, ProviderContainer container, {List<SeatSetup>? seats}) {
     final controller = container.read(gameControllerProvider.notifier);
     controller.startNewGame(
       variant: GameVariant.bieter,
       matchConfig: const MatchConfig(targetScore: 200),
       playerName: 'Test',
+      seats: seats,
       seed: 9,
     );
     for (var guard = 0; guard < 4000; guard += 1) {
@@ -128,16 +129,52 @@ void main() {
     expect(container.read(gameControllerProvider)!.state.phase, GamePhase.gameOver);
   }
 
-  test('Der Jubel ertoent nur beim eigenen Sieg und nur, wenn er eingeschaltet ist', () {
+  test('Yannicks Jubel ertoent nur, wenn Yannick gewinnt und der Ton an ist', () {
     fakeAsync((async) {
+      // Standardsitze: Yannick ist der Computer links.
       final sound = RecordingSoundPlayer();
       final container = ProviderContainer(overrides: testOverrides(instantAi: false, sound: sound));
       addTearDown(container.dispose);
       playToEnd(async, container);
       final session = container.read(gameControllerProvider)!;
       final over = session.events.whereType<GameOver>().single;
-      expect(sound.wins, humanWon(session.state, over) ? 1 : 0);
+      expect(session.state.players[1].name, 'Yannick');
+      expect(sound.wins, cheeringPlayerWon(session.state, over) ? 1 : 0);
+      expect(cheeringPlayerWon(session.state, over), over.winnerPlayer == 1);
 
+      // Ohne einen Yannick am Tisch bleibt es still, auch wenn dieselbe Partie laeuft.
+      final silent = RecordingSoundPlayer();
+      final nobody = ProviderContainer(overrides: testOverrides(instantAi: false, sound: silent));
+      addTearDown(nobody.dispose);
+      playToEnd(
+        async,
+        nobody,
+        seats: const [
+          SeatSetup(name: 'Test', isHuman: true),
+          SeatSetup(name: 'Anna', isHuman: false),
+          SeatSetup(name: 'Beat', isHuman: false),
+        ],
+      );
+      expect(silent.wins, 0);
+
+      // Heisst der Mensch Yannick, jubelt es bei seinem Sieg.
+      final own = RecordingSoundPlayer();
+      final human = ProviderContainer(overrides: testOverrides(instantAi: false, sound: own));
+      addTearDown(human.dispose);
+      playToEnd(
+        async,
+        human,
+        seats: const [
+          SeatSetup(name: ' yannick ', isHuman: true),
+          SeatSetup(name: 'Anna', isHuman: false),
+          SeatSetup(name: 'Beat', isHuman: false),
+        ],
+      );
+      final humanSession = human.read(gameControllerProvider)!;
+      expect(own.wins, over.winnerPlayer == 0 ? 1 : 0);
+      expect(humanSession.state.phase, GamePhase.gameOver);
+
+      // Ausgeschaltet bleibt es still.
       final muted = RecordingSoundPlayer();
       final quiet = ProviderContainer(
         overrides: testOverrides(

@@ -167,7 +167,7 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | 6.1 | Automatisierte Tests | 🟢 | M | Phase 4 | teilweise: Widget- und Ablauftests; Golden-Tests offen |
 | 6.2 | Performance und Barrierefreiheit | 🟡 | M | Phase 4 | offen |
 | 6.3 | Spieltests | 🔴 | M | M3 | offen |
-| 7.1 | Web-Version | 🟡 | S | 6.1 | Workflow bereit; D7 offen |
+| 7.1 | Web-Version | 🟡 | S | 6.1 | ✅ erledigt |
 | 7.2 | Android-Release | 🔴 | M | 6.3 | offen |
 | 7.3 | iOS-Release | 🔴 | M | 6.3 | offen |
 | 7.4 | Web-App ablösen | 🟡 | S | 7.1 | offen |
@@ -318,7 +318,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 
 - Geräusche für Ausspielen, Mischen, Stich einsammeln, Stöck und Match; Haptik beim Ausspielen. Beides einzeln abschaltbar.
 - 🔴 Sounds aus lizenzfreien Quellen (CC0) auswählen oder selbst aufnehmen. Ein echtes „Stöck!" aus der Familie wäre ein schöner Akzent.
-- **Stand:** teilweise. Beim Sieg des Menschen spielt die App „Uuh yeah“ (`assets/sounds/uuh_yeah.m4a`, über `audioplayers`), abschaltbar unter Einstellungen → Ton, Standard an. Weitere Klänge und Haptik sind offen.
+- **Stand:** teilweise. Gewinnt ein Spieler namens Yannick (der Computer links oder ein Mensch dieses Namens), spielt die App seinen Jubel „Uuh yeah“ (`assets/sounds/uuh_yeah.m4a`, über `audioplayers`), abschaltbar unter Einstellungen → Ton, Standard an. Weitere Klänge und Haptik sind offen.
 
 ### Phase 4 – Spieltisch
 
@@ -425,7 +425,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 #### AP 7.1 Web-Version · 🟡 Claude + Input · S
 
 - `flutter build web` und Deploy per GitHub Action.
-- **Stand:** Workflow `.github/workflows/deploy-web.yml` liegt bereit (Build mit `--base-href /bachmann-jass/`, Deploy auf GitHub Pages bei jedem Push auf `main`). Er läuft erst, wenn Pages im Repo aktiviert ist, siehe D7.
+- **Stand:** ✅ Workflow `.github/workflows/deploy-web.yml` baut bei jedem Push auf `main` mit `--base-href /bachmann-jass/` und veröffentlicht auf GitHub Pages: https://simple42science.github.io/bachmann-jass/ (Repo seit 16.09.2026 öffentlich, Pages-Source „GitHub Actions“).
 - 🟡 Hosting wählen (D7). GitHub Pages funktioniert nur mit öffentlichem Repo oder kostenpflichtigem GitHub-Plan. Cloudflare Pages und Firebase Hosting haben beide eine Gratisstufe.
 
 #### AP 7.2 Android-Release · 🔴 Deine Hilfe · M
@@ -461,7 +461,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | D4 | Designrichtung | nach den Mockups aus AP 3.1 | AP 3.2 | ✅ Stammtisch |
 | D5 | Standard-Hausregeln | heutige Werte der Web-App als Preset „Bachmann" | AP 5.2 | offen |
 | D6 | Rechte an den Kartenbildern | klären, bevor Store-Screenshots entstehen | AP 7.2 | ✅ nutzbar (Open Source); Quelle und Lizenz im Repo vermerken |
-| D7 | Web-Hosting und Repo-Sichtbarkeit | Repo öffentlich machen und GitHub Pages nutzen (Workflow liegt bereit); sonst Cloudflare Pages | AP 7.1 | offen |
+| D7 | Web-Hosting und Repo-Sichtbarkeit | Repo öffentlich machen und GitHub Pages nutzen | AP 7.1 | ✅ Repo öffentlich, GitHub Pages (16.09.2026) |
 | D8 | Online-Spiel nach 1.0 | erst nach den Spieltests entscheiden | Phase 8 | offen |
 
 ---

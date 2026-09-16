@@ -192,7 +192,7 @@ class GameController extends Notifier<GameSession?> {
     );
 
     ref.read(statsProvider.notifier).record(next, events);
-    if (events.any((event) => event is GameOver && humanWon(next, event))) {
+    if (events.any((event) => event is GameOver && cheeringPlayerWon(next, event))) {
       _celebrate();
     }
     final saved = ref.read(savedGameProvider.notifier);
@@ -265,7 +265,7 @@ class GameController extends Notifier<GameSession?> {
     _publish(result.state, result.events, revision: session.revision + 1);
   }
 
-  /// Jubel beim Sieg des Menschen, wenn der Ton eingeschaltet ist.
+  /// Yannicks Jubel, wenn er gewonnen hat und der Ton eingeschaltet ist.
   void _celebrate() {
     if (ref.read(settingsProvider).winSound) {
       unawaited(ref.read(soundPlayerProvider).playWin());

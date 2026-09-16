@@ -117,7 +117,7 @@ final class AppSettings {
   /// Der letzte eigene Zug darf zurueckgenommen werden.
   final bool allowUndo;
 
-  /// Jubel, wenn der Mensch eine Partie gewinnt.
+  /// Yannicks Jubel, wenn er eine Partie gewinnt.
   final bool winSound;
 
   /// Namen der Computergegner auf den Sitzen 1 bis 3 (links, gegenueber, rechts).

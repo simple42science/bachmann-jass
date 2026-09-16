@@ -2,11 +2,13 @@
 
 Schweizer Jass (Schieber und Bieterjass) als Flutter-App für Android und Web.
 
+Web-Version: **https://simple42science.github.io/bachmann-jass/** (im Browser spielbar, als App installierbar, offline nutzbar).
+
 Die App ersetzt die bisherige Web-App [`bachmann_jass_game`](https://github.com/YannickLuca/bachmann_jass_game). Regeln und Computergegner sind aus der Web-App übernommen und per Paritätstest abgesichert: Für dieselben Seeds spielt die Dart-Engine exakt dieselben Partien. Neu gebaut sind Oberfläche, Spielablauf, Animationen, Einstellungen und Hausregeln.
 
 ## Stand
 
-Meilenstein M4: Schieber und Bieterjass sind komplett spielbar (Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Pause, Speicherstand), im Design „Stammtisch“ (Holz, Filz, Messing, Tischkarten, Schiefertafel), mit Animationen, Jasstafel mit Z-Tafel-Strichen und Verlauf, Regel-Screen, Einstellungen (Tempo, automatisch spielen, Bestätigen, Zug zurücknehmen), Hausregel-Editor (Preset Bachmann, Bedanken, Stich-Rückblick), Gegnernamen und -stärke, Statistik und Jubel beim Sieg. Es fehlen noch weitere Klänge, ein eigenes Icon, das Tutorial und Avatare.
+Meilenstein M4: Schieber und Bieterjass sind komplett spielbar (Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Pause, Speicherstand), im Design „Stammtisch“ (Holz, Filz, Messing, Tischkarten, Schiefertafel), mit Animationen, Jasstafel mit Z-Tafel-Strichen und Verlauf, Regel-Screen, Einstellungen (Tempo, automatisch spielen, Bestätigen, Zug zurücknehmen), Hausregel-Editor (Preset Bachmann, Bedanken, Stich-Rückblick), Gegnernamen und -stärke, Statistik und Yannicks Jubel, wenn er gewinnt. Es fehlen noch weitere Klänge, ein eigenes Icon, das Tutorial und Avatare.
 
 Arbeitspakete, Entscheide und Stand: [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSPLAN.md). Screenshots der Web-Version: [`docs/screenshots/`](docs/screenshots/).
 
@@ -29,7 +31,7 @@ lib/
 packages/jass_engine/   Regeln, Wertung, Computergegner, Zufall (reines Dart)
 assets/cards/           36 Karten als WebP
 assets/fonts/           Vollkorn, Alegreya Sans, Caveat (OFL)
-assets/sounds/          Jubel beim Sieg
+assets/sounds/          Yannicks Jubel
 docs/design/            Design-Mockups (Stammtisch, verworfene Richtungen)
 tool/                   Konvertierung, Fixtures aus der Web-App, Screenshots
 ```
@@ -57,7 +59,7 @@ cd packages/jass_engine; dart analyze --fatal-infos; dart test; dart test -p nod
 
 ## Web-Version veröffentlichen
 
-[`.github/workflows/deploy-web.yml`](.github/workflows/deploy-web.yml) baut bei jedem Push auf `main` die Web-Version (`--base-href /bachmann-jass/`) und veröffentlicht sie auf GitHub Pages. Dafür einmalig im Repo unter *Settings → Pages* als Source „GitHub Actions“ wählen. GitHub Pages ist gratis für öffentliche Repos; ein privates Repo braucht einen bezahlten GitHub-Plan.
+[`.github/workflows/deploy-web.yml`](.github/workflows/deploy-web.yml) baut bei jedem Push auf `main` die Web-Version (`--base-href /bachmann-jass/`) und veröffentlicht sie auf GitHub Pages unter https://simple42science.github.io/bachmann-jass/. Im Repo ist dafür unter *Settings → Pages* die Source „GitHub Actions“ gesetzt; das Repo ist öffentlich, weil GitHub Pages nur so gratis ist.
 
 ## Werkzeuge
 

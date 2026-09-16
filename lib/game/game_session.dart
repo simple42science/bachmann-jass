@@ -51,3 +51,21 @@ final class GameSession {
 /// Hat der Mensch (Sitz 0) die Partie gewonnen?
 bool humanWon(GameState game, GameOver event) =>
     game.isSchieber ? event.winnerTeam == game.players[0].teamId : event.winnerPlayer == 0;
+
+/// Der Spieler, dessen Jubel in `assets/sounds/` liegt.
+const String cheeringPlayer = 'Yannick';
+
+/// Hat ein Spieler namens Yannick gewonnen, allein oder mit seinem Team?
+/// Gilt fuer den Computer "Yannick" wie fuer einen Menschen dieses Namens.
+bool cheeringPlayerWon(GameState game, GameOver event) {
+  for (var index = 0; index < game.players.length; index += 1) {
+    final player = game.players[index];
+    if (player.name.trim().toLowerCase() != cheeringPlayer.toLowerCase()) {
+      continue;
+    }
+    if (game.isSchieber ? player.teamId == event.winnerTeam : index == event.winnerPlayer) {
+      return true;
+    }
+  }
+  return false;
+}
