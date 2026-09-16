@@ -21,6 +21,8 @@ class PanelFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.jass;
+    // Handy quer: engere Raender, damit mehr vom Inhalt ohne Scrollen sichtbar ist.
+    final compact = MediaQuery.sizeOf(context).height < 420;
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
@@ -36,7 +38,9 @@ class PanelFrame extends StatelessWidget {
               border: Border.all(color: colors.brass, width: 1.5),
             ),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+              padding: compact
+                  ? const EdgeInsets.fromLTRB(14, 10, 14, 10)
+                  : const EdgeInsets.fromLTRB(18, 14, 18, 16),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,7 +54,7 @@ class PanelFrame extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(subtitle!, style: JassFonts.ui(size: 13, color: colors.muted)),
                     ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: compact ? 8 : 12),
                   child,
                 ],
               ),

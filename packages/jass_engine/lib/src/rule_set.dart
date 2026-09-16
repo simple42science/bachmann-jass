@@ -95,7 +95,7 @@ final class RuleSet {
   /// Welche Stiche nochmals angeschaut werden duerfen.
   final TrickReview trickReview;
 
-  int multiplierFor(RoundMode mode) => roundMultipliers[mode] ?? 1;
+  int multiplierFor(RoundMode mode) => roundMultipliers[mode.base] ?? 1;
 
   RuleSet copyWith({
     int? lastTrickBonus,
@@ -146,7 +146,7 @@ final class RuleSet {
       other.forcedDealerBid == forcedDealerBid &&
       other.bedanken == bedanken &&
       other.trickReview == trickReview &&
-      RoundMode.values.every((mode) => other.multiplierFor(mode) == multiplierFor(mode)) &&
+      RoundMode.baseModes.every((mode) => other.multiplierFor(mode) == multiplierFor(mode)) &&
       [
         for (var i = 0; i < bidValues.length; i += 1) other.bidValues[i] == bidValues[i],
       ].every((same) => same);
@@ -162,6 +162,6 @@ final class RuleSet {
     bedanken,
     trickReview,
     Object.hashAll(bidValues),
-    Object.hashAll([for (final mode in RoundMode.values) multiplierFor(mode)]),
+    Object.hashAll([for (final mode in RoundMode.baseModes) multiplierFor(mode)]),
   );
 }

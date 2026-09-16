@@ -24,8 +24,8 @@ extension GameTexts on AppLocalizations {
     if (roundMode == null) {
       return '';
     }
-    final label = roundMode == RoundMode.slalom
-        ? '${mode(roundMode)} · ${mode(game.trickMode!)}'
+    final label = roundMode.isSlalom
+        ? '${mode(roundMode.base)} · ${mode(game.trickMode!)}'
         : modeWithTrump(roundMode);
     final factor = game.roundMultiplier;
     return factor > 1 ? '$label ${multiplier(factor)}' : label;

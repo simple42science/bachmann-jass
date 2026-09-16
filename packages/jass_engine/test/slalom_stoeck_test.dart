@@ -34,6 +34,12 @@ void main() {
       expect(RoundMode.slalom.trickMode(1), RoundMode.uneUfe, reason: 'zweiter Stich unten-ufe');
       expect(RoundMode.slalom.trickMode(2), RoundMode.obeAbe);
       expect(RoundMode.slalom.trickMode(8), RoundMode.obeAbe, reason: 'neunter Stich obenabe');
+      expect(RoundMode.slalomUneUfe.trickMode(0), RoundMode.uneUfe, reason: 'von unten begonnen');
+      expect(RoundMode.slalomUneUfe.trickMode(1), RoundMode.obeAbe);
+      expect(RoundMode.slalomUneUfe.trickMode(8), RoundMode.uneUfe);
+      expect(RoundMode.slalomUneUfe.base, RoundMode.slalom);
+      expect(RoundMode.slalomUneUfe.isSlalom, isTrue);
+      expect(RoundMode.baseModes, isNot(contains(RoundMode.slalomUneUfe)));
       expect(RoundMode.rosen.trickMode(3), RoundMode.rosen);
     });
 
@@ -57,6 +63,7 @@ void main() {
 
     test('kennt keinen Trumpf und zaehlt dreifach', () {
       expect(RuleSet.bachmann.multiplierFor(RoundMode.slalom), 3);
+      expect(RuleSet.bachmann.multiplierFor(RoundMode.slalomUneUfe), 3);
       expect(
         rankIndex(card('rosen_under'), RoundMode.slalom),
         rankIndex(card('rosen_under'), RoundMode.obeAbe),

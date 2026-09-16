@@ -59,7 +59,7 @@
       }
     }
   },
-  "difficultyCopy": "{difficulty, select, einfach{Spielt geradeaus, ohne Plan. Gut zum Reinkommen.} normal{Zieht Trumpf, schmiert dem Partner und sticht sparsam.} schwer{Merkt sich zusätzlich alle gespielten Karten.} other{}}",
+  "difficultyCopy": "{difficulty, select, einfach{Zieht Trumpf, schmiert dem Partner, sticht sparsam und merkt sich die gespielten Karten.} normal{Rechnet vor jeder Karte mögliche Verteilungen der fremden Karten durch.} schwer{Rechnet viermal so viele Verteilungen durch wie Normal.} other{}}",
   "@difficultyCopy": {
     "placeholders": {
       "difficulty": {
@@ -154,7 +154,9 @@
       }
     }
   },
-  "modeName": "{mode, select, eicheln{Eicheln} rosen{Rosen} schellen{Schellen} schilten{Schilten} obeAbe{Obe-Abe} uneUfe{Une-Ufe} slalom{Slalom} other{{mode}}}",
+  "modeName": "{mode, select, eicheln{Eicheln} rosen{Rosen} schellen{Schellen} schilten{Schilten} obeAbe{Obe-Abe} uneUfe{Une-Ufe} slalom{Slalom} slalomUneUfe{Slalom von unten} other{{mode}}}",
+  "modeSlalomFromTop": "Slalom von oben",
+  "modeSlalomFromBottom": "Slalom von unten",
   "@modeName": {
     "placeholders": {
       "mode": {
@@ -882,7 +884,7 @@
   "rulesModeTrump": "Trumpf: die gewählte Farbe sticht, Under (Puur) und Nell sind die höchsten Karten.",
   "rulesModeObeAbe": "Obe-Abe: kein Trumpf, das Ass ist die höchste Karte.",
   "rulesModeUneUfe": "Une-Ufe: kein Trumpf, die Sechs ist die höchste Karte.",
-  "rulesModeSlalom": "Slalom: kein Trumpf. Der erste Stich geht obenabe, der zweite unten-ufe, danach abwechselnd. Auch die Kartenwerte folgen der Spielart des Stichs.",
+  "rulesModeSlalom": "Slalom: kein Trumpf. Wer ansagt, bestimmt, ob der erste Stich obenabe oder unten-ufe geht; danach wechselt die Spielart mit jedem Stich. Auch die Kartenwerte folgen der Spielart des Stichs.",
   "rulesCardValuesTitle": "Kartenwerte",
   "rulesRowSide": "Nebenfarbe",
   "rulesRowTrump": "Trumpf",

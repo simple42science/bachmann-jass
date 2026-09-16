@@ -56,7 +56,13 @@ void main() {
 
     expect(find.text('Jasstafel'), findsOneWidget);
     expect(find.byType(CustomPaint), findsWidgets);
-    expect(find.text('Rosen'), findsOneWidget, reason: 'eine abgeschlossene Runde');
+    final texts = AppLocalizations.of(tester.element(find.text('Jasstafel')));
+    final played = container.read(gameControllerProvider)!.state.roundHistory.single.summary;
+    expect(
+      find.text(texts.mode(played.roundMode)),
+      findsWidgets,
+      reason: 'eine abgeschlossene Runde',
+    );
     expect(find.textContaining('Runde abgerechnet'), findsOneWidget);
     expect(tester.takeException(), isNull);
 

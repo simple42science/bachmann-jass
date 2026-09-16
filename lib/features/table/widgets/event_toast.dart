@@ -102,7 +102,7 @@ class EventToast extends StatelessWidget {
           .animate(key: ValueKey('toast-${session.revision}'))
           .fadeIn(duration: motion.ms(200))
           .scale(begin: const Offset(0.85, 0.85), end: const Offset(1, 1), duration: motion.ms(260))
-          .then(delay: motion.ms(cards.isEmpty ? 1400 : 2200))
+          .then(delay: motion.ms(cards.isEmpty ? 1400 : 2700))
           .fadeOut(duration: motion.ms(300));
     }
     return IgnorePointer(child: Center(child: toast));

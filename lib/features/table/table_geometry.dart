@@ -102,7 +102,14 @@ final class TableGeometry {
       handRect.top - 4,
     );
     final statusRect = Rect.fromLTWH(center.left, center.top, center.width, statusHeight);
-    final panelRect = Rect.fromLTRB(pad, zoneTop, size.width - pad, handRect.top - 4);
+    // Bei wenig Hoehe darf ein Panel den Sitz gegenueber verdecken; die eigene
+    // Hand bleibt frei, damit man beim Entscheiden die Karten sieht.
+    final panelRect = Rect.fromLTRB(
+      pad,
+      compact ? pad + 2 : zoneTop,
+      size.width - pad,
+      handRect.top - 4,
+    );
 
     // Stich in der Mitte: drei Karten nebeneinander, gut zwei uebereinander.
     // Reicht die Hoehe nicht, ruecken die Karten zusammen und ueberlappen.

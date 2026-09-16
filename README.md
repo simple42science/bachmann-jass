@@ -4,7 +4,7 @@ Schweizer Jass (Schieber und Bieterjass) als Flutter-App für Android und Web.
 
 Web-Version: **https://simple42science.github.io/bachmann-jass/** (im Browser spielbar, als App installierbar, offline nutzbar).
 
-Die App ersetzt die bisherige Web-App [`bachmann_jass_game`](https://github.com/YannickLuca/bachmann_jass_game). Regeln und Computergegner sind aus der Web-App übernommen und per Paritätstest abgesichert: Für dieselben Seeds spielt die Dart-Engine exakt dieselben Partien. Neu gebaut sind Oberfläche, Spielablauf, Animationen, Einstellungen und Hausregeln.
+Die App ersetzt die bisherige Web-App [`bachmann_jass_game`](https://github.com/YannickLuca/bachmann_jass_game). Die Regeln sind aus der Web-App übernommen und per Paritätstest abgesichert: Für dieselben Seeds spielt die Dart-Engine exakt dieselben Partien. Neu gebaut sind Oberfläche, Spielablauf, Animationen, Einstellungen, Hausregeln und die Computergegner: Die Stufen Normal und Schwer entscheiden per Stichprobe (die unbekannten Karten werden mehrmals plausibel verteilt und jede Möglichkeit durchgespielt), die Stufe Einfach entspricht der stärksten Stufe der Web-App.
 
 ## Stand
 
@@ -69,7 +69,7 @@ cd packages/jass_engine; dart analyze --fatal-infos; dart test; dart test -p nod
 | `python tool/make_icons.py` | Web- und Android-Icons aus dem App-Icon erzeugen |
 | `node tool/export_rng_fixture.mjs` | Zufallszahlen der Web-App als Fixture exportieren |
 | `node tool/export_parity_fixtures.mjs` | Partien der Web-App für den Paritätstest aufzeichnen |
-| `dart run tool/benchmark.dart normal einfach 300` | KI-Stufen gegeneinander messen (im Engine-Paket) |
+| `dart run tool/benchmark.dart normal einfach 300` | KI-Stufen gegeneinander messen (im Engine-Paket); `schwer@web` = KI der Web-App, `schwer@48` = 48 Stichproben |
 | `dart run tool/benchmark_bieter.dart schieber 200` | KI-Anpassungen im Bieterjass messen (im Engine-Paket) |
 | `node tool/screenshot_web.mjs` | Web-Version in vier Fenstergrössen fotografieren |
 

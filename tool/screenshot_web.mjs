@@ -46,6 +46,7 @@ const VIEWPORTS = [
 const SCENES = [
   { name: 'home', query: '' },
   { name: 'schieber-spielart', query: '?demo=schieber&seed=5&moves=0' },
+  { name: 'schieber-ansage', query: '?demo=schieber&seed=4&moves=0' },
   { name: 'schieber-stich', query: '?demo=schieber&seed=5&moves=4' },
   { name: 'bieter-gebot', query: '?demo=bieter&seed=1000&moves=0' },
   { name: 'bieter-stich', query: '?demo=bieter&seed=1000&moves=3' },

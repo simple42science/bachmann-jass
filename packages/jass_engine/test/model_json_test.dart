@@ -216,7 +216,7 @@ void main() {
     expect(rules.fourSixesCount, isFalse);
     expect(rules.fourOfAKindBeatsSequence, isTrue);
     expect(
-      {for (final mode in RoundMode.values) mode.name: rules.multiplierFor(mode)},
+      {for (final mode in RoundMode.baseModes) mode.name: rules.multiplierFor(mode)},
       {
         'eicheln': 1,
         'rosen': 1,

@@ -12,6 +12,7 @@ final class GameSession {
     this.paused = false,
     this.waiting = false,
     this.canUndo = false,
+    this.showingLastTrick = false,
   });
 
   final GameState state;
@@ -34,18 +35,23 @@ final class GameSession {
   /// Der letzte eigene Zug laesst sich zuruecknehmen.
   final bool canUndo;
 
+  /// Die Runde ist abgerechnet, aber der letzte Stich liegt noch auf dem Tisch.
+  final bool showingLastTrick;
+
   /// Der Mensch (Sitz 0) ist an der Reihe und darf handeln.
   bool get humanTurn => state.isInteractive && state.players[state.currentPlayer].isHuman;
 
-  GameSession copyWith({bool? paused, bool? waiting, bool? canUndo}) => GameSession(
-    state: state,
-    events: events,
-    roundEvents: roundEvents,
-    revision: revision,
-    paused: paused ?? this.paused,
-    waiting: waiting ?? this.waiting,
-    canUndo: canUndo ?? this.canUndo,
-  );
+  GameSession copyWith({bool? paused, bool? waiting, bool? canUndo, bool? showingLastTrick}) =>
+      GameSession(
+        state: state,
+        events: events,
+        roundEvents: roundEvents,
+        revision: revision,
+        paused: paused ?? this.paused,
+        waiting: waiting ?? this.waiting,
+        canUndo: canUndo ?? this.canUndo,
+        showingLastTrick: showingLastTrick ?? this.showingLastTrick,
+      );
 }
 
 /// Hat der Mensch (Sitz 0) die Partie gewonnen?

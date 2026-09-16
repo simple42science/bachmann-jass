@@ -216,7 +216,8 @@ class _TableStageState extends ConsumerState<_TableStage> {
     final seats = seatsFor(game.variant);
     final humanPlaying = session.humanTurn && game.phase == GamePhase.playing && !session.paused;
     final playable = humanPlaying ? playableCards(game, 0).toSet() : const <JassCard>{};
-    final showTrick = game.phase != GamePhase.roundEnd && game.phase != GamePhase.gameOver;
+    final roundOver = game.phase == GamePhase.roundEnd || game.phase == GamePhase.gameOver;
+    final showTrick = !roundOver || session.showingLastTrick;
     final feltRect = Rect.fromLTRB(8, 4, geometry.size.width - 8, geometry.size.height - 6);
 
     return GestureDetector(
@@ -251,7 +252,11 @@ class _TableStageState extends ConsumerState<_TableStage> {
               rect: geometry.statusRect,
               child: _StatusRow(
                 mode: texts.modeChip(game),
-                message: session.paused ? texts.msgPaused : texts.phaseMessage(game),
+                message: session.paused
+                    ? texts.msgPaused
+                    : session.showingLastTrick
+                    ? texts.msgTrickEnd(game.players[game.trickLeader].name)
+                    : texts.phaseMessage(game),
                 compact: geometry.compact,
               ),
             ),
@@ -263,7 +268,9 @@ class _TableStageState extends ConsumerState<_TableStage> {
                   seats: seats,
                   motion: motion,
                   collectTo: seats[game.trickLeader] ?? Seat.bottom,
-                  winner: game.phase == GamePhase.trickEnd ? game.trickLeader : null,
+                  winner: game.phase == GamePhase.trickEnd || session.showingLastTrick
+                      ? game.trickLeader
+                      : null,
                 ),
               ),
             Positioned.fromRect(
@@ -296,10 +303,10 @@ class _TableStageState extends ConsumerState<_TableStage> {
               rect: geometry.center,
               child: EventToast(session: session, geometry: geometry, motion: motion),
             ),
-            if (!session.paused)
+            if (!session.paused && !session.showingLastTrick)
               Positioned.fromRect(
                 rect: geometry.panelRect,
-                child: _Panel(session: session, onAction: _act),
+                child: _Panel(session: session, onAction: _act, compact: geometry.compact),
               ),
           ],
         ),
@@ -491,10 +498,11 @@ class _StatusRow extends StatelessWidget {
 
 /// Das zur Phase passende Bedien-Panel, sofern der Mensch etwas entscheiden muss.
 class _Panel extends ConsumerWidget {
-  const _Panel({required this.session, required this.onAction});
+  const _Panel({required this.session, required this.onAction, required this.compact});
 
   final GameSession session;
   final void Function(GameAction action) onAction;
+  final bool compact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -518,7 +526,7 @@ class _Panel extends ConsumerWidget {
     }
     return switch (game.phase) {
       GamePhase.bidding => BidPanel(game: game, onAction: onAction),
-      GamePhase.chooseTrump => ModePanel(game: game, onAction: onAction),
+      GamePhase.chooseTrump => ModePanel(game: game, onAction: onAction, compact: compact),
       GamePhase.announceWeis => WeisPanel(game: game, onAction: onAction),
       _ => const SizedBox.shrink(),
     };

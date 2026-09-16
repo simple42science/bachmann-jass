@@ -77,7 +77,12 @@ enum RoundMode {
   schilten(Suit.schilten),
   obeAbe(null),
   uneUfe(null),
-  slalom(null);
+
+  /// Slalom, der obenabe beginnt (der Slalom der Web-App).
+  slalom(null),
+
+  /// Slalom, der unten-ufe beginnt.
+  slalomUneUfe(null);
 
   const RoundMode(this.trumpSuit);
 
@@ -85,17 +90,35 @@ enum RoundMode {
 
   bool get isTrump => trumpSuit != null;
 
+  bool get isSlalom => this == slalom || this == slalomUneUfe;
+
+  /// Grundform fuer Regeln, Multiplikatoren und Texte: beide Slaloms sind Slalom.
+  RoundMode get base => this == slalomUneUfe ? slalom : this;
+
   static const List<RoundMode> trumpModes = [eicheln, rosen, schellen, schilten];
+
+  /// Die sieben Spielarten der Regeln, ohne die zweite Slalom-Richtung.
+  static const List<RoundMode> baseModes = [
+    eicheln,
+    rosen,
+    schellen,
+    schilten,
+    obeAbe,
+    uneUfe,
+    slalom,
+  ];
 
   static RoundMode forSuit(Suit suit) => trumpModes[suit.index];
 
-  /// Im Slalom wechselt die Spielart mit jedem Stich: der erste Stich geht
-  /// obenabe, der zweite unten-ufe und so weiter. Alle anderen bleiben gleich.
+  /// Im Slalom wechselt die Spielart mit jedem Stich: der erste Stich geht in
+  /// die angesagte Richtung, der zweite in die andere und so weiter. Alle
+  /// anderen Spielarten bleiben gleich.
   RoundMode trickMode(int trickNumber) {
-    if (this != slalom) {
+    if (!isSlalom) {
       return this;
     }
-    return trickNumber.isEven ? obeAbe : uneUfe;
+    final startsHigh = this == slalom;
+    return trickNumber.isEven == startsHigh ? obeAbe : uneUfe;
   }
 }
 

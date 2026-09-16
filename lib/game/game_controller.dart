@@ -17,7 +17,7 @@ enum AiDelayKind { bidding, trump, weis, card, trickEnd, autoPlay }
 const Map<AiDelayKind, (int, int)> _delayRanges = {
   AiDelayKind.bidding: (1200, 2100),
   AiDelayKind.trump: (1500, 2600),
-  AiDelayKind.weis: (900, 1700),
+  AiDelayKind.weis: (1400, 2200),
   AiDelayKind.card: (1500, 2700),
   AiDelayKind.trickEnd: (1700, 2500),
   AiDelayKind.autoPlay: (600, 900),
@@ -183,12 +183,15 @@ class GameController extends Notifier<GameSession?> {
     // Der Verlauf sammelt die Ereignisse seit dem letzten Rundenstart.
     final startsRound = events.any((event) => event is RoundStarted);
     final roundEvents = startsRound ? events : [...?state?.roundEvents, ...events];
+    // Endet die Runde mit dem Stich, bleibt er wie jeder andere kurz liegen.
+    final roundOver = next.phase == GamePhase.roundEnd || next.phase == GamePhase.gameOver;
     state = GameSession(
       state: next,
       events: events,
       roundEvents: roundEvents,
       revision: revision,
       canUndo: _undo.isNotEmpty,
+      showingLastTrick: roundOver && events.any((event) => event is TrickWon),
     );
 
     ref.read(statsProvider.notifier).record(next, events);
@@ -232,7 +235,7 @@ class GameController extends Notifier<GameSession?> {
     if (session == null || session.paused) {
       return;
     }
-    final kind = _pendingKind(session.state);
+    final kind = session.showingLastTrick ? AiDelayKind.trickEnd : _pendingKind(session.state);
     if (kind == null) {
       return;
     }
@@ -245,6 +248,11 @@ class GameController extends Notifier<GameSession?> {
     _cancelTimer();
     final session = state;
     if (session == null || session.paused) {
+      return;
+    }
+    if (session.showingLastTrick) {
+      state = session.copyWith(showingLastTrick: false, waiting: false);
+      _schedule();
       return;
     }
     final game = session.state;

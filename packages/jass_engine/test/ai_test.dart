@@ -28,8 +28,16 @@ GameState aiRound(GameState state) {
   return current;
 }
 
-int roundTrickPoints(GameState state) =>
-    state.players.fold(0, (sum, player) => sum + player.pointsWon);
+/// Punkte der Runde, Stich fuer Stich nach der jeweiligen Spielart gezaehlt
+/// (im Slalom wechselt sie, darum ist die Summe dort nicht fest 157).
+int roundTrickPoints(GameState state) {
+  final mode = state.roundMode!;
+  var total = state.rules.lastTrickBonus;
+  for (var index = 0; index < state.roundTricks.length; index += 1) {
+    total += trickPoints(state.roundTricks[index].cards, mode.trickMode(index));
+  }
+  return total;
+}
 
 void main() {
   group('Handbewertung', () {
@@ -177,7 +185,11 @@ void main() {
         );
         final ended = aiRound(step(state, const StartRound()));
         final summary = ended.roundSummary! as SchieberRoundSummary;
-        expect(summary.results.fold(0, (sum, result) => sum + result.trickPoints), 157);
+        expect(
+          summary.results.fold(0, (sum, result) => sum + result.trickPoints),
+          roundTrickPoints(ended),
+        );
+        expect(ended.roundMode!.isSlalom || roundTrickPoints(ended) == 157, isTrue);
         expect(summary.results.fold(0, (sum, result) => sum + result.tricksWon), 9);
       }
     });
@@ -187,7 +199,11 @@ void main() {
         final state = createGame(variant: GameVariant.bieter, seed: 20000 + index);
         final ended = aiRound(step(state, const StartRound()));
         expect(ended.players.every((player) => player.hand.isEmpty), isTrue);
-        expect(roundTrickPoints(ended), 157);
+        expect(ended.roundMode!.isSlalom || roundTrickPoints(ended) == 157, isTrue);
+        expect(
+          ended.players.fold(0, (sum, player) => sum + player.pointsWon),
+          roundTrickPoints(ended),
+        );
       }
     });
 

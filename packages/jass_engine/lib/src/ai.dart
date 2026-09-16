@@ -5,25 +5,41 @@ import 'cards.dart';
 import 'engine.dart';
 import 'game_state.dart';
 import 'model.dart';
+import 'rollout.dart';
 import 'rule_set.dart';
 import 'rules.dart';
 
-/// Spielstrategie der Computergegner, portiert aus `ai.js` der Web-App.
+/// Spielstrategie der Computergegner, portiert aus `ai.js` der Web-App und
+/// mit [AiTuning.improvedPlay] weiterentwickelt.
 ///
-/// Reine lokale Heuristik ohne Netzwerk. Stufen:
-/// - einfach: spielt geradeaus, ohne Plan
-/// - normal:  Stellungsspiel (Trumpf ziehen, schmieren, billig stechen, sparsam abwerfen)
-/// - schwer:  zusaetzlich Kartengedaechtnis (sichere Stiche und sicheres Schmieren)
+/// Reine lokale Heuristik ohne Netzwerk. Spielweisen, aufsteigend:
+/// - geradeaus:      ohne Plan (nur noch fuer die Paritaet mit der Web-App)
+/// - Stellungsspiel: Trumpf ziehen, schmieren, billig stechen, sparsam abwerfen
+/// - Gedaechtnis:    dazu sichere Stiche und sicheres Schmieren aus den
+///                   gespielten Karten
+/// - Stichprobe:     verteilt die unbekannten Karten mehrmals plausibel (wer
+///                   eine Farbe nicht mehr hat, bekommt sie nicht) und spielt
+///                   jede Moeglichkeit durch, siehe rollout.dart; je mehr
+///                   Stichproben, desto staerker
+///
+/// Stufen der App: einfach = Gedaechtnis, normal = Stichprobe mit einem
+/// Viertel der Proben, schwer = Stichprobe mit allen Proben.
+/// Mit [AiTuning.webApp] gelten die Stufen der Web-App: einfach = geradeaus,
+/// normal = Stellungsspiel, schwer = Gedaechtnis.
 
 /// Einzeln schaltbare Abweichungen von der KI der Web-App.
 final class AiTuning {
-  const AiTuning({required this.correctBieterSides});
+  const AiTuning({
+    required this.correctBieterSides,
+    required this.improvedPlay,
+    this.rolloutSamples = 64,
+  });
 
   /// Verhalten exakt wie die Web-App (fuer den Paritaetstest und Vergleiche).
-  static const AiTuning webApp = AiTuning(correctBieterSides: false);
+  static const AiTuning webApp = AiTuning(correctBieterSides: false, improvedPlay: false);
 
   /// Standard der App.
-  static const AiTuning standard = AiTuning(correctBieterSides: true);
+  static const AiTuning standard = AiTuning(correctBieterSides: true, improvedPlay: true);
 
   /// Im Bieterjass Bieter gegen Verteidiger unterscheiden statt nach `teamId`.
   ///
@@ -32,10 +48,36 @@ final class AiTuning {
   /// ist. Gemessen mit tool/benchmark_bieter.dart (200 Verteilungen x 3 Sitze):
   /// Siegquote 62.8 % (Zaehlweise wie im Schieber) und 66.7 % (einfach) statt 33.3 %.
   final bool correctBieterSides;
+
+  /// Staerkere Spielweise als in der Web-App: Stichproben statt Heuristik auf
+  /// den Stufen normal und schwer, Slalom in beide Richtungen, ein Anspiel
+  /// nach Spielart (im Une-Ufe zaehlt die Sechs, nicht das Ass), Rueckschluesse
+  /// auf fremde Haende und Zurueckhaltung beim Trumpfziehen als Verteidiger.
+  final bool improvedPlay;
+
+  /// Stichproben der Stufe schwer je Kartenentscheidung (normal nimmt ein
+  /// Viertel); mehr spielt staerker, kostet aber Rechenzeit auf dem Geraet.
+  final int rolloutSamples;
+
+  /// Stichproben je Kartenentscheidung fuer diese Stufe.
+  int cardSamples(Difficulty level) =>
+      level == Difficulty.schwer ? rolloutSamples : math.max(4, rolloutSamples ~/ 4);
+
+  /// Spielart und Gebot brauchen weniger Proben als eine einzelne Karte.
+  int modeSamples(Difficulty level) => math.max(8, cardSamples(level) * 2 ~/ 3);
+
+  AiTuning copyWith({int? rolloutSamples}) => AiTuning(
+    correctBieterSides: correctBieterSides,
+    improvedPlay: improvedPlay,
+    rolloutSamples: rolloutSamples ?? this.rolloutSamples,
+  );
 }
 
 /// Standard fuer die App.
 const AiTuning defaultAiTuning = AiTuning.standard;
+
+/// Sicherheitsabstand des Experten zwischen erwarteten Punkten und Gebot.
+const int _bidMargin = 4;
 
 /* ------------------------------------------------------------------ *
  * Handbewertung
@@ -115,16 +157,24 @@ int evaluateNoTrumpMode(List<JassCard> hand, RoundMode mode) {
   return math.max(0, score);
 }
 
-int evaluateRoundMode(List<JassCard> hand, RoundMode mode) {
+/// Bewertet eine Spielart. Im Slalom zaehlt mit [weightedSlalom] die
+/// Startrichtung staerker, weil sie bei ungerader Stichzahl einmal mehr kommt;
+/// die Web-App mittelt nur.
+int evaluateRoundMode(List<JassCard> hand, RoundMode mode, {bool weightedSlalom = false}) {
   if (mode.isTrump) {
     return evaluateTrumpSuit(hand, mode.trumpSuit!);
   }
-  if (mode == RoundMode.slalom) {
+  if (mode.isSlalom) {
     // Slalom braucht beides: hohe Karten fuer Obenabe und tiefe fuer Une-Ufe.
-    return ((evaluateNoTrumpMode(hand, RoundMode.obeAbe) +
-                evaluateNoTrumpMode(hand, RoundMode.uneUfe)) /
-            2)
-        .round();
+    final high = evaluateNoTrumpMode(hand, RoundMode.obeAbe);
+    final low = evaluateNoTrumpMode(hand, RoundMode.uneUfe);
+    if (!weightedSlalom) {
+      return ((high + low) / 2).round();
+    }
+    final tricks = math.max(1, hand.length);
+    final first = mode == RoundMode.slalom ? high : low;
+    final second = mode == RoundMode.slalom ? low : high;
+    return ((first * ((tricks + 1) ~/ 2) + second * (tricks ~/ 2)) / tricks).round();
   }
   return evaluateNoTrumpMode(hand, mode);
 }
@@ -134,8 +184,16 @@ int estimateRoundPoints(int evaluation) => math.max(0, math.min(157, (evaluation
 
 /// Vorteil gegenueber einer ausgeglichenen Runde. Der Multiplikator vervielfacht
 /// die Punkte beider Teams, darum zaehlt er auf die Differenz.
-int modeAdvantage(List<JassCard> hand, RoundMode mode, RuleSet rules, {bool multipliers = true}) {
-  final estimate = estimateRoundPoints(evaluateRoundMode(hand, mode));
+int modeAdvantage(
+  List<JassCard> hand,
+  RoundMode mode,
+  RuleSet rules, {
+  bool multipliers = true,
+  AiTuning tuning = defaultAiTuning,
+}) {
+  final estimate = estimateRoundPoints(
+    evaluateRoundMode(hand, mode, weightedSlalom: tuning.improvedPlay),
+  );
   return (estimate - _halfRoundPoints) * (multipliers ? rules.multiplierFor(mode) : 1);
 }
 
@@ -145,27 +203,67 @@ RoundMode bestModeFrom(
   List<RoundMode> allowedModes,
   RuleSet rules, {
   bool multipliers = true,
-}) => allowedModes.reduce(
-  (best, mode) =>
-      modeAdvantage(hand, mode, rules, multipliers: multipliers) >
-          modeAdvantage(hand, best, rules, multipliers: multipliers)
-      ? mode
-      : best,
-);
+  AiTuning tuning = defaultAiTuning,
+}) {
+  int advantage(RoundMode mode) =>
+      modeAdvantage(hand, mode, rules, multipliers: multipliers, tuning: tuning);
+  return allowedModes.reduce((best, mode) => advantage(mode) > advantage(best) ? mode : best);
+}
 
 Suit bestTrumpSuit(List<JassCard> hand) => Suit.values.reduce(
   (best, suit) => evaluateTrumpSuit(hand, suit) > evaluateTrumpSuit(hand, best) ? suit : best,
 );
 
-RoundMode bestSchieberMode(List<JassCard> hand, RuleSet rules) =>
-    bestModeFrom(hand, RoundMode.values, rules);
+/// Spielarten, die diese KI ansagt: die Web-App kennt nur einen Slalom.
+List<RoundMode> _modesFor(List<RoundMode> allowed, AiTuning tuning) => tuning.improvedPlay
+    ? allowed
+    : [
+        for (final mode in allowed)
+          if (mode.base == mode) mode,
+      ];
+
+RoundMode bestSchieberMode(
+  List<JassCard> hand,
+  RuleSet rules, {
+  AiTuning tuning = defaultAiTuning,
+}) => bestModeFrom(hand, _modesFor(RoundMode.values, tuning), rules, tuning: tuning);
 
 /// Geschoben wird, wenn die eigene Hand keinen Vorteil verspricht.
-bool shouldPushTrump(List<JassCard> hand, RuleSet rules) =>
-    modeAdvantage(hand, bestSchieberMode(hand, rules), rules) <= 0;
+bool shouldPushTrump(List<JassCard> hand, RuleSet rules, {AiTuning tuning = defaultAiTuning}) =>
+    modeAdvantage(hand, bestSchieberMode(hand, rules, tuning: tuning), rules, tuning: tuning) <= 0;
+
+/// Erwartete eigene Punkte in der besten Trumpffarbe laut Stichprobe;
+/// `null`, wenn sich die Lage nicht simulieren laesst.
+int? _rolloutTrumpExpectation(GameState state, int seat, int samples) {
+  final advantages = rolloutModeAdvantages(state, seat, RoundMode.trumpModes, samples: samples);
+  if (advantages == null) {
+    return null;
+  }
+  final best = advantages.values.reduce(math.max);
+  // Vorsprung = eigene minus fremde Punkte; zusammen sind es 157 plus letzter Stich.
+  return ((157 + state.rules.lastTrickBonus + best) / 2).round();
+}
 
 /// Gebot fuer den Bieterjass; `0` bedeutet passen.
-int aiBidDecision(GameState state, int seat) {
+int aiBidDecision(
+  GameState state,
+  int seat, {
+  Difficulty? difficulty,
+  AiTuning tuning = defaultAiTuning,
+}) {
+  final level = _levelFor(state, seat, difficulty);
+  final expectation = _styleFor(level, tuning) == _Style.rollout
+      ? _rolloutTrumpExpectation(state, seat, tuning.modeSamples(level))
+      : null;
+  if (expectation != null) {
+    final expected = expectation - _bidMargin;
+    final allowed = state.rules.bidValues.where((value) => value <= expected);
+    if (allowed.isEmpty) {
+      return 0;
+    }
+    final bid = allowed.reduce(math.max);
+    return bid <= state.highestBid ? 0 : bid;
+  }
   final hand = state.players[seat].hand;
   // Bewusst nur mit Trumpffarben geschaetzt, auch wenn Obe-Abe, Une-Ufe oder
   // Slalom erlaubt sind: Mit allen Spielarten bot die KI zu hoch und gewann nur
@@ -187,30 +285,77 @@ int aiBidDecision(GameState state, int seat) {
  * Kartenspiel
  * ------------------------------------------------------------------ */
 
+/// Spielweisen, aufsteigend nach Staerke.
+enum _Style { simple, positional, memory, rollout }
+
+_Style _styleFor(Difficulty level, AiTuning tuning) => switch ((tuning.improvedPlay, level)) {
+  (false, Difficulty.einfach) => _Style.simple,
+  (false, Difficulty.normal) => _Style.positional,
+  (false, Difficulty.schwer) => _Style.memory,
+  (true, Difficulty.einfach) => _Style.memory,
+  (true, Difficulty.normal || Difficulty.schwer) => _Style.rollout,
+};
+
+Difficulty _levelFor(GameState state, int seat, Difficulty? difficulty) =>
+    difficulty ?? state.players[seat].difficulty ?? state.matchConfig.difficulty;
+
 typedef _SideCheck = bool Function(GameState state, int first, int second);
 
 final class _Play {
-  _Play(this.state, this.seat, this.legal, this.sameSide)
-    : mode = state.trickMode,
-      hand = state.players[seat].hand;
+  _Play(
+    this.state,
+    this.seat,
+    this.legal,
+    this.sameSide, {
+    required this.style,
+    required this.tuning,
+  }) : mode = state.trickMode,
+       hand = state.players[seat].hand;
 
   final GameState state;
   final int seat;
   final List<JassCard> legal;
   final _SideCheck sameSide;
+  final _Style style;
+  final AiTuning tuning;
   final RoundMode? mode;
   final List<JassCard> hand;
 
-  bool isTrump(JassCard card) => mode?.trumpSuit != null && card.suit == mode!.trumpSuit;
+  bool get improved => tuning.improvedPlay;
+
+  bool get memory => style.index >= _Style.memory.index;
+
+  bool get expert => style == _Style.rollout;
+
+  Suit? get trump => mode?.trumpSuit;
+
+  bool isTrump(JassCard card) => trump != null && card.suit == trump;
 
   int points(JassCard card) => cardPoints(card, mode);
 
   int rank(JassCard card) => rankIndex(card, mode);
 
+  /// Hoechste Karte einer Nebenfarbe in dieser Spielart (Ass, im Une-Ufe die Sechs).
+  bool isTopCard(JassCard card) => !isTrump(card) && rank(card) == Rank.values.length - 1;
+
   int suitLength(Suit suit) => hand.where((card) => card.suit == suit).length;
 
   bool wouldWin(JassCard card) =>
       trickWinner([...state.trick, TrickEntry(seat, card)], mode) == seat;
+
+  bool isOpponent(int other) => !sameSide(state, seat, other);
+
+  /// Alle Gegner am Tisch.
+  late final List<int> opponents = [
+    for (var index = 0; index < state.players.length; index += 1)
+      if (index != seat && isOpponent(index)) index,
+  ];
+
+  /// Wer in diesem Stich nach mir noch spielt.
+  late final List<int> playersAfterMe = [
+    for (var offset = 1; offset < state.players.length - state.trick.length; offset += 1)
+      (seat + offset) % state.players.length,
+  ];
 
   /// Karten, die weder gespielt wurden noch auf der eigenen Hand liegen.
   late final List<JassCard> unseen = [
@@ -218,13 +363,46 @@ final class _Play {
       if (!state.playedCards.contains(card) && !hand.contains(card)) card,
   ];
 
+  late final List<Set<Suit>> voids = inferVoids(state);
+
+  /// Koennte dieser Spieler die Karte noch halten? Die Web-App zieht keine
+  /// Rueckschluesse und rechnet mit allem.
+  bool couldHold(int player, JassCard card) => !improved || !voids[player].contains(card.suit);
+
+  int get unseenTrumps => trump == null ? 0 : unseen.where((card) => card.suit == trump).length;
+
+  /// Kein Gegner kann mehr trumpfen: Trumpf ist ausgespielt oder beide sind blank.
+  bool get opponentsOutOfTrump =>
+      trump != null &&
+      (unseenTrumps == 0 ||
+          opponents.every((player) => !couldHold(player, JassCard(trump!, Rank.six))));
+
+  /// Droht ein Gegner aus [players], die Farbe zu stechen? Nur bekannte
+  /// Blanken zaehlen; wer die Farbe noch bedienen muss, kann nicht trumpfen.
+  bool mayBeTrumped(Suit suit, Iterable<int> players) {
+    final trump = this.trump;
+    if (trump == null || suit == trump || unseenTrumps == 0) {
+      return false;
+    }
+    return players.any(
+      (player) =>
+          isOpponent(player) && voids[player].contains(suit) && !voids[player].contains(trump),
+    );
+  }
+
   /// Konservative Pruefung, ob der Stich nach dieser Karte nicht mehr zu holen ist.
   bool isTrickSafe(JassCard card, int leadingSeat) {
     final simulated = [...state.trick, TrickEntry(seat, card)];
-    if (state.players.length - simulated.length <= 0) {
+    if (playersAfterMe.isEmpty) {
       return trickWinner(simulated, mode) == leadingSeat;
     }
-    return unseen.every((other) => trickWinner([...simulated, TrickEntry(-1, other)], mode) != -1);
+    final threats = playersAfterMe.where(isOpponent).toList();
+    return unseen.every((other) {
+      if (trickWinner([...simulated, TrickEntry(-1, other)], mode) != -1) {
+        return true;
+      }
+      return !threats.any((player) => couldHold(player, other));
+    });
   }
 
   bool isHighestRemaining(JassCard card) =>
@@ -250,19 +428,48 @@ JassCard _firstBy(Iterable<JassCard> cards, int Function(JassCard first, JassCar
   return best!;
 }
 
-JassCard _chooseLead(_Play play, {required bool useMemory}) {
+/// Soll mit diesen Trumpfkarten Trumpf gezogen werden?
+bool _shouldDrawTrump(_Play play, List<JassCard> trumps) {
+  if (trumps.isEmpty) {
+    return false;
+  }
+  final state = play.state;
+  final caller = state.isBieter ? state.soloPlayer : state.chooserPlayer;
+  final isChooser = caller == play.seat;
+  final strongTrump = trumps.any((card) => card.rank == Rank.under || card.rank == Rank.nine);
+
+  if (!play.improved) {
+    // Web-App: als Ansager zuerst Trumpf ziehen, solange man die Kontrolle hat.
+    return trumps.length >= 3 || (isChooser && trumps.length >= 2 && strongTrump);
+  }
+  if (play.expert && play.opponentsOutOfTrump) {
+    // Die Gegner sind blank: die eigenen Truempfe stechen spaeter Nebenfarben.
+    return false;
+  }
+  final ownSideCalled = caller >= 0 && play.sameSide(state, caller, play.seat);
+  if (ownSideCalled) {
+    return trumps.length >= 3 || (trumps.length >= 2 && strongTrump);
+  }
+  // Als Verteidiger nur mit einer Uebermacht ins Trumpf des Ansagers spielen.
+  return trumps.length >= 4 && strongTrump;
+}
+
+JassCard _chooseLead(_Play play) {
   final legal = play.legal;
   final trumps = legal.where(play.isTrump).toList();
 
-  // Als Ansager zuerst Trumpf ziehen, solange man die Kontrolle hat.
-  final isChooser = play.state.chooserPlayer == play.seat || play.state.soloPlayer == play.seat;
-  final strongTrump = trumps.any((card) => card.rank == Rank.under || card.rank == Rank.nine);
-  if (trumps.length >= 3 || (isChooser && trumps.length >= 2 && strongTrump)) {
+  if (_shouldDrawTrump(play, trumps)) {
     return _firstBy(trumps, play.rankDescending);
   }
 
-  if (useMemory) {
-    final sureWinners = legal.where((card) => !play.isTrump(card) && play.isHighestRemaining(card));
+  if (play.memory) {
+    // Sichere Stiche zuerst; der Experte meidet Farben, die ein Gegner sticht.
+    final sureWinners = legal.where(
+      (card) =>
+          !play.isTrump(card) &&
+          play.isHighestRemaining(card) &&
+          !(play.expert && play.mayBeTrumped(card.suit, play.opponents)),
+    );
     if (sureWinners.isNotEmpty) {
       return _firstBy(sureWinners, play.pointsDescending);
     }
@@ -271,11 +478,36 @@ JassCard _chooseLead(_Play play, {required bool useMemory}) {
   final sideCards = legal.where((card) => !play.isTrump(card)).toList();
   final candidates = sideCards.isNotEmpty ? sideCards : legal;
 
-  // Asse in Nebenfarben holen frueh die Punkte heim.
-  final aces = candidates.where((card) => card.rank == Rank.ass);
-  if (aces.isNotEmpty) {
+  if (play.expert) {
+    // Anspiel fuer den Partner: eine Farbe, die er nicht mehr hat, sticht er.
+    final partner = partnerOf(play.state, play.seat);
+    final trump = play.trump;
+    if (partner >= 0 &&
+        trump != null &&
+        play.unseenTrumps > 0 &&
+        !play.voids[partner].contains(trump)) {
+      final nextOpponent = (play.seat + 1) % play.state.players.length;
+      final ruffs = sideCards.where(
+        (card) =>
+            play.voids[partner].contains(card.suit) &&
+            !play.voids[nextOpponent].contains(card.suit),
+      );
+      if (ruffs.isNotEmpty) {
+        return _firstBy(ruffs, play.pointsAscending);
+      }
+    }
+  }
+
+  // Die hoechsten Karten der Nebenfarben holen frueh die Punkte heim (Asse;
+  // im Une-Ufe die Sechser). Die Web-App nahm in jeder Spielart das Ass.
+  final tops = candidates.where(
+    (card) =>
+        (play.improved ? play.isTopCard(card) : card.rank == Rank.ass) &&
+        !(play.expert && play.mayBeTrumped(card.suit, play.opponents)),
+  );
+  if (tops.isNotEmpty) {
     return _firstBy(
-      aces,
+      tops,
       (first, second) => play.suitLength(second.suit) - play.suitLength(first.suit),
     );
   }
@@ -289,7 +521,15 @@ JassCard _chooseLead(_Play play, {required bool useMemory}) {
 
 JassCard _chooseDiscard(_Play play) {
   final keepers = play.legal.where((card) => !play.isTrump(card)).toList();
-  final candidates = keepers.isNotEmpty ? keepers : play.legal;
+  var candidates = keepers.isNotEmpty ? keepers : play.legal;
+
+  if (play.expert) {
+    // Sichere Stiche nicht wegwerfen, solange es Alternativen gibt.
+    final expendable = candidates.where((card) => !play.isHighestRemaining(card)).toList();
+    if (expendable.isNotEmpty) {
+      candidates = expendable;
+    }
+  }
 
   // Moeglichst eine Farbe leerspielen, dabei so wenig Punkte wie moeglich abgeben.
   return _firstBy(candidates, (first, second) {
@@ -303,7 +543,7 @@ JassCard _chooseSmear(_Play play) {
   return _firstBy(nonTrump.isNotEmpty ? nonTrump : play.legal, play.pointsDescending);
 }
 
-JassCard _chooseFollow(_Play play, {required bool useMemory}) {
+JassCard _chooseFollow(_Play play) {
   final state = play.state;
   final currentWinner = trickWinner(state.trick, play.mode);
   final partnerWinning =
@@ -313,7 +553,7 @@ JassCard _chooseFollow(_Play play, {required bool useMemory}) {
   final winningCards = play.legal.where(play.wouldWin).toList();
 
   if (partnerWinning) {
-    final safe = isLastSeat || (useMemory && play.isTrickSafe(_chooseSmear(play), currentWinner));
+    final safe = isLastSeat || (play.memory && play.isTrickSafe(_chooseSmear(play), currentWinner));
     return safe ? _chooseSmear(play) : _chooseDiscard(play);
   }
 
@@ -340,7 +580,7 @@ JassCard _chooseFollow(_Play play, {required bool useMemory}) {
   return _firstBy(winningCards, play.rankAscending);
 }
 
-/// Die einfache Stufe (das urspruengliche Verhalten der Web-App).
+/// Die geradeaus spielende Stufe (das urspruengliche Verhalten der Web-App).
 JassCard _chooseSimple(_Play play) {
   final state = play.state;
   if (state.trick.isEmpty) {
@@ -373,50 +613,108 @@ JassCard aiChooseCard(
   Difficulty? difficulty,
   AiTuning tuning = defaultAiTuning,
 }) {
-  final level = difficulty ?? state.players[seat].difficulty ?? state.matchConfig.difficulty;
+  final level = _levelFor(state, seat, difficulty);
   final legal = playableCards(state, seat);
   if (legal.length == 1) {
     return legal.first;
   }
 
-  final play = _Play(state, seat, legal, tuning.correctBieterSides ? sameSide : sameTeamId);
-  if (level == Difficulty.einfach) {
+  final play = _Play(
+    state,
+    seat,
+    legal,
+    tuning.correctBieterSides ? sameSide : sameTeamId,
+    style: _styleFor(level, tuning),
+    tuning: tuning,
+  );
+  if (play.style == _Style.simple) {
     return _chooseSimple(play);
   }
+  final heuristic = state.trick.isEmpty ? _chooseLead(play) : _chooseFollow(play);
+  if (play.style != _Style.rollout) {
+    return heuristic;
+  }
+  return rolloutChooseCard(
+        state,
+        seat,
+        legal,
+        samples: tuning.cardSamples(level),
+        preferred: heuristic,
+      ) ??
+      heuristic;
+}
 
-  final useMemory = level == Difficulty.schwer;
-  return state.trick.isEmpty
-      ? _chooseLead(play, useMemory: useMemory)
-      : _chooseFollow(play, useMemory: useMemory);
+/// Spielartwahl per Stichprobe; `null` heisst schieben. Laesst sich die Lage
+/// nicht simulieren, entscheidet die Handbewertung.
+RoundMode? _rolloutMode(
+  GameState state,
+  int seat,
+  List<RoundMode> modes,
+  int samples,
+  AiTuning tuning,
+) {
+  final advantages = rolloutModeAdvantages(state, seat, modes, samples: samples);
+  final hand = state.players[seat].hand;
+  if (advantages == null) {
+    if (canPushTrump(state) && shouldPushTrump(hand, state.rules, tuning: tuning)) {
+      return null;
+    }
+    return bestModeFrom(
+      hand,
+      modes,
+      state.rules,
+      multipliers: state.usesRoundMultipliers,
+      tuning: tuning,
+    );
+  }
+  double score(RoundMode mode) =>
+      advantages[mode]! * (state.usesRoundMultipliers ? state.rules.multiplierFor(mode) : 1);
+  final best = modes.reduce((a, b) => score(b) > score(a) ? b : a);
+  if (canPushTrump(state) && score(best) <= 0) {
+    return null;
+  }
+  return best;
 }
 
 /// Naechste Aktion des Computers, der gerade am Zug ist.
 ///
 /// Folgt dem Spielablauf der Web-App. Liefert `null` in Phasen ohne
 /// Spielerentscheidung (Rundenstart, Stichende, Spielende). Mit [difficulty]
-/// laesst sich die Stufe vorgeben, etwa fuer einen Tipp an den Menschen.
+/// laesst sich die Stufe vorgeben.
 GameAction? aiDecide(GameState state, {AiTuning tuning = defaultAiTuning, Difficulty? difficulty}) {
   final seat = state.currentPlayer;
   final hand = state.players[seat].hand;
 
   switch (state.phase) {
     case GamePhase.bidding:
-      final value = aiBidDecision(state, seat);
+      final value = aiBidDecision(state, seat, difficulty: difficulty, tuning: tuning);
       return value == 0 ? PassBid(seat) : PlaceBid(seat, value);
     case GamePhase.chooseTrump:
-      if (canPushTrump(state) && shouldPushTrump(hand, state.rules)) {
+      final level = _levelFor(state, seat, difficulty);
+      if (_styleFor(level, tuning) == _Style.rollout) {
+        final mode = _rolloutMode(
+          state,
+          seat,
+          _modesFor(state.allowedRoundModes, tuning),
+          tuning.modeSamples(level),
+          tuning,
+        );
+        return mode == null ? PushTrump(seat) : ChooseMode(seat, mode);
+      }
+      if (canPushTrump(state) && shouldPushTrump(hand, state.rules, tuning: tuning)) {
         return PushTrump(seat);
       }
       if (state.isSchieber) {
-        return ChooseMode(seat, bestSchieberMode(hand, state.rules));
+        return ChooseMode(seat, bestSchieberMode(hand, state.rules, tuning: tuning));
       }
       return ChooseMode(
         seat,
         bestModeFrom(
           hand,
-          state.allowedRoundModes,
+          _modesFor(state.allowedRoundModes, tuning),
           state.rules,
           multipliers: state.usesRoundMultipliers,
+          tuning: tuning,
         ),
       );
     case GamePhase.announceWeis:

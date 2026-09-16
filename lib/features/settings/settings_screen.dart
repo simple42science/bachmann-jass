@@ -212,7 +212,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       texts.ruleMultipliers,
                       style: JassFonts.ui(size: 15, weight: FontWeight.w700),
                     ),
-                    for (final mode in RoundMode.values)
+                    for (final mode in RoundMode.baseModes)
                       _Stepper(
                         title: texts.mode(mode),
                         value: rules.multiplierFor(mode),

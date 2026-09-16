@@ -14,6 +14,7 @@ class OptionTile extends StatelessWidget {
     this.leading,
     this.trailing,
     this.minWidth = 96,
+    this.dense = false,
   });
 
   final String title;
@@ -23,6 +24,9 @@ class OptionTile extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
   final double minWidth;
+
+  /// Flache Kachel fuer wenig Hoehe (Handy quer).
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +45,8 @@ class OptionTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           onTap: onTap,
           child: Container(
-            constraints: BoxConstraints(minWidth: minWidth, minHeight: 48),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            constraints: BoxConstraints(minWidth: minWidth, minHeight: dense ? 36 : 48),
+            padding: EdgeInsets.symmetric(horizontal: dense ? 10 : 14, vertical: dense ? 4 : 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: Border.all(

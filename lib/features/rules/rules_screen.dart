@@ -93,7 +93,7 @@ class RulesScreen extends ConsumerWidget {
                       intro: texts.rulesMultipliersCopy,
                       child: _KeyValueTable(
                         rows: [
-                          for (final mode in RoundMode.values)
+                          for (final mode in RoundMode.baseModes)
                             (texts.mode(mode), texts.multiplier(rules.multiplierFor(mode))),
                         ],
                       ),

@@ -10,9 +10,13 @@ library;
 
 import 'package:jass_engine/jass_engine.dart';
 
-const Map<String, AiTuning> _variants = {
-  'Web-App (Kontrolle)': AiTuning.webApp,
-  'Standard der App': AiTuning.standard,
+typedef _Variant = ({AiTuning tuning, Difficulty level});
+
+const Map<String, _Variant> _variants = {
+  'Web-App (Kontrolle)': (tuning: AiTuning.webApp, level: Difficulty.normal),
+  'App: einfach': (tuning: AiTuning.standard, level: Difficulty.einfach),
+  'App: normal': (tuning: AiTuning.standard, level: Difficulty.normal),
+  'App: schwer': (tuning: AiTuning.standard, level: Difficulty.schwer),
 };
 
 void main(List<String> args) {
@@ -20,7 +24,7 @@ void main(List<String> args) {
   final deals = int.parse(args.elementAtOrNull(1) ?? '200');
   print('Bieterjass, Zaehlweise ${scoring.name}, $deals Verteilungen x 3 Sitze');
 
-  for (final MapEntry(key: label, value: tuning) in _variants.entries) {
+  for (final MapEntry(key: label, value: variant) in _variants.entries) {
     var games = 0;
     var wins = 0;
     var lead = 0.0;
@@ -29,7 +33,7 @@ void main(List<String> args) {
 
     for (var seed = 1; seed <= deals; seed += 1) {
       for (var seat = 0; seat < 3; seat += 1) {
-        final result = _play(seed, scoring, tuning, seat);
+        final result = _play(seed, scoring, variant, seat);
         games += 1;
         if (result.winner == seat) {
           wins += 1;
@@ -52,7 +56,7 @@ void main(List<String> args) {
 ({int winner, List<int> scores, int bids, int bidsMade}) _play(
   int seed,
   BieterScoring scoring,
-  AiTuning tuning,
+  _Variant variant,
   int tunedSeat,
 ) {
   var state = createGame(
@@ -67,8 +71,11 @@ void main(List<String> args) {
   for (var rounds = 0; state.phase != GamePhase.gameOver && rounds < 80; rounds += 1) {
     state = applyAction(state, const StartRound()).state;
     while (state.phase != GamePhase.roundEnd && state.phase != GamePhase.gameOver) {
-      final seatTuning = state.currentPlayer == tunedSeat ? tuning : AiTuning.webApp;
-      state = applyAction(state, aiDecide(state, tuning: seatTuning) ?? const NextTrick()).state;
+      final tuned = state.currentPlayer == tunedSeat;
+      final action = tuned
+          ? aiDecide(state, tuning: variant.tuning, difficulty: variant.level)
+          : aiDecide(state, tuning: AiTuning.webApp);
+      state = applyAction(state, action ?? const NextTrick()).state;
     }
     final summary = state.roundSummary! as BieterRoundSummary;
     if (summary.soloPlayer == tunedSeat) {
