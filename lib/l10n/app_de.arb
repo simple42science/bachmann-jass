@@ -32,7 +32,7 @@
       }
     }
   },
-  "variantCopy": "{variant, select, bieter{3 Spieler, Gebot, Solo gegen 2} schieber{4 Spieler, Partner gegen Partner} other{}}",
+  "variantCopy": "{variant, select, bieter{3 Spieler, Steigern, Bieter gegen 2} schieber{4 Spieler, Partner gegen Partner} other{}}",
   "@variantCopy": {
     "placeholders": {
       "variant": {
@@ -40,7 +40,7 @@
       }
     }
   },
-  "variantSubtitle": "{variant, select, bieter{3 Spieler – du spielst alleine gegen 2 Computer} schieber{4 Spieler – du mit Partner gegen 2 Computer} other{}}",
+  "variantSubtitle": "{variant, select, bieter{3 Spieler – wer am höchsten bietet, spielt alleine gegen die zwei anderen} schieber{4 Spieler – du mit Partner gegen 2 Computer} other{}}",
   "@variantSubtitle": {
     "placeholders": {
       "variant": {
@@ -49,7 +49,7 @@
     }
   },
   "playerNameLabel": "Dein Name",
-  "playerNameDefault": "Du",
+  "playerNameDefault": "Näschel",
   "difficultyLabel": "Schwierigkeit",
   "difficultyName": "{difficulty, select, einfach{Einfach} normal{Normal} schwer{Schwer} other{{difficulty}}}",
   "@difficultyName": {
@@ -109,6 +109,16 @@
       }
     }
   },
+  "startBidLabel": "Anfangsgebot im Bieterjass",
+  "startBidHint": "Die beiden anderen brauchen {points}",
+  "@startBidHint": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "startBidCustom": "Eigene Zahl",
   "targetLabel": "Punkteziel im Schieber",
   "targetPoints": "{points} Punkte",
   "@targetPoints": {
@@ -219,6 +229,15 @@
       }
     }
   },
+  "badgeSolo": "Bieter {bid}",
+  "@badgeSolo": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
+  "badgePair": "Zu zweit",
   "trickCount": "{count, plural, =1{1 Stich} other{{count} Stiche}}",
   "@trickCount": {
     "placeholders": {
@@ -330,16 +349,16 @@
       }
     }
   },
-  "msgRoundEndBieter": "{name} {succeeded, select, true{erfüllt} other{verpasst}} {bid}.",
+  "msgRoundEndBieter": "{name} {solo}, zu zweit {pair}.",
   "@msgRoundEndBieter": {
     "placeholders": {
       "name": {
         "type": "String"
       },
-      "succeeded": {
-        "type": "String"
+      "solo": {
+        "type": "int"
       },
-      "bid": {
+      "pair": {
         "type": "int"
       }
     }
@@ -352,11 +371,25 @@
       }
     }
   },
-  "msgGameOverBieter": "{name} gewinnt das Spiel.",
-  "@msgGameOverBieter": {
+  "msgGameOverBieterSolo": "{name} erreicht {bid} zuerst und gewinnt.",
+  "@msgGameOverBieterSolo": {
     "placeholders": {
       "name": {
         "type": "String"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
+  "msgGameOverBieterPair": "{names} erreichen {points} zuerst und gewinnen.",
+  "@msgGameOverBieterPair": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
       }
     }
   },
@@ -382,15 +415,33 @@
   "restrictionNoUndertrump": "Untertrumpfen ist nicht erlaubt.",
   "restrictionNotYourTurn": "Du bist nicht am Zug.",
   "bidPrompt": "Dein Gebot",
-  "bidHighest": "Höchstes Gebot: {bid}",
-  "@bidHighest": {
+  "bidHighestBy": "{name} hält bei {bid}",
+  "@bidHighestBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
+  "bidStart": "Steigern ab {bid}",
+  "@bidStart": {
     "placeholders": {
       "bid": {
         "type": "int"
       }
     }
   },
-  "bidNone": "Noch kein Gebot",
+  "bidOffer": "{bid} bieten",
+  "@bidOffer": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "bidPass": "Passen",
   "modePrompt": "Spielart wählen",
   "modePromptPush": "Spielart wählen oder schieben",
@@ -460,25 +511,8 @@
       }
     }
   },
-  "summaryBieterSuccess": "{name} erfüllt {bid}. {points} Punkte in der Runde, +{gain} Spielpunkte.",
-  "@summaryBieterSuccess": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "bid": {
-        "type": "int"
-      },
-      "points": {
-        "type": "int"
-      },
-      "gain": {
-        "type": "int"
-      }
-    }
-  },
-  "summaryBieterFail": "{name} scheitert mit {points}/{bid}: {gain} Spielpunkte. {defenders}: je +{defenderGain} Spielpunkte.",
-  "@summaryBieterFail": {
+  "summaryBieterSide": "{name}: +{points}, jetzt {total} von {target}.",
+  "@summaryBieterSide": {
     "placeholders": {
       "name": {
         "type": "String"
@@ -486,16 +520,10 @@
       "points": {
         "type": "int"
       },
-      "bid": {
+      "total": {
         "type": "int"
       },
-      "gain": {
-        "type": "int"
-      },
-      "defenders": {
-        "type": "String"
-      },
-      "defenderGain": {
+      "target": {
         "type": "int"
       }
     }
@@ -615,6 +643,20 @@
     }
   },
   "rankingLine": "{rank}. {name}: {points} Punkte",
+  "rankingBieter": "{name}: {points} von {target}",
+  "@rankingBieter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
   "@rankingLine": {
     "placeholders": {
       "rank": {
@@ -691,6 +733,14 @@
   "colThem": "Sie",
   "colTotal": "Total",
   "colBidder": "Bieter",
+  "colStandOf": "Stand {name}",
+  "@colStandOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "colBid": "Gebot",
   "colReached": "Erreicht",
   "colResult": "Ergebnis",
@@ -732,7 +782,7 @@
       }
     }
   },
-  "logBiddingWon": "{name} spielt mit {bid}.",
+  "logBiddingWon": "{name} spielt die Partie alleine mit {bid}.",
   "@logBiddingWon": {
     "placeholders": {
       "name": {
@@ -955,24 +1005,17 @@
   "rulesMultipliersCopy": "Sie gelten in der 1000er- wie in der 2500er-Partie gleich. Der Zielscore bestimmt nur die Länge der Partie.",
   "rulesBieterTitle": "Bieterjass (Hausregel)",
   "rulesBieter1": "36 Karten, 12 Karten pro Spieler, in 3er-Paketen verteilt.",
-  "rulesBieter2": "Es wird gesteigert, bis alle bis auf einen passen. Der Höchstbietende spielt alleine gegen die anderen zwei.",
-  "rulesBieter3": "Passen alle, spielt der Geber mit {bid}.",
-  "@rulesBieter3": {
-    "placeholders": {
-      "bid": {
-        "type": "int"
-      }
-    }
-  },
-  "rulesBieter4": "Erfüllt der Bieter sein Gebot, erhält er den Gebotswert, sonst wird er ihm abgezogen; die Verteidiger teilen sich den Gebotswert.",
-  "rulesBieter5": "Kein Weis, kein Stöck, kein Match. Ziel: {points} Spielpunkte.",
-  "@rulesBieter5": {
+  "rulesBieter2": "Zu Beginn der Partie wird gesteigert: ab dem Anfangsgebot (400, 450, 500 oder eine eigene Zahl) in Zehnerschritten, bis alle bis auf einen passen. Passen alle, spielt der Geber mit dem Anfangsgebot.",
+  "rulesBieter3": "Wer am höchsten bietet, spielt die ganze Partie alleine gegen die anderen zwei. Die Spielart sagt reihum die Vorhand an (wer nach dem Geber kommt), auch der Bieter nur, wenn er Vorhand ist.",
+  "rulesBieter4": "Der Bieter muss sein Gebot erreichen, bevor die beiden anderen zusammen {points} Punkte haben. Die Partie endet mit dem Stich, in dem eine Seite ihr Ziel erreicht.",
+  "@rulesBieter4": {
     "placeholders": {
       "points": {
         "type": "int"
       }
     }
   },
+  "rulesBieter5": "Kein Weis, kein Stöck, kein Match. Der letzte Stich zählt 5; die Multiplikatoren gelten je nach Zählweise.",
   "rulesSchieberTitle": "Schieber",
   "rulesSchieber1": "36 Karten, 9 Karten pro Spieler. Zwei feste Teams, der Partner sitzt gegenüber.",
   "rulesSchieber2": "Vorhand wählt die Spielart oder schiebt einmal an den Partner.",
@@ -1074,7 +1117,6 @@
       }
     }
   },
-  "ruleForcedBid": "Pflichtgebot des Gebers",
   "pointsValue": "{points} Punkte",
   "@pointsValue": {
     "placeholders": {
@@ -1097,7 +1139,7 @@
       }
     }
   },
-  "statsBids": "Gebote erfüllt",
+  "statsBids": "Als Bieter gewonnen",
   "statsBidsValue": "{made} von {attempted}",
   "@statsBidsValue": {
     "placeholders": {

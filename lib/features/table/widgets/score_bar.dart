@@ -76,7 +76,67 @@ class ScoreBar extends StatelessWidget {
     ];
   }
 
+  /// Nach dem Steigern: der Bieter gegen die beiden anderen, je mit Ziel.
+  List<Widget> _sideChips(AppLocalizations texts, bool compact) {
+    final solo = game.players[game.soloPlayer];
+    final factor = game.roundMultiplier > 1 && game.roundMode != null
+        ? ' ${texts.multiplier(game.roundMultiplier)}'
+        : '';
+    final currentSide = !game.isInteractive
+        ? -1
+        : game.currentPlayer == game.soloPlayer
+        ? 0
+        : 1;
+    final pairTricks = game.players
+        .where((player) => player.id != game.soloPlayer)
+        .fold(0, (sum, player) => sum + player.tricksWon);
+
+    Widget plate({
+      required String title,
+      required int total,
+      required int target,
+      required int roundPoints,
+      required int tricks,
+      required int side,
+    }) => _ScorePlate(
+      title: title,
+      value: total,
+      detail: compact
+          ? texts.targetShort(target)
+          : [
+              texts.targetShort(target),
+              texts.scoreRound('$roundPoints$factor'),
+              texts.trickCount(tricks),
+            ].join(' · '),
+      active: side == currentSide,
+      allied: (game.soloPlayer == 0) == (side == 0),
+      compact: compact,
+    );
+
+    return [
+      plate(
+        title: solo.name,
+        total: solo.totalScore,
+        target: game.soloTarget,
+        roundPoints: solo.pointsWon,
+        tricks: solo.tricksWon,
+        side: 0,
+      ),
+      plate(
+        title: texts.pairName(game),
+        total: game.pairScore,
+        target: game.pairTarget,
+        roundPoints: game.pairRoundPoints,
+        tricks: pairTricks,
+        side: 1,
+      ),
+    ];
+  }
+
   List<Widget> _playerChips(AppLocalizations texts, bool compact) {
+    if (game.soloPlayer >= 0) {
+      return _sideChips(texts, compact);
+    }
     final inRound = game.phase != GamePhase.bidding && game.phase != GamePhase.setup;
     return [
       for (final player in game.players)

@@ -12,7 +12,7 @@ GameAction? simpleAction(GameState state) {
     GamePhase.setup || GamePhase.roundEnd => const StartRound(),
     GamePhase.bidding =>
       seat == state.biddingOrder.first && state.highestBid == 0
-          ? PlaceBid(seat, 60)
+          ? PlaceBid(seat, minimumBid(state))
           : PassBid(seat),
     GamePhase.chooseTrump => ChooseMode(seat, RoundMode.rosen),
     GamePhase.announceWeis => DeclareWeis(seat),

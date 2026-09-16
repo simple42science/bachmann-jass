@@ -140,7 +140,11 @@ void main() {
       final over = session.events.whereType<GameOver>().single;
       expect(session.state.players[1].name, 'Yannick');
       expect(sound.wins, cheeringPlayerWon(session.state, over) ? 1 : 0);
-      expect(cheeringPlayerWon(session.state, over), over.winnerPlayer == 1);
+      expect(
+        cheeringPlayerWon(session.state, over),
+        over.winnerTeam == session.state.players[1].teamId,
+        reason: 'Yannick gewinnt als Bieter oder als einer der beiden anderen',
+      );
 
       // Ohne einen Yannick am Tisch bleibt es still, auch wenn dieselbe Partie laeuft.
       final silent = RecordingSoundPlayer();
@@ -171,7 +175,7 @@ void main() {
         ],
       );
       final humanSession = human.read(gameControllerProvider)!;
-      expect(own.wins, over.winnerPlayer == 0 ? 1 : 0);
+      expect(own.wins, humanWon(session.state, over) ? 1 : 0);
       expect(humanSession.state.phase, GamePhase.gameOver);
 
       // Ausgeschaltet bleibt es still.

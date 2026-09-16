@@ -4,7 +4,7 @@ import 'cards.dart';
 import 'json.dart';
 
 enum GameVariant {
-  bieter(playerCount: 3, handSize: 12, dealPacketSize: 3, defaultTargetScore: 1500),
+  bieter(playerCount: 3, handSize: 12, dealPacketSize: 3, defaultTargetScore: 1000),
   schieber(playerCount: 4, handSize: 9, dealPacketSize: 3, defaultTargetScore: 1000);
 
   const GameVariant({
@@ -27,20 +27,29 @@ enum BieterScoring { einfach, schieber }
 
 enum GamePhase { setup, bidding, chooseTrump, announceWeis, playing, trickEnd, roundEnd, gameOver }
 
+/// Bieterjass: uebliche Anfangsgebote, Schrittweite und Obergrenze des Steigerns.
+const List<int> bieterStartBids = [400, 450, 500];
+const int bidStep = 10;
+const int maxBid = 2000;
+
 @immutable
 final class MatchConfig {
   const MatchConfig({
     required this.targetScore,
     this.difficulty = Difficulty.normal,
     this.bieterScoring = BieterScoring.einfach,
+    this.bieterStartBid = 450,
   });
 
   factory MatchConfig.fromJson(Map<String, Object?> json) => MatchConfig(
     targetScore: json['targetScore']! as int,
     difficulty: Difficulty.values.byName(json['difficulty']! as String),
     bieterScoring: BieterScoring.values.byName(json['bieterScoring']! as String),
+    bieterStartBid: json['bieterStartBid'] as int? ?? 450,
   );
 
+  /// Schieber: Ziel beider Teams. Bieterjass: Ziel der beiden, die zusammen
+  /// gegen den Bieter spielen (1000); der Bieter muss sein Gebot erreichen.
   final int targetScore;
 
   /// Standardstufe fuer alle Computergegner ohne eigene Stufe.
@@ -49,10 +58,14 @@ final class MatchConfig {
   /// Nur im Bieterjass relevant.
   final BieterScoring bieterScoring;
 
+  /// Bieterjass: Mit diesem Wert beginnt das Steigern zu Beginn der Partie.
+  final int bieterStartBid;
+
   Map<String, Object?> toJson() => {
     'targetScore': targetScore,
     'difficulty': difficulty.name,
     'bieterScoring': bieterScoring.name,
+    'bieterStartBid': bieterStartBid,
   };
 }
 
@@ -118,6 +131,7 @@ final class Player {
   Player copyWith({
     List<JassCard>? hand,
     Object? bid = unchanged,
+    int? teamId,
     int? tricksWon,
     int? pointsWon,
     int? totalScore,
@@ -125,7 +139,7 @@ final class Player {
     id: id,
     name: name,
     isHuman: isHuman,
-    teamId: teamId,
+    teamId: teamId ?? this.teamId,
     difficulty: difficulty,
     hand: hand ?? this.hand,
     bid: identical(bid, unchanged) ? this.bid : bid as int?,

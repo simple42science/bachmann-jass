@@ -15,7 +15,7 @@ enum AiDelayKind { bidding, trump, weis, card, trickEnd, autoPlay }
 
 /// Wartezeiten in Millisekunden (min, max) wie in der Web-App.
 const Map<AiDelayKind, (int, int)> _delayRanges = {
-  AiDelayKind.bidding: (1200, 2100),
+  AiDelayKind.bidding: (700, 1200),
   AiDelayKind.trump: (1500, 2600),
   AiDelayKind.weis: (1400, 2200),
   AiDelayKind.card: (1500, 2700),

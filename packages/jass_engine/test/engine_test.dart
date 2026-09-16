@@ -6,6 +6,10 @@ import 'package:test/test.dart';
 import 'support/simple_players.dart';
 
 void expectCleanRoundEnd(GameState state) {
+  if (state.isBieter && state.phase == GamePhase.gameOver) {
+    // Der Bieterjass endet mit dem Stich, in dem eine Seite ihr Ziel erreicht.
+    return;
+  }
   expect(
     state.players.every((player) => player.hand.isEmpty),
     isTrue,
@@ -121,12 +125,13 @@ void main() {
       final second = bieter.biddingOrder[1];
 
       expect(violationOf(bieter, PassBid(second))?.violation, RuleViolation.notYourTurn);
-      expect(violationOf(bieter, PlaceBid(first, 65))?.violation, RuleViolation.invalidBid);
+      expect(violationOf(bieter, PlaceBid(first, 9999))?.violation, RuleViolation.invalidBid);
+      expect(violationOf(bieter, PlaceBid(first, 400))?.violation, RuleViolation.bidTooLow);
       expect(violationOf(bieter, PushTrump(first))?.violation, RuleViolation.pushNotAllowed);
       expect(violationOf(bieter, const NextTrick())?.violation, RuleViolation.wrongPhase);
 
-      final afterBid = step(bieter, PlaceBid(first, 80));
-      expect(violationOf(afterBid, PlaceBid(second, 70))?.violation, RuleViolation.bidTooLow);
+      final afterBid = step(bieter, PlaceBid(first, 480));
+      expect(violationOf(afterBid, PlaceBid(second, 470))?.violation, RuleViolation.bidTooLow);
 
       final schieber = step(createGame(variant: GameVariant.schieber, seed: 2), const StartRound());
       expect(
@@ -190,7 +195,7 @@ void main() {
   test('Aktionen ueberstehen JSON', () {
     final actions = <GameAction>[
       const StartRound(),
-      const PlaceBid(1, 90),
+      const PlaceBid(1, 490),
       const PassBid(2),
       const PushTrump(0),
       const ChooseMode(2, RoundMode.slalom),

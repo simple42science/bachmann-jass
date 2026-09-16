@@ -399,57 +399,48 @@ class _BieterTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final texts = AppLocalizations.of(context);
+    final solo = game.soloPlayer >= 0 ? game.players[game.soloPlayer].name : texts.pileBidder;
+    final pair = game.soloPlayer >= 0 ? texts.pairName(game) : texts.pileOpponents;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 440),
+        constraints: const BoxConstraints(minWidth: 460),
         child: Table(
           columnWidths: const {
             0: FixedColumnWidth(30),
-            1: FixedColumnWidth(84),
-            2: FlexColumnWidth(),
-            3: FixedColumnWidth(54),
-            4: FixedColumnWidth(60),
-            5: FixedColumnWidth(70),
-            6: FixedColumnWidth(58),
+            1: FlexColumnWidth(),
+            2: FixedColumnWidth(60),
+            3: FixedColumnWidth(60),
+            4: FixedColumnWidth(84),
+            5: FixedColumnWidth(84),
           },
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
             TableRow(
               children: [
                 _HeadCell(texts.colRound, align: TextAlign.left),
-                _HeadCell(texts.colBidder, align: TextAlign.left),
                 _HeadCell(texts.colMode, align: TextAlign.left),
-                _HeadCell(texts.colBid),
-                _HeadCell(texts.colReached),
-                _HeadCell(texts.colResult),
-                _HeadCell(texts.colPoints),
+                _HeadCell(solo),
+                _HeadCell(pair),
+                _HeadCell(texts.colStandOf(solo)),
+                _HeadCell(texts.colStandOf(pair)),
               ],
             ),
             for (final entry in game.roundHistory)
               if (entry.summary case final BieterRoundSummary summary) ...[
-                _divider(context, 7),
+                _divider(context, 6),
                 TableRow(
                   children: [
                     _ChalkCell('${entry.roundNumber}', align: TextAlign.left, size: 18, dim: true),
-                    _ModeCell(
-                      label: game.players[summary.soloPlayer].name,
-                      multiplier: 1,
-                      tags: const [],
-                    ),
                     _ModeCell(
                       label: texts.mode(summary.roundMode),
                       multiplier: summary.multiplier,
                       tags: const [],
                     ),
-                    _ChalkCell('${summary.bid}'),
                     _ChalkCell('${summary.soloPoints}'),
-                    _ChalkCell(
-                      summary.succeeded ? texts.resultMade : texts.resultMissed,
-                      size: 17,
-                      dim: true,
-                    ),
-                    _ChalkCell('${summary.soloGain > 0 ? '+' : ''}${summary.soloGain}'),
+                    _ChalkCell('${summary.pairPoints}'),
+                    _ChalkCell('${summary.soloTotal}/${summary.bid}', size: 17),
+                    _ChalkCell('${summary.pairTotal}/${summary.pairTarget}', size: 17),
                   ],
                 ),
               ],

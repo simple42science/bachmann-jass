@@ -130,6 +130,8 @@ sealed class RoundSummary {
   Map<String, Object?> toJson();
 }
 
+/// Bieterjass: Der Bieter sammelt auf sein Gebot hin, die beiden anderen
+/// gemeinsam auf das Punkteziel. Die Rundenpunkte sind bereits multipliziert.
 final class BieterRoundSummary extends RoundSummary {
   const BieterRoundSummary({
     required super.roundMode,
@@ -137,9 +139,10 @@ final class BieterRoundSummary extends RoundSummary {
     required this.soloPlayer,
     required this.bid,
     required this.soloPoints,
-    required this.succeeded,
-    required this.soloGain,
-    required this.defenderGain,
+    required this.pairPoints,
+    required this.soloTotal,
+    required this.pairTotal,
+    required this.pairTarget,
   });
 
   factory BieterRoundSummary.fromJson(Map<String, Object?> json) => BieterRoundSummary(
@@ -148,21 +151,27 @@ final class BieterRoundSummary extends RoundSummary {
     soloPlayer: json['soloPlayer']! as int,
     bid: json['bid']! as int,
     soloPoints: json['soloPoints']! as int,
-    succeeded: json['succeeded']! as bool,
-    soloGain: json['soloGain']! as int,
-    defenderGain: json['defenderGain']! as int,
+    pairPoints: json['pairPoints']! as int,
+    soloTotal: json['soloTotal']! as int,
+    pairTotal: json['pairTotal']! as int,
+    pairTarget: json['pairTarget']! as int,
   );
 
   final int soloPlayer;
   final int bid;
+
+  /// Punkte des Bieters und der beiden anderen in dieser Runde (mit Multiplikator).
   final int soloPoints;
-  final bool succeeded;
+  final int pairPoints;
 
-  /// Spielpunkte des Bieters; negativ, wenn er sein Gebot verpasst.
-  final int soloGain;
+  /// Stand nach der Runde.
+  final int soloTotal;
+  final int pairTotal;
+  final int pairTarget;
 
-  /// Spielpunkte je Verteidiger.
-  final int defenderGain;
+  bool get soloWon => soloTotal >= bid;
+
+  bool get pairWon => !soloWon && pairTotal >= pairTarget;
 
   @override
   Map<String, Object?> toJson() => {
@@ -172,9 +181,10 @@ final class BieterRoundSummary extends RoundSummary {
     'soloPlayer': soloPlayer,
     'bid': bid,
     'soloPoints': soloPoints,
-    'succeeded': succeeded,
-    'soloGain': soloGain,
-    'defenderGain': defenderGain,
+    'pairPoints': pairPoints,
+    'soloTotal': soloTotal,
+    'pairTotal': pairTotal,
+    'pairTarget': pairTarget,
   };
 }
 

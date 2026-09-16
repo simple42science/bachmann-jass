@@ -145,6 +145,7 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | 1.4 | Tests und Paritätsprüfung gegen die Web-App | 🟢 | M | 1.2, 1.3 | ✅ erledigt |
 | 1.5 | Computergegner portieren | 🟢 | M | 1.2 | ✅ erledigt |
 | 1.6 | Stärkere Computergegner | 🟢 | L | 1.2, 1.4 | ✅ erledigt (16.09.2026) |
+| 1.7 | Bieterjass nach Familienregeln | 🟡 | M | 1.2 | ✅ erledigt (16.09.2026); D9 |
 | 2.1 | GameController und Spielablauf | 🟢 | M | 1.2 | ✅ erledigt |
 | 2.2 | Speicherstand und Einstellungen | 🟢 | S | 2.1 | ✅ erledigt |
 | 2.3 | Navigation und Screen-Gerüst | 🟢 | S | 0.1 | ✅ erledigt |
@@ -257,6 +258,13 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - **Stand:** ✅ Neue KI in `packages/jass_engine/lib/src/rollout.dart`: Die Stufen Normal und Schwer entscheiden per Stichprobe. Die unbekannten Karten werden mehrmals zufällig, aber mit dem bisherigen Spiel verträglich verteilt (wer eine Farbe nicht bedienen konnte, bekommt sie nicht), jede Möglichkeit wird mit einer schnellen Spielweise zu Ende gespielt, und gewählt wird die Karte, Spielart oder das Gebot mit dem besten Punkteschnitt. Normal nutzt 16 Stichproben je Karte, Schwer 64. Einfach entspricht der bisherigen stärksten Stufe (Stellungsspiel plus Kartengedächtnis). Die Web-App-KI bleibt für den Paritätstest unter `AiTuning.webApp` erhalten.
 - **Gemessen** (`tool/benchmark.dart`, 200 Verteilungen mit getauschten Sitzen, Schieber auf 1000): Schwer gewinnt 72 % gegen die alte Top-Stufe, Normal 65 % gegen das neue Einfach, Schwer 63 % gegen Normal; Rechenzeit unter 2 ms je Entscheidung. Bieterjass (`tool/benchmark_bieter.dart`): Normal und Schwer gewinnen 94–97 % der Partien gegen zwei Web-App-Gegner (vorher 66 %), erfüllte Gebote 95 % statt 65 %.
 - Dazu: Slalom lässt sich von oben oder von unten ansagen (`RoundMode.slalomUneUfe`), die KI wählt die Richtung mit.
+
+#### AP 1.7 Bieterjass nach Familienregeln · 🟡 Claude + Input · M
+
+- Rückmeldung vom Handy-Test: Die Web-App bot je Runde 60–157 Stichpunkte; die Familie steigert einmal zu Beginn der Partie ab 400/450/500 und spielt dann Bieter gegen die beiden anderen bis zum Ziel (Gebot bzw. 1000).
+- **Stand:** ✅ Engine umgebaut (`engine.dart`, `trick_play.dart`, `round.dart`): Steigern nur in Runde 1, Anfangsgebot in `MatchConfig.bieterStartBid`, Mindestschritt 10, Passen alle → Geber mit Anfangsgebot; der Bieter sagt jede Runde an; Rundenpunkte (mal Multiplikator je Zählweise) laufen auf Gebot bzw. 1000 zu; Ende mit dem Stich, in dem eine Seite ihr Ziel erreicht. Setup mit Anfangsgebot (400/450/500/eigene Zahl), Gebotspanel mit −10/+10/+50, Punkteleiste und Jasstafel je Seite, Regeltext, Statistik „Als Bieter gewonnen“. Die Computer steigern bis zu einer Schmerzgrenze zwischen 450 und 650 (aus dem Seed, leicht nach der ersten Hand verschoben), so endet das Steigern meist in diesem Bereich und ein Mensch wird hochgetrieben.
+- Die alten Bieterjass-Paritätsfixtures der Web-App sind entfernt; Parität gilt weiter für den Schieber.
+- 🟡 Bitte prüfen: Zehnerschritte beim Steigern, Geber spielt mit dem Anfangsgebot, wenn alle passen, Partieende mitten in der Runde.
 
 ### Phase 2 – App-Architektur
 
@@ -383,7 +391,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 - ~~Tipp-Knopf~~ – auf Wunsch gestrichen (16.09.2026).
 - Zug zurücknehmen, nur gegen Computer und abschaltbar.
 - Bestätigung vor dem Ausspielen, Layout für Links- und Rechtshänder.
-- **Stand:** ✅ Tempo-Regler (30–200 %), Vorgaben Langsam/Normal/Schnell bleiben im Menü, automatisch spielen bei einziger erlaubter Karte, Zug zurücknehmen (standardmässig aus; bis 20 Züge, nimmt auch die Computerzüge danach zurück), Bestätigen per zweitem Tippen. Der Tipp-Knopf wurde auf Wunsch wieder entfernt. Nach dem Handy-Test (16.09.2026): Weise der Computer bleiben eine halbe Sekunde länger sichtbar, der letzte Stich einer Runde bleibt wie jeder andere kurz liegen, bevor die Abrechnung erscheint. Links-/Rechtshänder-Layout ist offen.
+- **Stand:** ✅ Tempo-Regler (30–200 %), Vorgaben Langsam/Normal/Schnell bleiben im Menü, automatisch spielen bei einziger erlaubter Karte, Zug zurücknehmen (standardmässig aus; bis 20 Züge, nimmt auch die Computerzüge danach zurück), Bestätigen per zweitem Tippen. Der Tipp-Knopf wurde auf Wunsch wieder entfernt. Nach dem Handy-Test (16.09.2026): Standardname „Näschel“ statt „Du“, Weise der Computer bleiben eine halbe Sekunde länger sichtbar, der letzte Stich einer Runde bleibt wie jeder andere kurz liegen, bevor die Abrechnung erscheint. Links-/Rechtshänder-Layout ist offen.
 
 #### AP 5.2 Hausregel-Editor · 🟡 Claude + Input · M
 
@@ -471,6 +479,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | D6 | Rechte an den Kartenbildern | klären, bevor Store-Screenshots entstehen | AP 7.2 | ✅ nutzbar (Open Source); Quelle und Lizenz im Repo vermerken |
 | D7 | Web-Hosting und Repo-Sichtbarkeit | Repo öffentlich machen und GitHub Pages nutzen | AP 7.1 | ✅ Repo öffentlich, GitHub Pages (16.09.2026) |
 | D8 | Online-Spiel nach 1.0 | erst nach den Spieltests entscheiden | Phase 8 | offen |
+| D9 | Bieterjass-Regeln | Familienregeln statt Web-App: Steigern zu Beginn der Partie ab 400/450/500 (oder eigene Zahl) in Zehnerschritten; der Bieter spielt die ganze Partie alleine und muss sein Gebot erreichen, bevor die beiden anderen 1000 haben; die Partie endet mit dem Stich, in dem eine Seite ihr Ziel erreicht; Zählweise (einfach / mit Multiplikatoren) bleibt wählbar | 1.2 | ✅ entschieden 16.09.2026; Annahmen offen: Zehnerschritte, Geber spielt mit dem Anfangsgebot, wenn alle passen |
 
 ---
 

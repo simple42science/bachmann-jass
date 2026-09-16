@@ -28,6 +28,9 @@ enum GameSpeed {
 /// Zielscores, die im Schieber zur Wahl stehen.
 const List<int> schieberTargetScores = [1000, 2500];
 
+/// Kleinstes Anfangsgebot, das sich im Bieterjass eingeben laesst.
+const int minStartBid = 100;
+
 /// Grenzen des stufenlosen Tempos.
 const double minSpeedFactor = 0.3;
 const double maxSpeedFactor = 2.0;
@@ -39,6 +42,7 @@ final class AppSettings {
     this.variant = GameVariant.bieter,
     this.schieberTargetScore = 1000,
     this.bieterScoring = BieterScoring.einfach,
+    this.bieterStartBid = 450,
     this.difficulty = Difficulty.normal,
     this.speedFactor = 1.0,
     this.autoPlaySingleCard = false,
@@ -75,6 +79,9 @@ final class AppSettings {
       variant: pick(GameVariant.values, json['variant'], GameVariant.bieter),
       schieberTargetScore: target is int && schieberTargetScores.contains(target) ? target : 1000,
       bieterScoring: pick(BieterScoring.values, json['bieterScoring'], BieterScoring.einfach),
+      bieterStartBid: json['bieterStartBid'] is int
+          ? (json['bieterStartBid']! as int).clamp(minStartBid, maxBid)
+          : 450,
       difficulty: pick(Difficulty.values, json['difficulty'], Difficulty.normal),
       speedFactor: factor.clamp(minSpeedFactor, maxSpeedFactor),
       autoPlaySingleCard: json['autoPlaySingleCard'] as bool? ?? false,
@@ -103,6 +110,9 @@ final class AppSettings {
   final GameVariant variant;
   final int schieberTargetScore;
   final BieterScoring bieterScoring;
+
+  /// Bieterjass: Anfangsgebot beim Steigern (400, 450, 500 oder eigene Zahl).
+  final int bieterStartBid;
   final Difficulty difficulty;
 
   /// Stufenloses Tempo; 1.0 entspricht den Wartezeiten der Web-App.
@@ -137,6 +147,7 @@ final class AppSettings {
       targetScore: GameVariant.bieter.defaultTargetScore,
       difficulty: difficulty,
       bieterScoring: bieterScoring,
+      bieterStartBid: bieterStartBid,
     ),
   };
 
@@ -158,6 +169,7 @@ final class AppSettings {
     GameVariant? variant,
     int? schieberTargetScore,
     BieterScoring? bieterScoring,
+    int? bieterStartBid,
     Difficulty? difficulty,
     double? speedFactor,
     bool? autoPlaySingleCard,
@@ -172,6 +184,7 @@ final class AppSettings {
     variant: variant ?? this.variant,
     schieberTargetScore: schieberTargetScore ?? this.schieberTargetScore,
     bieterScoring: bieterScoring ?? this.bieterScoring,
+    bieterStartBid: bieterStartBid ?? this.bieterStartBid,
     difficulty: difficulty ?? this.difficulty,
     speedFactor: (speedFactor ?? this.speedFactor).clamp(minSpeedFactor, maxSpeedFactor),
     autoPlaySingleCard: autoPlaySingleCard ?? this.autoPlaySingleCard,
@@ -188,6 +201,7 @@ final class AppSettings {
     'variant': variant.name,
     'schieberTargetScore': schieberTargetScore,
     'bieterScoring': bieterScoring.name,
+    'bieterStartBid': bieterStartBid,
     'difficulty': difficulty.name,
     'speedFactor': speedFactor,
     'autoPlaySingleCard': autoPlaySingleCard,

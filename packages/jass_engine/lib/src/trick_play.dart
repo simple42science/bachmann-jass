@@ -102,10 +102,22 @@ GameState _resolveTrick(GameState state, List<GameEvent> events) {
     phase: GamePhase.trickEnd,
   );
 
-  if (isLastTrick || _bedanken(next)) {
+  if (isLastTrick || _bedanken(next) || _bieterDecided(next)) {
     return _resolveRound(next, events);
   }
   return next;
+}
+
+/// Bieterjass: Die Partie endet mit dem Stich, in dem eine Seite ihr Ziel
+/// erreicht - der Bieter sein Gebot oder die beiden anderen das Punkteziel.
+bool _bieterDecided(GameState state) {
+  if (!state.isBieter) {
+    return false;
+  }
+  final multiplier = state.roundMultiplier;
+  final solo = state.players[state.soloPlayer];
+  return solo.totalScore + solo.pointsWon * multiplier >= state.soloTarget ||
+      state.pairScore + state.pairRoundPoints * multiplier >= state.pairTarget;
 }
 
 /// Bedanken: Im Schieber endet die Partie sofort, sobald ein Team mit den
@@ -134,54 +146,51 @@ GameState _resolveRound(GameState state, List<GameEvent> events) {
   );
 
   if (scored.phase == GamePhase.gameOver) {
-    events.add(
-      scored.isSchieber
-          ? GameOver(
-              variant: scored.variant,
-              winnerTeam: maxBy(scored.teams, (Team team) => team.totalScore)!.id,
-            )
-          : GameOver(
-              variant: scored.variant,
-              winnerPlayer: maxBy(scored.players, (Player player) => player.totalScore)!.id,
-            ),
-    );
+    events.add(switch (summary) {
+      SchieberRoundSummary() => GameOver(
+        variant: scored.variant,
+        winnerTeam: maxBy(scored.teams, (Team team) => team.totalScore)!.id,
+      ),
+      // Der Bieter ist Team 0, die beiden anderen sind Team 1.
+      BieterRoundSummary(:final soloWon, :final soloPlayer) => GameOver(
+        variant: scored.variant,
+        winnerPlayer: soloWon ? soloPlayer : null,
+        winnerTeam: soloWon ? 0 : 1,
+      ),
+    });
   }
   return scored.copyWith(roundHistory: [...scored.roundHistory, entry]);
 }
 
 GameState _resolveBieterRound(GameState state) {
-  final solo = state.players[state.soloPlayer];
-  final bid = state.highestBid;
-  final soloPoints = solo.pointsWon;
-  final succeeded = soloPoints >= bid;
-  // Geboten wird in Stichpunkten. Der Multiplikator wirkt auf die Spielpunkte,
-  // die daraus werden - nicht auf das Gebot selbst.
   final multiplier = state.roundMultiplier;
-  final stake = bid * multiplier;
-  final soloGain = succeeded ? stake : -stake;
-  final defenderGain = succeeded ? 0 : stake ~/ (state.players.length - 1);
+  final solo = state.players[state.soloPlayer];
+  final soloPoints = solo.pointsWon * multiplier;
+  final pairPoints = state.pairRoundPoints * multiplier;
+  final soloTotal = solo.totalScore + soloPoints;
+  final pairTotal = state.pairScore + pairPoints;
 
+  // Die beiden anderen fuehren einen gemeinsamen Stand; er steht bei beiden.
   final players = [
     for (final player in state.players)
-      player.copyWith(
-        totalScore: player.totalScore + (player.id == state.soloPlayer ? soloGain : defenderGain),
-      ),
+      player.copyWith(totalScore: player.id == state.soloPlayer ? soloTotal : pairTotal),
   ];
-  final someoneWon = players.any((player) => player.totalScore >= state.targetScore);
+  final summary = BieterRoundSummary(
+    roundMode: state.roundMode!,
+    multiplier: multiplier,
+    soloPlayer: state.soloPlayer,
+    bid: state.soloTarget,
+    soloPoints: soloPoints,
+    pairPoints: pairPoints,
+    soloTotal: soloTotal,
+    pairTotal: pairTotal,
+    pairTarget: state.pairTarget,
+  );
 
   return state.copyWith(
     players: players,
-    roundSummary: BieterRoundSummary(
-      roundMode: state.roundMode!,
-      multiplier: multiplier,
-      soloPlayer: state.soloPlayer,
-      bid: bid,
-      soloPoints: soloPoints,
-      succeeded: succeeded,
-      soloGain: soloGain,
-      defenderGain: defenderGain,
-    ),
-    phase: someoneWon ? GamePhase.gameOver : GamePhase.roundEnd,
+    roundSummary: summary,
+    phase: summary.soloWon || summary.pairWon ? GamePhase.gameOver : GamePhase.roundEnd,
   );
 }
 

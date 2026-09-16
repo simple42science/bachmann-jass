@@ -109,17 +109,9 @@ final class ParityFixture {
 }
 
 List<Object?> _summaryOf(RoundSummary summary) => switch (summary) {
-  BieterRoundSummary() => [
-    'bieter',
-    summary.soloPlayer,
-    summary.bid,
-    summary.soloPoints,
-    summary.succeeded,
-    summary.soloGain,
-    summary.defenderGain,
-    summary.roundMode.name,
-    summary.multiplier,
-  ],
+  // Der Bieterjass folgt seit dem 16.09.2026 den Familienregeln und nicht
+  // mehr der Web-App; Fixtures gibt es nur noch fuer den Schieber.
+  BieterRoundSummary() => ['bieter', summary.soloPlayer, summary.bid, summary.soloPoints],
   SchieberRoundSummary() => [
     'schieber',
     [

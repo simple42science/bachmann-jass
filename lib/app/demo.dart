@@ -60,7 +60,7 @@ Future<void> runDemo(ProviderContainer container, DemoRequest request) async {
       targetScore: request.variant.defaultTargetScore,
       bieterScoring: BieterScoring.schieber,
     ),
-    playerName: 'Du',
+    playerName: 'Näschel',
     seed: request.seed,
   );
 

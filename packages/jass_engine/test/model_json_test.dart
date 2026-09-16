@@ -52,11 +52,12 @@ GameState richState() {
     roundMode: RoundMode.obeAbe,
     multiplier: 3,
     soloPlayer: 1,
-    bid: 90,
-    soloPoints: 71,
-    succeeded: false,
-    soloGain: -270,
-    defenderGain: 135,
+    bid: 520,
+    soloPoints: 213,
+    pairPoints: 273,
+    soloTotal: 480,
+    pairTotal: 610,
+    pairTarget: 1000,
   );
 
   final firstTrick = [

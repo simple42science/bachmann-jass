@@ -5,6 +5,7 @@ import 'cards.dart';
 import 'engine.dart';
 import 'game_state.dart';
 import 'model.dart';
+import 'rng.dart';
 import 'rollout.dart';
 import 'rule_set.dart';
 import 'rules.dart';
@@ -75,9 +76,6 @@ final class AiTuning {
 
 /// Standard fuer die App.
 const AiTuning defaultAiTuning = AiTuning.standard;
-
-/// Sicherheitsabstand des Experten zwischen erwarteten Punkten und Gebot.
-const int _bidMargin = 4;
 
 /* ------------------------------------------------------------------ *
  * Handbewertung
@@ -232,53 +230,38 @@ RoundMode bestSchieberMode(
 bool shouldPushTrump(List<JassCard> hand, RuleSet rules, {AiTuning tuning = defaultAiTuning}) =>
     modeAdvantage(hand, bestSchieberMode(hand, rules, tuning: tuning), rules, tuning: tuning) <= 0;
 
-/// Erwartete eigene Punkte in der besten Trumpffarbe laut Stichprobe;
-/// `null`, wenn sich die Lage nicht simulieren laesst.
-int? _rolloutTrumpExpectation(GameState state, int seat, int samples) {
-  final advantages = rolloutModeAdvantages(state, seat, RoundMode.trumpModes, samples: samples);
-  if (advantages == null) {
-    return null;
-  }
-  final best = advantages.values.reduce(math.max);
-  // Vorsprung = eigene minus fremde Punkte; zusammen sind es 157 plus letzter Stich.
-  return ((157 + state.rules.lastTrickBonus + best) / 2).round();
+/// Schmerzgrenze eines Computers beim Steigern, fuer die ganze Partie.
+///
+/// Geboten wird nicht fuer eine Runde, sondern fuer die Partie: Der Bieter muss
+/// sein Gebot erreichen, bevor die beiden anderen 1000 Punkte haben. Darum
+/// zaehlt weniger die erste Hand als der Mut. Jeder Computer zieht aus dem Seed
+/// eine Grenze zwischen 450 und 650, leicht nach der ersten Hand verschoben.
+/// So endet das Steigern meist zwischen 450 und 650, und ein Mensch wird noch
+/// ein Stueck hochgetrieben.
+int aiBidLimit(GameState state, int seat) {
+  final rng = Mulberry32(state.seed ^ ((seat + 1) * 0x9E3779B1));
+  final base = 450 + (rng.nextDouble() * 21).floor() * 10;
+  final hand = state.players[seat].hand;
+  final strength = estimateRoundPoints(evaluateTrumpSuit(hand, bestTrumpSuit(hand)));
+  final shift = ((strength - 80) / 4).round().clamp(-20, 20);
+  final limit = ((base + shift) / bidStep).round() * bidStep;
+  return math.max(state.matchConfig.bieterStartBid, limit);
 }
 
-/// Gebot fuer den Bieterjass; `0` bedeutet passen.
+/// Gebot fuer den Bieterjass; `0` bedeutet passen. Gesteigert wird in
+/// Zehnerschritten, mit Luft nach oben auch in Zwanzigern.
 int aiBidDecision(
   GameState state,
   int seat, {
   Difficulty? difficulty,
   AiTuning tuning = defaultAiTuning,
 }) {
-  final level = _levelFor(state, seat, difficulty);
-  final expectation = _styleFor(level, tuning) == _Style.rollout
-      ? _rolloutTrumpExpectation(state, seat, tuning.modeSamples(level))
-      : null;
-  if (expectation != null) {
-    final expected = expectation - _bidMargin;
-    final allowed = state.rules.bidValues.where((value) => value <= expected);
-    if (allowed.isEmpty) {
-      return 0;
-    }
-    final bid = allowed.reduce(math.max);
-    return bid <= state.highestBid ? 0 : bid;
-  }
-  final hand = state.players[seat].hand;
-  // Bewusst nur mit Trumpffarben geschaetzt, auch wenn Obe-Abe, Une-Ufe oder
-  // Slalom erlaubt sind: Mit allen Spielarten bot die KI zu hoch und gewann nur
-  // noch 27.2 statt 33.3 Prozent (tool/benchmark_bieter.dart, Zaehlweise wie im Schieber).
-  final expectedPoints = estimateRoundPoints(evaluateTrumpSuit(hand, bestTrumpSuit(hand)));
-
-  // Kalibriert in der Web-App: mit Faktor 1.1 liegt die Erfuellungsquote bei rund 70 Prozent.
-  final estimate = (expectedPoints * 1.1).round();
-  final proposed = math.min(140, (estimate ~/ 10) * 10);
-  final allowed = state.rules.bidValues.where((value) => value <= proposed);
-  if (allowed.isEmpty) {
+  final minimum = minimumBid(state);
+  final limit = aiBidLimit(state, seat);
+  if (minimum > limit) {
     return 0;
   }
-  final bid = allowed.reduce(math.max);
-  return bid <= state.highestBid ? 0 : bid;
+  return limit - minimum >= 4 * bidStep ? minimum + bidStep : minimum;
 }
 
 /* ------------------------------------------------------------------ *

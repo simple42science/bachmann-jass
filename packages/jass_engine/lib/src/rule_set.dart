@@ -16,8 +16,6 @@ final class RuleSet {
     required this.fourSixesCount,
     required this.fourOfAKindBeatsSequence,
     required this.roundMultipliers,
-    required this.bidValues,
-    required this.forcedDealerBid,
     this.bedanken = false,
     this.trickReview = TrickReview.first,
   });
@@ -33,8 +31,6 @@ final class RuleSet {
       for (final entry in (json['roundMultipliers']! as Map<String, Object?>).entries)
         RoundMode.values.byName(entry.key): entry.value! as int,
     },
-    bidValues: [for (final value in json['bidValues']! as List<Object?>) value! as int],
-    forcedDealerBid: json['forcedDealerBid']! as int,
     bedanken: json['bedanken'] as bool? ?? false,
     trickReview:
         TrickReview.values.cast<TrickReview?>().firstWhere(
@@ -60,8 +56,6 @@ final class RuleSet {
       RoundMode.uneUfe: 3,
       RoundMode.slalom: 3,
     },
-    bidValues: [60, 70, 80, 90, 100, 110, 120, 130, 140, 157],
-    forcedDealerBid: 60,
   );
 
   /// Punkte fuer den letzten Stich.
@@ -82,12 +76,6 @@ final class RuleSet {
   /// Faktor je Spielart.
   final Map<RoundMode, int> roundMultipliers;
 
-  /// Erlaubte Gebote im Bieterjass, aufsteigend. Passen ist kein Gebotswert.
-  final List<int> bidValues;
-
-  /// Mit diesem Gebot spielt der Geber, wenn alle passen.
-  final int forcedDealerBid;
-
   /// Bedanken: Die Partie endet im Schieber sofort, sobald ein Team das Ziel
   /// erreicht - auch mitten in der Runde. Sonst wird die Runde zu Ende gespielt.
   final bool bedanken;
@@ -104,8 +92,6 @@ final class RuleSet {
     bool? fourSixesCount,
     bool? fourOfAKindBeatsSequence,
     Map<RoundMode, int>? roundMultipliers,
-    List<int>? bidValues,
-    int? forcedDealerBid,
     bool? bedanken,
     TrickReview? trickReview,
   }) => RuleSet(
@@ -115,8 +101,6 @@ final class RuleSet {
     fourSixesCount: fourSixesCount ?? this.fourSixesCount,
     fourOfAKindBeatsSequence: fourOfAKindBeatsSequence ?? this.fourOfAKindBeatsSequence,
     roundMultipliers: roundMultipliers ?? this.roundMultipliers,
-    bidValues: bidValues ?? this.bidValues,
-    forcedDealerBid: forcedDealerBid ?? this.forcedDealerBid,
     bedanken: bedanken ?? this.bedanken,
     trickReview: trickReview ?? this.trickReview,
   );
@@ -128,8 +112,6 @@ final class RuleSet {
     'fourSixesCount': fourSixesCount,
     'fourOfAKindBeatsSequence': fourOfAKindBeatsSequence,
     'roundMultipliers': {for (final entry in roundMultipliers.entries) entry.key.name: entry.value},
-    'bidValues': bidValues,
-    'forcedDealerBid': forcedDealerBid,
     'bedanken': bedanken,
     'trickReview': trickReview.name,
   };
@@ -142,14 +124,9 @@ final class RuleSet {
       other.stoeckPoints == stoeckPoints &&
       other.fourSixesCount == fourSixesCount &&
       other.fourOfAKindBeatsSequence == fourOfAKindBeatsSequence &&
-      other.bidValues.length == bidValues.length &&
-      other.forcedDealerBid == forcedDealerBid &&
       other.bedanken == bedanken &&
       other.trickReview == trickReview &&
-      RoundMode.baseModes.every((mode) => other.multiplierFor(mode) == multiplierFor(mode)) &&
-      [
-        for (var i = 0; i < bidValues.length; i += 1) other.bidValues[i] == bidValues[i],
-      ].every((same) => same);
+      RoundMode.baseModes.every((mode) => other.multiplierFor(mode) == multiplierFor(mode));
 
   @override
   int get hashCode => Object.hash(
@@ -158,10 +135,8 @@ final class RuleSet {
     stoeckPoints,
     fourSixesCount,
     fourOfAKindBeatsSequence,
-    forcedDealerBid,
     bedanken,
     trickReview,
-    Object.hashAll(bidValues),
     Object.hashAll([for (final mode in RoundMode.baseModes) multiplierFor(mode)]),
   );
 }

@@ -50,6 +50,15 @@ extension GameTexts on AppLocalizations {
     return teamName(game.players[ordered[0]].name, game.players[ordered[1]].name);
   }
 
+  /// Bieterjass: die beiden, die zusammen gegen den Bieter spielen.
+  String pairName(GameState game) {
+    final names = [
+      for (final player in game.players)
+        if (player.id != game.soloPlayer) player.name,
+    ];
+    return names.length == 2 ? teamName(names[0], names[1]) : names.join(' & ');
+  }
+
   String playerOrTeam(GameState game, int playerIndex) => game.isSchieber
       ? team(game, game.players[playerIndex].teamId)
       : game.players[playerIndex].name;
@@ -68,6 +77,12 @@ extension GameTexts on AppLocalizations {
   String seatBadge(GameState game, int playerIndex) {
     final player = game.players[playerIndex];
     if (game.isBieter) {
+      if (game.soloPlayer >= 0) {
+        return [
+          if (playerIndex == game.soloPlayer) badgeSolo(game.soloTarget) else badgePair,
+          if (playerIndex == game.dealer) badgeDealer,
+        ].join(' · ');
+      }
       if (player.bid == null) {
         return playerIndex == game.dealer ? badgeDealer : '';
       }
@@ -102,11 +117,8 @@ extension GameTexts on AppLocalizations {
         return msgTrickEnd(game.players[game.trickLeader].name);
       case GamePhase.roundEnd:
         return switch (game.roundSummary) {
-          BieterRoundSummary(:final soloPlayer, :final succeeded, :final bid) => msgRoundEndBieter(
-            game.players[soloPlayer].name,
-            succeeded.toString(),
-            bid,
-          ),
+          BieterRoundSummary(:final soloPlayer, :final soloPoints, :final pairPoints) =>
+            msgRoundEndBieter(game.players[soloPlayer].name, soloPoints, pairPoints),
           SchieberRoundSummary(:final roundWinnerTeamId) => msgRoundEndSchieber(
             team(game, roundWinnerTeamId),
           ),
@@ -114,8 +126,10 @@ extension GameTexts on AppLocalizations {
         };
       case GamePhase.gameOver:
         if (game.isBieter) {
-          final winner = game.players.reduce((a, b) => b.totalScore > a.totalScore ? b : a);
-          return msgGameOverBieter(winner.name);
+          final solo = game.players[game.soloPlayer];
+          return solo.totalScore >= game.soloTarget
+              ? msgGameOverBieterSolo(solo.name, game.soloTarget)
+              : msgGameOverBieterPair(pairName(game), game.pairTarget);
         }
         final winner = game.teams.reduce((a, b) => b.totalScore > a.totalScore ? b : a);
         return msgGameOverSchieber(team(game, winner.id));
@@ -183,26 +197,19 @@ extension GameTexts on AppLocalizations {
 
     switch (summary) {
       case BieterRoundSummary():
-        final solo = game.players[summary.soloPlayer].name;
-        if (summary.succeeded) {
-          return [
-            modeLine,
-            summaryBieterSuccess(solo, summary.bid, summary.soloPoints, summary.soloGain),
-          ];
-        }
-        final defenders = game.players
-            .where((player) => player.id != summary.soloPlayer)
-            .map((player) => player.name)
-            .join(' & ');
         return [
           modeLine,
-          summaryBieterFail(
-            solo,
+          summaryBieterSide(
+            game.players[summary.soloPlayer].name,
             summary.soloPoints,
+            summary.soloTotal,
             summary.bid,
-            summary.soloGain,
-            defenders,
-            summary.defenderGain,
+          ),
+          summaryBieterSide(
+            pairName(game),
+            summary.pairPoints,
+            summary.pairTotal,
+            summary.pairTarget,
           ),
         ];
       case SchieberRoundSummary():
@@ -246,11 +253,10 @@ extension GameTexts on AppLocalizations {
   /// Rangliste am Spielende.
   List<String> rankingLines(GameState game) {
     if (game.isBieter) {
-      final ranked = [...game.players]..sort((a, b) => b.totalScore - a.totalScore);
-      return [
-        for (var index = 0; index < ranked.length; index += 1)
-          rankingLine(index + 1, ranked[index].name, ranked[index].totalScore),
-      ];
+      final solo = game.players[game.soloPlayer];
+      final soloLine = rankingBieter(solo.name, solo.totalScore, game.soloTarget);
+      final pairLine = rankingBieter(pairName(game), game.pairScore, game.pairTarget);
+      return solo.totalScore >= game.soloTarget ? [soloLine, pairLine] : [pairLine, soloLine];
     }
     final ranked = [...game.teams]..sort((a, b) => b.totalScore - a.totalScore);
     return [

@@ -189,7 +189,7 @@ void main() {
       BieterRoundSummary playRound(BieterScoring scoring) {
         var state = step(bieter(scoring, seed: 77), const StartRound());
         final [first, second, third] = state.biddingOrder;
-        state = step(state, PlaceBid(first, 100));
+        state = step(state, PlaceBid(first, 450));
         state = step(state, PassBid(second));
         state = step(state, PassBid(third));
         state = step(state, ChooseMode(state.currentPlayer, RoundMode.schilten));
@@ -199,16 +199,17 @@ void main() {
       final einfach = playRound(BieterScoring.einfach);
       final wieSchieber = playRound(BieterScoring.schieber);
 
-      expect(einfach.bid, 100, reason: 'Geboten wird in Stichpunkten');
-      expect(wieSchieber.bid, 100, reason: 'Das Gebot bleibt gleich');
+      expect(einfach.bid, 450, reason: 'Das Gebot gilt fuer die ganze Partie');
+      expect(wieSchieber.bid, 450, reason: 'Das Gebot bleibt gleich');
       expect(einfach.multiplier, 1);
       expect(wieSchieber.multiplier, 2, reason: 'Schilten zaehlt doppelt');
-      expect(wieSchieber.soloGain.abs(), einfach.soloGain.abs() * 2);
       expect(
-        einfach.soloPoints,
         wieSchieber.soloPoints,
-        reason: 'Gleiche Karten, gleiche Stichpunkte',
+        einfach.soloPoints * 2,
+        reason: 'Gleiche Karten, die Rundenpunkte zaehlen doppelt',
       );
+      expect(wieSchieber.pairPoints, einfach.pairPoints * 2);
+      expect(einfach.soloPoints + einfach.pairPoints, 157, reason: '152 Kartenpunkte plus 5');
     });
   });
 }

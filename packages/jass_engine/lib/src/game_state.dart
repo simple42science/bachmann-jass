@@ -128,7 +128,7 @@ final class GameState {
   }
 
   /// Erhoehen, sobald sich das JSON-Format inkompatibel aendert.
-  static const int schemaVersion = 1;
+  static const int schemaVersion = 2;
 
   final GameVariant variant;
   final MatchConfig matchConfig;
@@ -159,7 +159,8 @@ final class GameState {
 
   final RoundMode? roundMode;
 
-  /// Bieter im Bieterjass, sonst -1.
+  /// Bieterjass: der Bieter der ganzen Partie (steht nach dem Steigern in
+  /// Runde 1 fest), sonst -1.
   final int soloPlayer;
   final int chooserPlayer;
 
@@ -202,6 +203,21 @@ final class GameState {
   bool get isSchieber => variant == GameVariant.schieber;
 
   int get targetScore => matchConfig.targetScore;
+
+  /// Bieterjass: Ziel des Bieters ist sein Gebot, Ziel der beiden anderen
+  /// das Punkteziel der Partie.
+  int get soloTarget => highestBid;
+
+  int get pairTarget => targetScore;
+
+  /// Bieterjass: Punktestand der beiden, die zusammen spielen (beide gleich).
+  int get pairScore =>
+      soloPlayer < 0 ? 0 : players.firstWhere((player) => player.id != soloPlayer).totalScore;
+
+  /// Bieterjass: Punkte der beiden anderen in der laufenden Runde.
+  int get pairRoundPoints => soloPlayer < 0
+      ? 0
+      : players.where((player) => player.id != soloPlayer).fold(0, (sum, p) => sum + p.pointsWon);
 
   /// Spielart des laufenden Stichs (im Slalom wechselnd).
   RoundMode? get trickMode => roundMode?.trickMode(trickNumber);

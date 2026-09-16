@@ -81,8 +81,12 @@ void main() {
     expect(session.state.phase, GamePhase.bidding);
     expect(find.byType(BidPanel), findsOneWidget);
 
-    // Der Mensch bietet 157, die Computer passen darauf.
-    await tester.tap(find.widgetWithText(FilledButton, '157'));
+    // Der Mensch bietet weit ueber der Schmerzgrenze der Computer (650); sie passen.
+    for (var i = 0; i < 6; i += 1) {
+      await tester.tap(find.byKey(const Key('bid-plus-big')));
+      await tester.pump();
+    }
+    await tester.tap(find.byKey(const Key('bid-offer')));
     await tester.pumpAndSettle();
     await settleUntilHuman(tester, container);
     await tester.pumpAndSettle();

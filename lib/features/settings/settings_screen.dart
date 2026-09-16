@@ -157,15 +157,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       onChanged: (v) =>
                           _update((s) => s.copyWith(rules: rules.copyWith(stoeckPoints: v))),
                     ),
-                    _Stepper(
-                      title: texts.ruleForcedBid,
-                      value: rules.forcedDealerBid,
-                      min: 60,
-                      max: 100,
-                      step: 10,
-                      onChanged: (v) =>
-                          _update((s) => s.copyWith(rules: rules.copyWith(forcedDealerBid: v))),
-                    ),
                     _Switch(
                       title: texts.ruleFourSixes,
                       value: rules.fourSixesCount,

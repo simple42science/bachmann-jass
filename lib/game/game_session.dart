@@ -56,7 +56,7 @@ final class GameSession {
 
 /// Hat der Mensch (Sitz 0) die Partie gewonnen?
 bool humanWon(GameState game, GameOver event) =>
-    game.isSchieber ? event.winnerTeam == game.players[0].teamId : event.winnerPlayer == 0;
+    event.winnerTeam != null ? event.winnerTeam == game.players[0].teamId : event.winnerPlayer == 0;
 
 /// Der Spieler, dessen Jubel in `assets/sounds/` liegt.
 const String cheeringPlayer = 'Yannick';
@@ -69,7 +69,10 @@ bool cheeringPlayerWon(GameState game, GameOver event) {
     if (player.name.trim().toLowerCase() != cheeringPlayer.toLowerCase()) {
       continue;
     }
-    if (game.isSchieber ? player.teamId == event.winnerTeam : index == event.winnerPlayer) {
+    final won = event.winnerTeam != null
+        ? player.teamId == event.winnerTeam
+        : index == event.winnerPlayer;
+    if (won) {
       return true;
     }
   }

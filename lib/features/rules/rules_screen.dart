@@ -112,9 +112,9 @@ class RulesScreen extends ConsumerWidget {
                       bullets: [
                         texts.rulesBieter1,
                         texts.rulesBieter2,
-                        texts.rulesBieter3(rules.forcedDealerBid),
-                        texts.rulesBieter4,
-                        texts.rulesBieter5(GameVariant.bieter.defaultTargetScore),
+                        texts.rulesBieter3,
+                        texts.rulesBieter4(GameVariant.bieter.defaultTargetScore),
+                        texts.rulesBieter5,
                       ],
                     ),
                   ],

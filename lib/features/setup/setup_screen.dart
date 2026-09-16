@@ -21,10 +21,14 @@ class SetupScreen extends ConsumerStatefulWidget {
 class _SetupScreenState extends ConsumerState<SetupScreen> {
   late AppSettings _draft = ref.read(settingsProvider);
   late final TextEditingController _name = TextEditingController(text: _draft.playerName);
+  late final TextEditingController _startBid = TextEditingController(
+    text: bieterStartBids.contains(_draft.bieterStartBid) ? '' : '${_draft.bieterStartBid}',
+  );
 
   @override
   void dispose() {
     _name.dispose();
+    _startBid.dispose();
     super.dispose();
   }
 
@@ -142,6 +146,45 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                             selected: _draft.bieterScoring == scoring,
                             onTap: () => _change((s) => s.copyWith(bieterScoring: scoring)),
                           ),
+                      ],
+                    ),
+                    SectionHead(
+                      title: texts.startBidLabel,
+                      hint: texts.startBidHint(GameVariant.bieter.defaultTargetScore),
+                    ),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        for (final value in bieterStartBids)
+                          OptionTile(
+                            title: '$value',
+                            selected: _draft.bieterStartBid == value,
+                            minWidth: 72,
+                            onTap: () {
+                              _startBid.clear();
+                              _change((s) => s.copyWith(bieterStartBid: value));
+                            },
+                          ),
+                        SizedBox(
+                          width: 150,
+                          child: TextField(
+                            controller: _startBid,
+                            keyboardType: TextInputType.number,
+                            maxLength: 4,
+                            decoration: InputDecoration(
+                              hintText: texts.startBidCustom,
+                              counterText: '',
+                            ),
+                            onChanged: (raw) {
+                              final value = int.tryParse(raw.trim());
+                              if (value != null && value >= minStartBid && value <= maxBid) {
+                                _change((s) => s.copyWith(bieterStartBid: value));
+                              }
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ] else ...[

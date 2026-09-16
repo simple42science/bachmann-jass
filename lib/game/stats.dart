@@ -56,7 +56,7 @@ final class GameStats {
   final Map<String, VariantStats> byVariant;
   final int roundsPlayed;
 
-  /// Gebote des Menschen im Bieterjass.
+  /// Partien des Menschen als Bieter, und wie viele davon er gewann.
   final int bidsAttempted;
   final int bidsMade;
   final int highestWeis;
@@ -79,12 +79,8 @@ final class GameStats {
     var next = this;
     for (final event in events) {
       switch (event) {
-        case RoundScored(summary: final BieterRoundSummary summary):
-          next = next.copyWith(
-            roundsPlayed: next.roundsPlayed + 1,
-            bidsAttempted: next.bidsAttempted + (summary.soloPlayer == 0 ? 1 : 0),
-            bidsMade: next.bidsMade + (summary.soloPlayer == 0 && summary.succeeded ? 1 : 0),
-          );
+        case RoundScored(summary: BieterRoundSummary()):
+          next = next.copyWith(roundsPlayed: next.roundsPlayed + 1);
         case RoundScored(summary: final SchieberRoundSummary summary):
           final ownTeam = game.players[0].teamId;
           next = next.copyWith(
@@ -99,11 +95,15 @@ final class GameStats {
           final won = humanWon(game, over);
           final key = keyFor(game);
           final current = next.byVariant[key] ?? const VariantStats();
+          // Partien, in denen der Mensch der Bieter war, und wie oft er sie gewann.
+          final asSolo = game.isBieter && game.soloPlayer == 0;
           next = next.copyWith(
             byVariant: {
               ...next.byVariant,
               key: VariantStats(played: current.played + 1, won: current.won + (won ? 1 : 0)),
             },
+            bidsAttempted: next.bidsAttempted + (asSolo ? 1 : 0),
+            bidsMade: next.bidsMade + (asSolo && won ? 1 : 0),
           );
         default:
           break;

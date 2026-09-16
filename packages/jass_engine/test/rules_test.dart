@@ -124,42 +124,95 @@ void main() {
   });
 
   group('Steigern im Bieterjass', () {
-    GameState dealt() => step(createGame(variant: GameVariant.bieter, seed: 1), const StartRound());
+    GameState dealt({int startBid = 450}) => step(
+      createGame(
+        variant: GameVariant.bieter,
+        seed: 1,
+        matchConfig: MatchConfig(targetScore: 1000, bieterStartBid: startBid),
+      ),
+      const StartRound(),
+    );
 
-    test('gesteigert wird, bis alle bis auf einen passen', () {
+    test('gesteigert wird ab dem Anfangsgebot, bis alle bis auf einen passen', () {
       var state = dealt();
       final [first, second, third] = state.biddingOrder;
 
-      state = step(state, PlaceBid(first, 60));
+      expect(minimumBid(state), 450);
+      state = step(state, PlaceBid(first, 450));
       expect(state.currentPlayer, second);
-      state = step(state, PlaceBid(second, 80));
+      expect(minimumBid(state), 460);
+      state = step(state, PlaceBid(second, 500));
       expect(state.currentPlayer, third);
       state = step(state, PassBid(third));
       expect(state.currentPlayer, first, reason: 'Der erste Bieter darf nachziehen');
-      state = step(state, PlaceBid(first, 100));
+      state = step(state, PlaceBid(first, 530));
       expect(state.currentPlayer, second);
       state = step(state, PassBid(second));
 
       expect(state.phase, GamePhase.chooseTrump);
       expect(state.soloPlayer, first);
-      expect(state.highestBid, 100);
+      expect(state.highestBid, 530);
+      expect(state.soloTarget, 530);
+      expect(state.pairTarget, 1000);
+      expect(state.players[first].teamId, 0);
+      expect(state.players.where((p) => p.id != first).map((p) => p.teamId), everyElement(1));
     });
 
-    test('passen alle, spielt der Geber mit 60', () {
-      var state = dealt();
+    test('passen alle, spielt der Geber mit dem Anfangsgebot', () {
+      var state = dealt(startBid: 500);
       for (final seat in state.biddingOrder) {
         state = step(state, PassBid(seat));
       }
       expect(state.phase, GamePhase.chooseTrump);
       expect(state.soloPlayer, state.dealer);
-      expect(state.highestBid, 60);
+      expect(state.highestBid, 500);
     });
 
-    test('ein zu tiefes Gebot ist ungueltig', () {
+    test('ein zu tiefes oder unsinniges Gebot ist ungueltig', () {
       final state = dealt();
       final [first, second, _] = state.biddingOrder;
-      final afterBid = step(state, PlaceBid(first, 80));
-      expect(() => applyAction(afterBid, PlaceBid(second, 70)), throwsA(isA<GameRuleException>()));
+      expect(() => applyAction(state, PlaceBid(first, 440)), throwsA(isA<GameRuleException>()));
+      expect(() => applyAction(state, PlaceBid(first, 5000)), throwsA(isA<GameRuleException>()));
+      final afterBid = step(state, PlaceBid(first, 480));
+      expect(() => applyAction(afterBid, PlaceBid(second, 485)), throwsA(isA<GameRuleException>()));
+      expect(step(afterBid, PlaceBid(second, 490)).highestBid, 490);
+    });
+
+    test('der Bieter bleibt die ganze Partie und die Seiten sammeln auf ihr Ziel', () {
+      var state = dealt();
+      final [first, second, third] = state.biddingOrder;
+      state = step(state, PlaceBid(first, 450));
+      state = step(state, PassBid(second));
+      state = step(state, PassBid(third));
+      final solo = state.soloPlayer;
+
+      var rounds = 0;
+      while (state.phase != GamePhase.gameOver && rounds < 40) {
+        while (state.phase != GamePhase.roundEnd && state.phase != GamePhase.gameOver) {
+          state = applyAction(state, aiDecide(state) ?? const NextTrick()).state;
+        }
+        final summary = state.roundSummary! as BieterRoundSummary;
+        expect(summary.soloPlayer, solo);
+        expect(summary.bid, 450);
+        expect(state.players[solo].totalScore, summary.soloTotal);
+        expect(state.pairScore, summary.pairTotal);
+        rounds += 1;
+        if (state.phase == GamePhase.roundEnd) {
+          state = step(state, const StartRound());
+          expect(state.phase, GamePhase.chooseTrump, reason: 'kein zweites Steigern');
+          expect(state.soloPlayer, solo);
+          expect(state.currentPlayer, (state.dealer + 1) % 3, reason: 'die Vorhand sagt reihum an');
+        }
+      }
+      expect(state.phase, GamePhase.gameOver);
+      final last = state.roundSummary! as BieterRoundSummary;
+      expect(last.soloWon || last.pairWon, isTrue);
+      if (last.soloWon) {
+        expect(state.players[solo].totalScore, greaterThanOrEqualTo(450));
+      } else {
+        expect(state.pairScore, greaterThanOrEqualTo(1000));
+        expect(state.players[solo].totalScore, lessThan(450));
+      }
     });
   });
 

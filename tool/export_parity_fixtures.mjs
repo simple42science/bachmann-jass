@@ -36,18 +36,14 @@ const deckIndex = new Map(engine.createDeck().map((card, index) => [card.id, ind
 const cardChar = (card) => CHARS[deckIndex.get(card.id)];
 const encodeHand = (hand) => hand.map(cardChar).join('');
 
+// Nur Schieber: Der Bieterjass der App folgt den Familienregeln (Steigern fuer die
+// ganze Partie), nicht mehr dem Bieterjass der Web-App.
 const CONFIGS = [
   ['schieber_1000_einfach', 'schieber', { targetScore: 1000, difficulty: 'einfach' }, 8],
   ['schieber_1000_normal', 'schieber', { targetScore: 1000, difficulty: 'normal' }, 8],
   ['schieber_1000_schwer', 'schieber', { targetScore: 1000, difficulty: 'schwer' }, 8],
   ['schieber_2500_normal', 'schieber', { targetScore: 2500, difficulty: 'normal' }, 3],
-  ['bieter_einfach_einfach', 'bieter', { scoring: 'einfach', difficulty: 'einfach' }, 4],
-  ['bieter_einfach_normal', 'bieter', { scoring: 'einfach', difficulty: 'normal' }, 4],
-  ['bieter_einfach_schwer', 'bieter', { scoring: 'einfach', difficulty: 'schwer' }, 4],
-  ['bieter_schieber_normal', 'bieter', { scoring: 'schieber', difficulty: 'normal' }, 4],
-  ['bieter_schieber_schwer', 'bieter', { scoring: 'schieber', difficulty: 'schwer' }, 4],
   ['schieber_slalom_schwer', 'schieber', { targetScore: 1000, difficulty: 'schwer' }, 3, { mode: 'slalom' }],
-  ['bieter_allepassen_normal', 'bieter', { scoring: 'schieber', difficulty: 'normal' }, 2, { bid: 'pass' }],
 ];
 
 const coverage = {

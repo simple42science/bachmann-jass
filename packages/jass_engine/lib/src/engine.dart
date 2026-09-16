@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'actions.dart';
 import 'cards.dart';
 import 'dealing.dart';
@@ -152,7 +154,9 @@ GameState _startRound(GameState state, List<GameEvent> events) {
   final rng = Mulberry32(state.rngState);
   final hands = dealHands(playerCount, state.variant.dealPacketSize, dealer, rng);
 
-  var forehand = -1;
+  // Bieterjass: die Vorhand (nach dem Geber) sagt reihum an, auch fuer den
+  // Bieter gilt keine Ausnahme. Beim Steigern ist sie die erste Bieterin.
+  var forehand = state.isBieter ? (dealer + 1) % playerCount : -1;
   if (state.isSchieber) {
     // Die Rosen 7 bestimmt nur den ersten Geber. Danach ruecken Geber und
     // Vorhand jede Runde gemeinsam weiter.
@@ -165,13 +169,15 @@ GameState _startRound(GameState state, List<GameEvent> events) {
     }
   }
 
+  // Im Bieterjass gilt das Gebot aus Runde 1 fuer die ganze Partie.
+  final keepBidding = state.isBieter && state.soloPlayer >= 0;
   final dealt = state.copyWith(
     rngState: rng.state,
     players: [
       for (var index = 0; index < playerCount; index += 1)
         state.players[index].copyWith(
           hand: sortPlayerHand(hands[index]),
-          bid: null,
+          bid: keepBidding ? state.players[index].bid : null,
           tricksWon: 0,
           pointsWon: 0,
         ),
@@ -181,10 +187,10 @@ GameState _startRound(GameState state, List<GameEvent> events) {
     currentPlayer: 0,
     biddingOrder: const [],
     biddingPassed: const [],
-    highestBid: 0,
-    highestBidder: -1,
+    highestBid: keepBidding ? state.highestBid : 0,
+    highestBidder: keepBidding ? state.highestBidder : -1,
     roundMode: null,
-    soloPlayer: -1,
+    soloPlayer: keepBidding ? state.soloPlayer : -1,
     chooserPlayer: -1,
     forehandPlayer: forehand,
     trumpWasPushed: false,
@@ -208,6 +214,16 @@ GameState _startRound(GameState state, List<GameEvent> events) {
   );
 
   if (state.isBieter) {
+    if (keepBidding) {
+      events.add(
+        RoundStarted(roundNumber: dealt.roundNumber, dealer: dealer, firstPlayer: forehand),
+      );
+      return dealt.copyWith(
+        chooserPlayer: forehand,
+        currentPlayer: forehand,
+        phase: GamePhase.chooseTrump,
+      );
+    }
     final order = [
       for (var offset = 1; offset <= playerCount; offset += 1) (dealer + offset) % playerCount,
     ];
@@ -229,18 +245,24 @@ GameState _startRound(GameState state, List<GameEvent> events) {
   );
 }
 
-/// Gebot oder Passen (`value == 0`) im Bieterjass.
+/// Tiefstes Gebot, das gerade noch erlaubt ist.
+int minimumBid(GameState state) =>
+    math.max(state.matchConfig.bieterStartBid, state.highestBid + bidStep);
+
+/// Gebot oder Passen (`value == 0`) im Bieterjass. Gesteigert wird zu Beginn
+/// der Partie: Der Hoechstbietende spielt die ganze Partie alleine und muss
+/// sein Gebot erreichen, bevor die beiden anderen das Punkteziel erreichen.
 GameState _bid(GameState state, int playerIndex, int value, List<GameEvent> events) {
   if (!state.isBieter) {
     throw const GameRuleException(RuleViolation.wrongVariant, 'Gebote gibt es nur im Bieterjass');
   }
   requirePhase(state, const {GamePhase.bidding});
   requireTurn(state, playerIndex);
-  if (value != 0 && !state.rules.bidValues.contains(value)) {
+  if (value < 0 || value > maxBid) {
     throw GameRuleException(RuleViolation.invalidBid, '$value');
   }
-  if (value != 0 && value <= state.highestBid) {
-    throw GameRuleException(RuleViolation.bidTooLow, '$value <= ${state.highestBid}');
+  if (value != 0 && value < minimumBid(state)) {
+    throw GameRuleException(RuleViolation.bidTooLow, '$value < ${minimumBid(state)}');
   }
 
   final players = replacedAt(
@@ -275,7 +297,7 @@ GameState _finishBidding(GameState state, List<GameEvent> events) {
   var next = state;
   final allPassed = state.highestBidder == -1;
   if (allPassed) {
-    final forced = state.rules.forcedDealerBid;
+    final forced = state.matchConfig.bieterStartBid;
     next = state.copyWith(
       highestBidder: state.dealer,
       highestBid: forced,
@@ -290,10 +312,16 @@ GameState _finishBidding(GameState state, List<GameEvent> events) {
   events.add(
     BiddingWon(playerIndex: next.highestBidder, bid: next.highestBid, allPassed: allPassed),
   );
+  // Ab jetzt stehen die Seiten fest: der Bieter (Team 0) gegen die beiden
+  // anderen (Team 1). Angesagt wird wie in jeder Runde von der Vorhand.
+  final solo = next.highestBidder;
   return next.copyWith(
-    soloPlayer: next.highestBidder,
-    currentPlayer: next.highestBidder,
-    chooserPlayer: next.highestBidder,
+    players: [
+      for (final player in next.players) player.copyWith(teamId: player.id == solo ? 0 : 1),
+    ],
+    soloPlayer: solo,
+    currentPlayer: next.forehandPlayer,
+    chooserPlayer: next.forehandPlayer,
     phase: GamePhase.chooseTrump,
   );
 }
@@ -316,7 +344,7 @@ GameState _chooseMode(GameState state, int playerIndex, RoundMode mode, List<Gam
     throw GameRuleException(RuleViolation.modeNotAllowed, mode.name);
   }
 
-  final leader = state.isBieter ? state.soloPlayer : state.forehandPlayer;
+  final leader = state.forehandPlayer;
   events.add(ModeChosen(playerIndex: playerIndex, mode: mode, leader: leader));
   final next = state.copyWith(roundMode: mode, trickLeader: leader);
 
