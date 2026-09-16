@@ -152,7 +152,7 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | 3.2 | Design-System und Theme | 🟢 | M | 3.1 | ✅ erledigt |
 | 3.3 | Karten-Assets | 🟢 | S | – | ✅ erledigt; Quelle/Lizenz nachtragen |
 | 3.4 | App-Icon und Splash | 🟡 | S | 3.1 | teilweise: bisheriges Icon übernommen |
-| 3.5 | Sound und Haptik | 🟡 | S | 4.3 | offen |
+| 3.5 | Sound und Haptik | 🟡 | S | 4.3 | teilweise: Jubel beim Sieg |
 | 4.1 | Adaptives Tisch-Layout | 🟢 | L | 2.1 | ✅ erledigt |
 | 4.2 | Karten und Hand | 🟢 | M | 3.3, 4.1 | ✅ erledigt (Tippen); Ziehen später |
 | 4.3 | Animationen | 🟢 | L | 4.1, 4.2 | ✅ erledigt |
@@ -163,11 +163,11 @@ bachmann_jass_app/                 Git-Root → github.com/simple42science/bachm
 | 5.2 | Hausregel-Editor | 🟡 | M | 1.2, 2.2 | ✅ erledigt; D5 offen |
 | 5.3 | Gegner und Profile | 🟡 | S | 2.2 | teilweise: Namen und Stärke; Avatare offen |
 | 5.4 | Statistik | 🟢 | S | 2.2 | ✅ erledigt |
-| 5.5 | Debug-Menü | 🟢 | S | 2.1 | ✅ erledigt |
+| 5.5 | Debug-Menü | 🟢 | S | 2.1 | gestrichen (16.09.2026) |
 | 6.1 | Automatisierte Tests | 🟢 | M | Phase 4 | teilweise: Widget- und Ablauftests; Golden-Tests offen |
 | 6.2 | Performance und Barrierefreiheit | 🟡 | M | Phase 4 | offen |
 | 6.3 | Spieltests | 🔴 | M | M3 | offen |
-| 7.1 | Web-Version | 🟡 | S | 6.1 | offen |
+| 7.1 | Web-Version | 🟡 | S | 6.1 | Workflow bereit; D7 offen |
 | 7.2 | Android-Release | 🔴 | M | 6.3 | offen |
 | 7.3 | iOS-Release | 🔴 | M | 6.3 | offen |
 | 7.4 | Web-App ablösen | 🟡 | S | 7.1 | offen |
@@ -318,6 +318,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 
 - Geräusche für Ausspielen, Mischen, Stich einsammeln, Stöck und Match; Haptik beim Ausspielen. Beides einzeln abschaltbar.
 - 🔴 Sounds aus lizenzfreien Quellen (CC0) auswählen oder selbst aufnehmen. Ein echtes „Stöck!" aus der Familie wäre ein schöner Akzent.
+- **Stand:** teilweise. Beim Sieg des Menschen spielt die App „Uuh yeah“ (`assets/sounds/uuh_yeah.m4a`, über `audioplayers`), abschaltbar unter Einstellungen → Ton, Standard an. Weitere Klänge und Haptik sind offen.
 
 ### Phase 4 – Spieltisch
 
@@ -371,10 +372,10 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 
 - Stufenloses Tempo mit den Presets Langsam, Normal und Schnell, dazu eine Pause.
 - Automatisch spielen, wenn nur eine Karte erlaubt ist.
-- Tipp-Knopf: zeigt die Karte, die die Stufe „Schwer" spielen würde.
+- ~~Tipp-Knopf~~ – auf Wunsch gestrichen (16.09.2026).
 - Zug zurücknehmen, nur gegen Computer und abschaltbar.
 - Bestätigung vor dem Ausspielen, Layout für Links- und Rechtshänder.
-- **Stand:** ✅ Tempo-Regler (30–200 %), Vorgaben Langsam/Normal/Schnell bleiben im Menü, automatisch spielen bei einziger erlaubter Karte, Tipp-Knopf (zeigt den Zug der Stufe Schwer), Zug zurücknehmen (bis 20 Züge, nimmt auch die Computerzüge danach zurück), Bestätigen per zweitem Tippen. Links-/Rechtshänder-Layout ist offen.
+- **Stand:** ✅ Tempo-Regler (30–200 %), Vorgaben Langsam/Normal/Schnell bleiben im Menü, automatisch spielen bei einziger erlaubter Karte, Zug zurücknehmen (standardmässig aus; bis 20 Züge, nimmt auch die Computerzüge danach zurück), Bestätigen per zweitem Tippen. Der Tipp-Knopf wurde auf Wunsch wieder entfernt. Links-/Rechtshänder-Layout ist offen.
 
 #### AP 5.2 Hausregel-Editor · 🟡 Claude + Input · M
 
@@ -397,7 +398,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 #### AP 5.5 Debug-Menü · 🟢 Claude · S
 
 - Nur in Debug-Builds: Seed setzen, Gegnerkarten aufdecken, Handverteilung vorgeben (zum Beispiel für ein Stöck-Szenario), KI gegen KI zuschauen, Partie aus Seed und Aktionen nachspielen.
-- **Stand:** ✅ Debug-Screen (nur Debug- und Demo-Builds): Seed der laufenden Partie, Partie aus Seed starten, Gegnerkarten aufdecken, „KI spielt für mich“. Dazu der Demo-Start per URL (`?demo=schieber&seed=5&moves=4&screen=scoreboard`), genutzt vom Screenshot-Werkzeug.
+- **Stand:** gestrichen. Der Debug-Screen wurde auf Wunsch am 16.09.2026 komplett entfernt. Geblieben ist nur der Demo-Start per URL in Builds mit `--dart-define=JASS_DEMO=true` (`?demo=schieber&seed=5&moves=4&screen=scoreboard`), den das Screenshot-Werkzeug braucht; normale Builds kennen ihn nicht.
 
 ### Phase 6 – Qualität
 
@@ -424,6 +425,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 #### AP 7.1 Web-Version · 🟡 Claude + Input · S
 
 - `flutter build web` und Deploy per GitHub Action.
+- **Stand:** Workflow `.github/workflows/deploy-web.yml` liegt bereit (Build mit `--base-href /bachmann-jass/`, Deploy auf GitHub Pages bei jedem Push auf `main`). Er läuft erst, wenn Pages im Repo aktiviert ist, siehe D7.
 - 🟡 Hosting wählen (D7). GitHub Pages funktioniert nur mit öffentlichem Repo oder kostenpflichtigem GitHub-Plan. Cloudflare Pages und Firebase Hosting haben beide eine Gratisstufe.
 
 #### AP 7.2 Android-Release · 🔴 Deine Hilfe · M
@@ -459,7 +461,7 @@ Ziel dieser Phase: Die Dart-Engine verhält sich nachweislich genau wie `game-en
 | D4 | Designrichtung | nach den Mockups aus AP 3.1 | AP 3.2 | ✅ Stammtisch |
 | D5 | Standard-Hausregeln | heutige Werte der Web-App als Preset „Bachmann" | AP 5.2 | offen |
 | D6 | Rechte an den Kartenbildern | klären, bevor Store-Screenshots entstehen | AP 7.2 | ✅ nutzbar (Open Source); Quelle und Lizenz im Repo vermerken |
-| D7 | Web-Hosting und Repo-Sichtbarkeit | Repo privat lassen, Web auf Cloudflare Pages | AP 7.1 | offen |
+| D7 | Web-Hosting und Repo-Sichtbarkeit | Repo öffentlich machen und GitHub Pages nutzen (Workflow liegt bereit); sonst Cloudflare Pages | AP 7.1 | offen |
 | D8 | Online-Spiel nach 1.0 | erst nach den Spieltests entscheiden | Phase 8 | offen |
 
 ---

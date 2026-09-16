@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jass_engine/jass_engine.dart';
 
-import '../../app/debug_state.dart';
 import '../../app/router.dart';
 import '../../app/settings.dart';
 import '../../app/theme.dart';
@@ -24,7 +23,7 @@ import 'widgets/score_bar.dart';
 import 'widgets/seat_label.dart';
 import 'widgets/trick_view.dart';
 
-enum _MenuAction { speed, trickReview, scoreboard, rules, settings, debug, abandon }
+enum _MenuAction { speed, trickReview, scoreboard, rules, settings, abandon }
 
 class TableScreen extends ConsumerWidget {
   const TableScreen({super.key});
@@ -101,8 +100,6 @@ class TableScreen extends ConsumerWidget {
                   context.go(Routes.rules);
                 case _MenuAction.settings:
                   context.go(Routes.settings);
-                case _MenuAction.debug:
-                  context.go(Routes.debug);
                 case _MenuAction.abandon:
                   _confirmAbandon(context, ref);
               }
@@ -117,8 +114,6 @@ class TableScreen extends ConsumerWidget {
               PopupMenuItem(value: _MenuAction.scoreboard, child: Text(texts.menuScoreboard)),
               PopupMenuItem(value: _MenuAction.rules, child: Text(texts.menuRules)),
               PopupMenuItem(value: _MenuAction.settings, child: Text(texts.menuSettings)),
-              if (debugMenuAvailable)
-                PopupMenuItem(value: _MenuAction.debug, child: Text(texts.menuDebug)),
               const PopupMenuDivider(),
               PopupMenuItem(value: _MenuAction.abandon, child: Text(texts.menuAbandon)),
             ],
@@ -156,9 +151,6 @@ class _TableStageState extends ConsumerState<_TableStage> {
   /// Beim Bestaetigen: die zuerst angetippte Karte.
   JassCard? _selected;
 
-  /// Vom Tipp empfohlene Karte.
-  JassCard? _hint;
-
   GameSession get session => widget.session;
 
   TableGeometry get geometry => widget.geometry;
@@ -168,7 +160,6 @@ class _TableStageState extends ConsumerState<_TableStage> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.session.revision != widget.session.revision) {
       _selected = null;
-      _hint = null;
     }
   }
 
@@ -198,28 +189,6 @@ class _TableStageState extends ConsumerState<_TableStage> {
     _act(PlayCard(0, card));
   }
 
-  void _showHint() {
-    final texts = AppLocalizations.of(context);
-    final action = ref.read(gameControllerProvider.notifier).hint();
-    switch (action) {
-      case PlayCard(:final card):
-        setState(() => _hint = card);
-        _notify(texts.hintCard(texts.card(card)));
-      case PlaceBid(:final value):
-        _notify(texts.hintBid(value));
-      case PassBid():
-        _notify(texts.hintPass);
-      case PushTrump():
-        _notify(texts.hintPush);
-      case ChooseMode(:final mode):
-        _notify(texts.hintMode(texts.modeWithTrump(mode)));
-      case DeclareWeis():
-        _notify(texts.hintWeis);
-      default:
-        _notify(texts.hintNone);
-    }
-  }
-
   void _notify(String message) {
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
@@ -245,7 +214,6 @@ class _TableStageState extends ConsumerState<_TableStage> {
     final motion = widget.motion;
     final game = session.state;
     final seats = seatsFor(game.variant);
-    final reveal = ref.watch(revealHandsProvider);
     final humanPlaying = session.humanTurn && game.phase == GamePhase.playing && !session.paused;
     final playable = humanPlaying ? playableCards(game, 0).toSet() : const <JassCard>{};
     final showTrick = game.phase != GamePhase.roundEnd && game.phase != GamePhase.gameOver;
@@ -277,7 +245,6 @@ class _TableStageState extends ConsumerState<_TableStage> {
                     badge: texts.seatBadge(game, playerIndex),
                     active: game.isInteractive && game.currentPlayer == playerIndex,
                     cards: game.players[playerIndex].hand.length,
-                    revealed: reveal ? game.players[playerIndex].hand : null,
                   ),
                 ),
             Positioned.fromRect(
@@ -320,19 +287,11 @@ class _TableStageState extends ConsumerState<_TableStage> {
                     motion: motion,
                     roundNumber: game.roundNumber,
                     selected: _selected,
-                    highlighted: _hint,
                     onTap: _playCard,
                   ),
                 ],
               ),
             ),
-            // Tipp: unten rechts ueber der Hand, nur wenn der Mensch dran ist.
-            if (session.humanTurn && !session.paused)
-              Positioned(
-                right: 12,
-                top: geometry.handRect.top - 44,
-                child: _HintButton(onPressed: _showHint),
-              ),
             Positioned.fromRect(
               rect: geometry.center,
               child: EventToast(session: session, geometry: geometry, motion: motion),
@@ -343,41 +302,6 @@ class _TableStageState extends ConsumerState<_TableStage> {
                 child: _Panel(session: session, onAction: _act),
               ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HintButton extends StatelessWidget {
-  const _HintButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final texts = AppLocalizations.of(context);
-    final colors = context.jass;
-    return Material(
-      color: colors.cream,
-      borderRadius: BorderRadius.circular(4),
-      elevation: 3,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(4),
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.lightbulb_outline, size: 18, color: colors.inkSoft),
-              const SizedBox(width: 4),
-              Text(
-                texts.hintButton,
-                style: JassFonts.ui(size: 13, weight: FontWeight.w800, color: colors.ink),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -442,7 +366,6 @@ class _AiSeat extends StatelessWidget {
     required this.badge,
     required this.active,
     required this.cards,
-    this.revealed,
   });
 
   final TableGeometry geometry;
@@ -454,9 +377,6 @@ class _AiSeat extends StatelessWidget {
   final bool active;
   final int cards;
 
-  /// Debug: die Karten offen zeigen.
-  final List<JassCard>? revealed;
-
   @override
   Widget build(BuildContext context) {
     final label = SeatLabel(name: name, badge: badge, active: active);
@@ -465,7 +385,6 @@ class _AiSeat extends StatelessWidget {
       count: cards,
       motion: motion,
       roundNumber: roundNumber,
-      revealed: revealed,
       quarterTurns: switch (seat) {
         Seat.left => 1,
         Seat.right => 3,

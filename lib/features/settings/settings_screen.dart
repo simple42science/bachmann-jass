@@ -90,6 +90,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       onChanged: (value) => _update((s) => s.copyWith(allowUndo: value)),
                     ),
 
+                    SectionHead(title: texts.settingsSoundSection),
+                    _Switch(
+                      title: texts.settingsWinSound,
+                      subtitle: texts.settingsWinSoundCopy,
+                      value: settings.winSound,
+                      onChanged: (value) => _update((s) => s.copyWith(winSound: value)),
+                    ),
+
                     SectionHead(title: texts.settingsOpponentsSection),
                     Text(
                       texts.settingsOpponentsCopy,

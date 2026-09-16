@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bachmann_jass/app/settings.dart';
 import 'package:bachmann_jass/game/game_controller.dart';
+import 'package:bachmann_jass/game/game_session.dart';
 import 'package:bachmann_jass/game/key_value_store.dart';
 import 'package:bachmann_jass/game/stats.dart';
 import 'package:fake_async/fake_async.dart';
@@ -102,33 +103,52 @@ void main() {
     });
   });
 
-  test('Der Tipp folgt der Stufe Schwer und ist immer erlaubt', () {
-    fakeAsync((async) {
-      final container = makeContainer();
-      final controller = container.read(gameControllerProvider.notifier);
-      controller.startNewGame(
-        variant: GameVariant.bieter,
-        matchConfig: const MatchConfig(targetScore: 1500),
-        playerName: 'Test',
-        seed: 3,
-      );
-      settle(async, container);
-      var hints = 0;
-      for (var guard = 0; guard < 300; guard += 1) {
-        final session = container.read(gameControllerProvider)!;
-        if (session.state.phase == GamePhase.roundEnd) {
-          break;
-        }
-        if (session.humanTurn) {
-          final hint = controller.hint();
-          expect(hint, isNotNull);
-          expect(hint, aiDecide(session.state, difficulty: Difficulty.schwer));
-          hints += 1;
-          expect(controller.act(hint!), isNull);
-        }
-        async.elapse(const Duration(seconds: 1));
+  /// Spielt eine kurze Bieterjass-Partie zu Ende; der Mensch zieht wie die KI.
+  void playToEnd(FakeAsync async, ProviderContainer container) {
+    final controller = container.read(gameControllerProvider.notifier);
+    controller.startNewGame(
+      variant: GameVariant.bieter,
+      matchConfig: const MatchConfig(targetScore: 200),
+      playerName: 'Test',
+      seed: 9,
+    );
+    for (var guard = 0; guard < 4000; guard += 1) {
+      final session = container.read(gameControllerProvider)!;
+      if (session.state.phase == GamePhase.gameOver) {
+        break;
       }
-      expect(hints, greaterThan(5));
+      if (session.state.phase == GamePhase.roundEnd) {
+        expect(controller.act(const StartRound()), isNull);
+      } else if (session.humanTurn) {
+        expect(controller.act(aiDecide(session.state)!), isNull);
+      }
+      async.elapse(const Duration(seconds: 1));
+    }
+    async.flushMicrotasks();
+    expect(container.read(gameControllerProvider)!.state.phase, GamePhase.gameOver);
+  }
+
+  test('Der Jubel ertoent nur beim eigenen Sieg und nur, wenn er eingeschaltet ist', () {
+    fakeAsync((async) {
+      final sound = RecordingSoundPlayer();
+      final container = ProviderContainer(overrides: testOverrides(instantAi: false, sound: sound));
+      addTearDown(container.dispose);
+      playToEnd(async, container);
+      final session = container.read(gameControllerProvider)!;
+      final over = session.events.whereType<GameOver>().single;
+      expect(sound.wins, humanWon(session.state, over) ? 1 : 0);
+
+      final muted = RecordingSoundPlayer();
+      final quiet = ProviderContainer(
+        overrides: testOverrides(
+          instantAi: false,
+          sound: muted,
+          settings: const AppSettings(winSound: false),
+        ),
+      );
+      addTearDown(quiet.dispose);
+      playToEnd(async, quiet);
+      expect(muted.wins, 0);
     });
   });
 
@@ -137,25 +157,7 @@ void main() {
       final store = MemoryKeyValueStore();
       final container = ProviderContainer(overrides: testOverrides(store: store, instantAi: false));
       addTearDown(container.dispose);
-      final controller = container.read(gameControllerProvider.notifier);
-      controller.aiPlaysHuman = true;
-      controller.startNewGame(
-        variant: GameVariant.bieter,
-        matchConfig: const MatchConfig(targetScore: 200),
-        playerName: 'Test',
-        seed: 9,
-      );
-      for (var guard = 0; guard < 4000; guard += 1) {
-        final session = container.read(gameControllerProvider)!;
-        if (session.state.phase == GamePhase.gameOver) {
-          break;
-        }
-        if (session.state.phase == GamePhase.roundEnd) {
-          expect(controller.act(const StartRound()), isNull);
-        }
-        async.elapse(const Duration(seconds: 1));
-      }
-      async.flushMicrotasks();
+      playToEnd(async, container);
 
       final stats = container.read(statsProvider);
       expect(container.read(gameControllerProvider)!.state.phase, GamePhase.gameOver);
@@ -176,7 +178,8 @@ void main() {
       speedFactor: 0.7,
       autoPlaySingleCard: true,
       confirmPlay: true,
-      allowUndo: false,
+      allowUndo: true,
+      winSound: false,
       opponentNames: const ['Anna', 'Beat', 'Cla'],
       opponentDifficulties: const [Difficulty.schwer, null, Difficulty.einfach],
       rules: RuleSet.bachmann.copyWith(bedanken: true, trickReview: TrickReview.all),
@@ -192,6 +195,8 @@ void main() {
     expect(legacy.speed, GameSpeed.schnell);
     expect(legacy.opponentNames, defaultOpponentNames);
     expect(legacy.rules, RuleSet.bachmann);
+    expect(legacy.allowUndo, isFalse);
+    expect(legacy.winSound, isTrue);
 
     final seats = settings.seatsFor(GameVariant.schieber, 'Ich');
     expect(seats.map((s) => s.name), ['Ich', 'Anna', 'Beat', 'Cla']);

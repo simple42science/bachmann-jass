@@ -47,3 +47,7 @@ final class GameSession {
     canUndo: canUndo ?? this.canUndo,
   );
 }
+
+/// Hat der Mensch (Sitz 0) die Partie gewonnen?
+bool humanWon(GameState game, GameOver event) =>
+    game.isSchieber ? event.winnerTeam == game.players[0].teamId : event.winnerPlayer == 0;

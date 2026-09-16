@@ -6,7 +6,7 @@ Die App ersetzt die bisherige Web-App [`bachmann_jass_game`](https://github.com/
 
 ## Stand
 
-Meilenstein M4: Schieber und Bieterjass sind komplett spielbar (Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Pause, Speicherstand), im Design „Stammtisch“ (Holz, Filz, Messing, Tischkarten, Schiefertafel), mit Animationen, Jasstafel mit Z-Tafel-Strichen und Verlauf, Regel-Screen, Einstellungen (Tempo, automatisch spielen, Bestätigen, Zug zurücknehmen, Tipp), Hausregel-Editor (Preset Bachmann, Bedanken, Stich-Rückblick), Gegnernamen und -stärke, Statistik und Debug-Screen. Es fehlen noch Sound, ein eigenes Icon, das Tutorial und Avatare.
+Meilenstein M4: Schieber und Bieterjass sind komplett spielbar (Bieten, Schieben, Spielartwahl, Weis, Stöck, Match, Rundenabrechnung, Spielende, Pause, Speicherstand), im Design „Stammtisch“ (Holz, Filz, Messing, Tischkarten, Schiefertafel), mit Animationen, Jasstafel mit Z-Tafel-Strichen und Verlauf, Regel-Screen, Einstellungen (Tempo, automatisch spielen, Bestätigen, Zug zurücknehmen), Hausregel-Editor (Preset Bachmann, Bedanken, Stich-Rückblick), Gegnernamen und -stärke, Statistik und Jubel beim Sieg. Es fehlen noch weitere Klänge, ein eigenes Icon, das Tutorial und Avatare.
 
 Arbeitspakete, Entscheide und Stand: [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSPLAN.md). Screenshots der Web-Version: [`docs/screenshots/`](docs/screenshots/).
 
@@ -21,14 +21,15 @@ Arbeitspakete, Entscheide und Stand: [`docs/UMSETZUNGSPLAN.md`](docs/UMSETZUNGSP
 ```text
 lib/
   app/        Start, Router, Theme (Design-System Stammtisch), Einstellungen, Demo-Start
-  game/       GameController (Spielablauf, KI-Wartezeiten, Pause, Zurücknehmen, Tipp),
-              Speicherstand, Statistik, Texte
+  game/       GameController (Spielablauf, KI-Wartezeiten, Pause, Zurücknehmen),
+              Speicherstand, Statistik, Ton, Texte
   features/   Screens: Home, Setup, Tisch (Geometrie, Karten, Hand, Panels, Animationen),
-              Jasstafel, Regeln, Einstellungen, Statistik, Debug
+              Jasstafel, Regeln, Einstellungen, Statistik
   l10n/       Texte (ARB, Deutsch)
 packages/jass_engine/   Regeln, Wertung, Computergegner, Zufall (reines Dart)
 assets/cards/           36 Karten als WebP
 assets/fonts/           Vollkorn, Alegreya Sans, Caveat (OFL)
+assets/sounds/          Jubel beim Sieg
 docs/design/            Design-Mockups (Stammtisch, verworfene Richtungen)
 tool/                   Konvertierung, Fixtures aus der Web-App, Screenshots
 ```
@@ -54,6 +55,10 @@ flutter test
 cd packages/jass_engine; dart analyze --fatal-infos; dart test; dart test -p node
 ```
 
+## Web-Version veröffentlichen
+
+[`.github/workflows/deploy-web.yml`](.github/workflows/deploy-web.yml) baut bei jedem Push auf `main` die Web-Version (`--base-href /bachmann-jass/`) und veröffentlicht sie auf GitHub Pages. Dafür einmalig im Repo unter *Settings → Pages* als Source „GitHub Actions“ wählen. GitHub Pages ist gratis für öffentliche Repos; ein privates Repo braucht einen bezahlten GitHub-Plan.
+
 ## Werkzeuge
 
 | Befehl | Zweck |
@@ -70,7 +75,7 @@ Die Werkzeuge, die aus der Web-App lesen, erwarten sie unter `../bachmann_jass_g
 
 ### Demo-Start
 
-Ein Build mit `--dart-define=JASS_DEMO=true` startet über die URL direkt eine reproduzierbare Spielsituation, zum Beispiel `?demo=schieber&seed=5&moves=4` (Schieber mit Seed 5, der Mensch hat seine ersten vier Entscheidungen wie die KI gespielt). `&screen=scoreboard` öffnet die Jasstafel, `&screen=rules` die Regeln, `&screen=settings` die Einstellungen. Computerzüge kommen dabei sofort. Solche Builds zeigen wie Debug-Builds den Debug-Screen (Seed anzeigen und setzen, Gegnerkarten aufdecken, KI spielt für mich). Der Screenshot-Befehl nutzt das:
+Ein Build mit `--dart-define=JASS_DEMO=true` startet über die URL direkt eine reproduzierbare Spielsituation, zum Beispiel `?demo=schieber&seed=5&moves=4` (Schieber mit Seed 5, der Mensch hat seine ersten vier Entscheidungen wie die KI gespielt). `&screen=scoreboard` öffnet die Jasstafel, `&screen=rules` die Regeln, `&screen=settings` die Einstellungen. Computerzüge kommen dabei sofort. Der Screenshot-Befehl nutzt das:
 
 ```powershell
 flutter build web --release --dart-define=JASS_DEMO=true

@@ -43,7 +43,8 @@ final class AppSettings {
     this.speedFactor = 1.0,
     this.autoPlaySingleCard = false,
     this.confirmPlay = false,
-    this.allowUndo = true,
+    this.allowUndo = false,
+    this.winSound = true,
     this.opponentNames = defaultOpponentNames,
     this.opponentDifficulties = const [null, null, null],
     this.rules = RuleSet.bachmann,
@@ -78,7 +79,8 @@ final class AppSettings {
       speedFactor: factor.clamp(minSpeedFactor, maxSpeedFactor),
       autoPlaySingleCard: json['autoPlaySingleCard'] as bool? ?? false,
       confirmPlay: json['confirmPlay'] as bool? ?? false,
-      allowUndo: json['allowUndo'] as bool? ?? true,
+      allowUndo: json['allowUndo'] as bool? ?? false,
+      winSound: json['winSound'] as bool? ?? true,
       opponentNames: names is List && names.length == 3 && names.every((n) => n is String)
           ? [for (final name in names) name as String]
           : defaultOpponentNames,
@@ -114,6 +116,9 @@ final class AppSettings {
 
   /// Der letzte eigene Zug darf zurueckgenommen werden.
   final bool allowUndo;
+
+  /// Jubel, wenn der Mensch eine Partie gewinnt.
+  final bool winSound;
 
   /// Namen der Computergegner auf den Sitzen 1 bis 3 (links, gegenueber, rechts).
   final List<String> opponentNames;
@@ -158,6 +163,7 @@ final class AppSettings {
     bool? autoPlaySingleCard,
     bool? confirmPlay,
     bool? allowUndo,
+    bool? winSound,
     List<String>? opponentNames,
     List<Difficulty?>? opponentDifficulties,
     RuleSet? rules,
@@ -171,6 +177,7 @@ final class AppSettings {
     autoPlaySingleCard: autoPlaySingleCard ?? this.autoPlaySingleCard,
     confirmPlay: confirmPlay ?? this.confirmPlay,
     allowUndo: allowUndo ?? this.allowUndo,
+    winSound: winSound ?? this.winSound,
     opponentNames: opponentNames ?? this.opponentNames,
     opponentDifficulties: opponentDifficulties ?? this.opponentDifficulties,
     rules: rules ?? this.rules,
@@ -186,6 +193,7 @@ final class AppSettings {
     'autoPlaySingleCard': autoPlaySingleCard,
     'confirmPlay': confirmPlay,
     'allowUndo': allowUndo,
+    'winSound': winSound,
     'opponentNames': opponentNames,
     'opponentDifficulties': [for (final level in opponentDifficulties) level?.name],
     'rules': rules.toJson(),

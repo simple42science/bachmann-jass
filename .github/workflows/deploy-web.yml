@@ -1,0 +1,53 @@
+name: Web veroeffentlichen
+
+# Baut die Web-Version und veroeffentlicht sie auf GitHub Pages.
+# Voraussetzung: Settings > Pages > Source = "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Web-Version bauen
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Abhaengigkeiten installieren
+        run: flutter pub get
+
+      # Die Seite liegt unter https://<konto>.github.io/<repo>/, darum der base-href.
+      - name: Fuer GitHub Pages bauen
+        run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    name: Auf GitHub Pages veroeffentlichen
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

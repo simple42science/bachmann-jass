@@ -4,19 +4,31 @@ import 'package:bachmann_jass/app/settings.dart';
 import 'package:bachmann_jass/game/game_controller.dart';
 import 'package:bachmann_jass/game/key_value_store.dart';
 import 'package:bachmann_jass/game/saved_game.dart';
+import 'package:bachmann_jass/game/sound.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
-/// Overrides fuer Tests: Speicher im Arbeitsspeicher, keine Wartezeit vor Computerzuegen.
+/// Zaehlt die Klaenge, statt sie zu spielen.
+final class RecordingSoundPlayer implements SoundPlayer {
+  int wins = 0;
+
+  @override
+  Future<void> playWin() async => wins += 1;
+}
+
+/// Overrides fuer Tests: Speicher im Arbeitsspeicher, keine Wartezeit vor
+/// Computerzuegen, kein Ton.
 List<Override> testOverrides({
   MemoryKeyValueStore? store,
   AppSettings settings = AppSettings.defaults,
   SavedGame? saved,
   bool instantAi = true,
+  SoundPlayer? sound,
 }) => [
   keyValueStoreProvider.overrideWithValue(store ?? MemoryKeyValueStore()),
+  soundPlayerProvider.overrideWithValue(sound ?? RecordingSoundPlayer()),
   initialSettingsProvider.overrideWithValue(settings),
   initialSavedGameProvider.overrideWithValue(saved),
   if (instantAi) aiDelayProvider.overrideWithValue((kind, speed, random) => Duration.zero),

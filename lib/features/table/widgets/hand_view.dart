@@ -26,17 +26,14 @@ class HumanHandView extends StatelessWidget {
     required this.roundNumber,
     required this.onTap,
     this.selected,
-    this.highlighted,
   });
 
   final TableGeometry geometry;
   final List<JassCard> hand;
 
-  /// Beim Bestaetigen zuerst angetippte Karte; steht hoeher.
+  /// Beim Bestaetigen zuerst angetippte Karte; steht hoeher und bekommt
+  /// einen Messingrand.
   final JassCard? selected;
-
-  /// Vom Tipp empfohlene Karte; bekommt einen Messingrand.
-  final JassCard? highlighted;
 
   /// Karten, die gerade gespielt werden duerfen (leer, wenn nicht am Zug).
   final Set<JassCard> playable;
@@ -82,7 +79,7 @@ class HumanHandView extends StatelessWidget {
                   fan: fanTransform(index, hand.length),
                   isPlayable: playable.contains(hand[index]),
                   dimmed: interactive && !playable.contains(hand[index]),
-                  highlighted: hand[index] == highlighted || hand[index] == selected,
+                  highlighted: hand[index] == selected,
                   label: playable.contains(hand[index])
                       ? texts.cardPlayLabel(texts.card(hand[index]))
                       : texts.cardNotPlayableLabel(texts.card(hand[index])),
@@ -171,7 +168,6 @@ class HiddenHandView extends StatelessWidget {
     required this.quarterTurns,
     required this.motion,
     required this.roundNumber,
-    this.revealed,
   });
 
   final TableGeometry geometry;
@@ -179,9 +175,6 @@ class HiddenHandView extends StatelessWidget {
   final int quarterTurns;
   final Motion motion;
   final int roundNumber;
-
-  /// Debug: die Karten offen statt als Ruecken zeigen.
-  final List<JassCard>? revealed;
 
   @override
   Widget build(BuildContext context) {
@@ -208,9 +201,7 @@ class HiddenHandView extends StatelessWidget {
                     Transform.rotate(
                       angle: fanTransform(index, count).angle * 0.6,
                       alignment: Alignment.bottomCenter,
-                      child: revealed != null && index < revealed!.length
-                          ? PlayingCardView(card: revealed![index], size: cardSize)
-                          : CardBackView(size: cardSize),
+                      child: CardBackView(size: cardSize),
                     ),
                   ),
                 ),

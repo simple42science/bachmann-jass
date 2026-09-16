@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jass_engine/jass_engine.dart';
 
 import '../app/bootstrap.dart';
+import 'game_session.dart';
 import 'key_value_store.dart';
 
 /// Partien und Siege je Jassart und Stufe.
@@ -94,8 +95,8 @@ final class GameStats {
           next = next.copyWith(highestWeis: math.max(next.highestWeis, points));
         case StoeckAnnounced(:final playerIndex) when playerIndex == 0:
           next = next.copyWith(stoeck: next.stoeck + 1);
-        case GameOver(:final winnerPlayer, :final winnerTeam):
-          final won = game.isSchieber ? winnerTeam == game.players[0].teamId : winnerPlayer == 0;
+        case final GameOver over:
+          final won = humanWon(game, over);
           final key = keyFor(game);
           final current = next.byVariant[key] ?? const VariantStats();
           next = next.copyWith(

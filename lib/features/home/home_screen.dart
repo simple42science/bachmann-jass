@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../app/debug_state.dart';
 import '../../app/router.dart';
 import '../../app/theme.dart';
 import '../../game/game_controller.dart';
@@ -139,11 +138,6 @@ class HomeScreen extends ConsumerWidget {
                           onPressed: () => context.go(Routes.stats),
                           child: Text(texts.menuStats),
                         ),
-                        if (debugMenuAvailable)
-                          TextButton(
-                            onPressed: () => context.go(Routes.debug),
-                            child: Text(texts.menuDebug),
-                          ),
                       ],
                     ),
                   ],

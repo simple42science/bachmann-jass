@@ -7,6 +7,7 @@ import 'package:jass_engine/jass_engine.dart';
 import '../app/settings.dart';
 import 'game_session.dart';
 import 'saved_game.dart';
+import 'sound.dart';
 import 'stats.dart';
 
 /// Wofuer der Computer gerade Bedenkzeit braucht.
@@ -45,7 +46,6 @@ typedef _UndoEntry = ({GameState state, List<GameEvent> roundEvents});
 class GameController extends Notifier<GameSession?> {
   Timer? _timer;
   bool _pausedBySystem = false;
-  bool _aiPlaysHuman = false;
   final List<_UndoEntry> _undo = [];
   final math.Random _random = math.Random();
 
@@ -53,15 +53,6 @@ class GameController extends Notifier<GameSession?> {
   GameSession? build() {
     ref.onDispose(_cancelTimer);
     return null;
-  }
-
-  /// Debug: die KI trifft auch die Entscheidungen des Menschen.
-  bool get aiPlaysHuman => _aiPlaysHuman;
-
-  set aiPlaysHuman(bool value) {
-    _aiPlaysHuman = value;
-    _cancelTimer();
-    _schedule();
   }
 
   void startNewGame({
@@ -138,15 +129,6 @@ class GameController extends Notifier<GameSession?> {
     _schedule();
   }
 
-  /// Was die Stufe "Schwer" an Stelle des Menschen tun wuerde.
-  GameAction? hint() {
-    final session = state;
-    if (session == null || !session.humanTurn) {
-      return null;
-    }
-    return aiDecide(session.state, difficulty: Difficulty.schwer);
-  }
-
   /// Ein Tipp auf den Tisch ueberspringt die laufende Wartezeit.
   void skipDelay() {
     if (_timer != null) {
@@ -210,6 +192,9 @@ class GameController extends Notifier<GameSession?> {
     );
 
     ref.read(statsProvider.notifier).record(next, events);
+    if (events.any((event) => event is GameOver && humanWon(next, event))) {
+      _celebrate();
+    }
     final saved = ref.read(savedGameProvider.notifier);
     if (next.phase == GamePhase.gameOver) {
       saved.clear();
@@ -228,9 +213,6 @@ class GameController extends Notifier<GameSession?> {
       return null;
     }
     if (game.players[game.currentPlayer].isHuman) {
-      if (_aiPlaysHuman) {
-        return AiDelayKind.autoPlay;
-      }
       final autoPlay = ref.read(settingsProvider).autoPlaySingleCard;
       if (autoPlay && game.phase == GamePhase.playing && playableCards(game, 0).length == 1) {
         return AiDelayKind.autoPlay;
@@ -269,7 +251,7 @@ class GameController extends Notifier<GameSession?> {
     final GameAction? action;
     if (game.phase == GamePhase.trickEnd) {
       action = const NextTrick();
-    } else if (game.isInteractive && game.players[game.currentPlayer].isHuman && !_aiPlaysHuman) {
+    } else if (game.isInteractive && game.players[game.currentPlayer].isHuman) {
       // Automatisches Spielen der einzigen erlaubten Karte.
       final legal = playableCards(game, 0);
       action = legal.length == 1 ? PlayCard(0, legal.single) : null;
@@ -281,6 +263,13 @@ class GameController extends Notifier<GameSession?> {
     }
     final result = applyAction(game, action);
     _publish(result.state, result.events, revision: session.revision + 1);
+  }
+
+  /// Jubel beim Sieg des Menschen, wenn der Ton eingeschaltet ist.
+  void _celebrate() {
+    if (ref.read(settingsProvider).winSound) {
+      unawaited(ref.read(soundPlayerProvider).playWin());
+    }
   }
 
   void _cancelTimer() {

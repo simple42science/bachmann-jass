@@ -983,35 +983,6 @@
       }
     }
   },
-  "hintButton": "Tipp",
-  "hintCard": "Tipp: {card}",
-  "@hintCard": {
-    "placeholders": {
-      "card": {
-        "type": "String"
-      }
-    }
-  },
-  "hintBid": "Tipp: {value} bieten",
-  "@hintBid": {
-    "placeholders": {
-      "value": {
-        "type": "int"
-      }
-    }
-  },
-  "hintPass": "Tipp: passen",
-  "hintPush": "Tipp: schieben",
-  "hintMode": "Tipp: {mode}",
-  "@hintMode": {
-    "placeholders": {
-      "mode": {
-        "type": "String"
-      }
-    }
-  },
-  "hintWeis": "Tipp: Weis melden",
-  "hintNone": "Gerade kein Tipp.",
   "undoButton": "Zug zurücknehmen",
   "confirmPlayHint": "Nochmals tippen, um {card} zu spielen.",
   "@confirmPlayHint": {
@@ -1064,6 +1035,9 @@
   "settingsConfirmPlayCopy": "Das erste Tippen hebt die Karte an, das zweite spielt sie.",
   "settingsUndo": "Zug zurücknehmen erlauben",
   "settingsUndoCopy": "Nimmt den letzten eigenen Zug samt den Computerzügen danach zurück.",
+  "settingsSoundSection": "Ton",
+  "settingsWinSound": "Jubel beim Sieg",
+  "settingsWinSoundCopy": "Spielt «Uuh yeah», wenn du eine Partie gewinnst.",
   "settingsOpponentsSection": "Gegner",
   "settingsOpponentsCopy": "Namen und Stärke der Computer. Im Bieterjass spielen nur links und rechts mit.",
   "seatName": "{seat, select, left{Links} top{Gegenüber} right{Rechts} other{{seat}}}",
@@ -1150,25 +1124,5 @@
   },
   "statsReset": "Statistik löschen",
   "statsResetTitle": "Statistik wirklich löschen?",
-  "statsResetConfirm": "Löschen",
-  "menuDebug": "Debug",
-  "debugTitle": "Debug",
-  "debugCurrentSeed": "Laufende Partie: Seed {seed}, Runde {round}",
-  "@debugCurrentSeed": {
-    "placeholders": {
-      "seed": {
-        "type": "int"
-      },
-      "round": {
-        "type": "int"
-      }
-    }
-  },
-  "debugNoGame": "Keine Partie am Tisch.",
-  "debugSeedLabel": "Seed",
-  "debugStartSchieber": "Schieber mit Seed starten",
-  "debugStartBieter": "Bieterjass mit Seed starten",
-  "debugRevealHands": "Gegnerkarten aufdecken",
-  "debugAiPlaysHuman": "KI spielt für mich",
-  "debugCopy": "Nur in Debug-Builds sichtbar. Mit dem Seed lässt sich jede Partie exakt nachspielen."
+  "statsResetConfirm": "Löschen"
 }
